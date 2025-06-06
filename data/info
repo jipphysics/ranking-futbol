@@ -1,0 +1,83 @@
+El programa get_data.ipynb recopila todos los intervalos de posesion (BPI), calcula as metricas
+en cada uno de estos y luego computa el agregado por partido y por equipo.
+Este programa toma info de la base de datos eventos y matches de L. Pappalardo et al,
+y produce los archivos:
+
+matches.csv:
+
+    contiene metadata de cada uno de los partidos
+
+metrics.csv:
+
+    cada fila tiene las metricas asociadas a un partido de un equipo
+
+ligue2team2rank.json:
+
+    Diccionario que dice el ranking final en la tabla de posiciones para cada equipo de cada liga 
+
+
+
+SIGNIFICADO DE LAS METRICAS
+
+Direct play. 
+Cada vez que hay un pase o un tiro libre en un BPI, 
+medimos la velocidad media en la dirección de ataque, dada por el 
+cociente entre la distancia recorrida por la pelota en el eje $x$ 
+y el tiempo transcurrido. De cada BPI tomamos el valor máximo. 
+Esto nos permite detectar que tan directo hacia la portería 
+rival es el movimiento de la pelota en el equipo.
+
+Counterattack. 
+Dado dos eventos consecutivos en un BPI, si el primero 
+se observa en $x_1<40$ y el segundo en $x_2>60$ a una diferencia 
+temporal $\Delta t$, se informa la velocidad como $v=\frac{x_2-x_1}{\Delta t}$. 
+En otro caso se informa $0$.
+Esto es una medida de que tan rápido un equipo pasa de una posición d
+efensiva en su campo a una ofensiva en campo rival.
+
+Maintenance.
+Dado un BPI, se calcula el promedio de las posiciones en el eje $x$, 
+donde se generaron todos los eventos. Si se cumple $\bar{x}<40$, 
+es decir si los eventos se desarrollaron mayoritariamente en la zona 
+defensiva del equipo,
+se informa el tiempo total de la posesión. En otro caso se informa $0$. 
+Esto nos permite detectar que tanto un equipo decide mantener 
+y construir su juego desde su propio campo.
+
+Build up.
+Si en un BPI se verifica que $\bar{x}>60$, es decir la posesión se 
+desarrolla mayoritariamente en campo rival, se informa el tiempo 
+total de la posesión. En otro caso se informa $0$. Esta métrica informa 
+el tiempo de posesión en situaciones donde el equipo invade fuertemente el campo rival.   
+
+Midfield play. 
+Si en un BPI se observa que $\bar{x}\leq60$ y 
+$\bar{x}\geq40$, es decir la posesión de desarrolla mayoritariamente 
+por el centro del campo de juego, se informa el tiempo total de la posesión, 
+en otro caso se informa $0$.La idea de esta variable es medir el tiempo 
+que el equipo pasa en el sector medio del campo de juego.
+
+Flow rate. 
+En cada BPI donde $\bar{x}\geq50$ se toma la diferencia temporal entre todos 
+los eventos, y se calcula el valor medio, $\bar{dt}$. Luego se define la 
+métrica como $1/\bar{dt}$. De esta manera se tiene una medida de que tan 
+rápido el equipo mueve la pelota en el campo rival.
+
+Crossing. 
+Si en un BPI se observa un evento centro, se informa $1$, en otro caso se informa $0$. 
+Esta métrica sirve para contabilizar los intentos de llegada por vía aérea.
+
+Pressure point.
+De cada BPI se toma el primer evento, y se extrae la posición en la variable $x$, 
+es decir donde el equipo comienza su posición. Esto nos permite medir si el equipo 
+esta recuperando la pelota en su campo, en la zona media o en el campo rival.
+ 
+Pressure loss.
+Si un BPI comienza en un evento donde $x>40$, se informa el tiempo total de la 
+posesión del adversario del BPI inmediatamente anterior. Este métrica es útil 
+para observar si el equipo esta relajando o aumentando el nivel de presión que 
+ejerce sobre el juego del rival en las zonas medias y altas del campo de juego.
+
+Shots.
+Si en un BPI se registra un evento ``Shot", se informa 1, en otro caso se informa $0$. 
+Esta métrica permite contabilizar los tiros al arco de cada equipo.
