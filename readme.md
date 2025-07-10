@@ -1,5 +1,5 @@
 # Ranking Futbol with Higher Order Networks
 
-## Julia environment
+## Setup Julia environment
 
-Please read 
+Please read [setup-julia.md](https://github.com/jipphysics/ranking-futbol/blob/main/setup-julia.md).
