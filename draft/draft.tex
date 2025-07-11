@@ -148,6 +148,17 @@ Theory
 Bla bla...
 
 \section{
+Data
+\label{sec:data}
+}
+
+There are 5 leagues: England, France, Germany, Italy and Spain.
+Each has 20 teams, with the exception of Germany.
+In each league, each pair of teams plays two games, one as the local team and the other as the visitor.
+In each game between the $i$-th and the $j$-th team, different metrics are measured.
+With each metric, a weighted graphs of entries $w_{ij}\in \RR$ is obtained.
+
+\section{
 Results
 \label{sec:results}
 }
@@ -155,13 +166,16 @@ Results
 The following experiments are carried on.
 \begin{enumerate}
 \item 
-Compute ratings and rankings from the full weighted networks.
+Compute ratings and rankings from the full weighted networks $w$ defining $f_{ij}=w_j-w_i$ for each pair $ij$ of a given league.
 
 \item 
 Compute ratings and rankings from sparsified versiond of the weighted networks, by randomly removing a varying fraction of links.
 
 \item 
 Compute ratings and rankings from sparsified versiond of the weighted networks, by removing a varying fraction of links sorted in decreasing order of absolute weight.
+
+\item 
+Compute ratings defining the $f_{ij}=\phi_j-\phi_i$ where the strength $\phi_i = \sum_j w_{ij}$ defines a local potential for the $i$-th team.
 \end{enumerate}
 
 \begin{figure*}
