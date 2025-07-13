@@ -154,8 +154,21 @@ Data
 
 The data comprehends 5 soccer leagues from England, France, Germany, Italy and Spain.
 Each has 20 teams, with the exception of Germany which has 18.
-Each pair of teams of each league plays two games, one as local and another the visitor.
-For each game between two teams $i$ and $j$ of a given league, a score $\phi_{ij}\in \RR$ is provided.
+For each pair of teams $i$ and $j$ of a given league, a score $\phi_{ij}\in \RR$ is provided, which is the aggregate of the two games between them, one as a local and another as a visitor.
+There are ten different types of scores:
+\begin{enumerate}
+\item {\bf crossings:}
+\item {\bf counterattacks:}
+\item {\bf pressure loss:}
+\item {\bf build-up time:}
+\item {\bf direct play:}
+\item {\bf pressure points:}
+\item {\bf shots:}
+\item {\bf flow rate:}
+\item {\bf maintenance time:}
+\item {\bf middle-zone time:}
+\end{enumerate}
+
 
 Each matrix $\phi$ of scores $\phi_{ij}$ defines a fully connected undirected network for the teams in a league.
 In some experiments, some fraction of links is removed from the network according to some criterium, defining a graph $\mathcal{G}$ that is not fully connected.
