@@ -169,7 +169,6 @@ There are ten different types of scores:
 \item {\bf middle-zone time:}
 \end{enumerate}
 
-
 Each matrix $\phi$ of scores $\phi_{ij}$ defines a fully connected undirected network for the teams in a league.
 In some experiments, some fraction of links is removed from the network according to some criterium, defining a graph $\mathcal{G}$ that is not fully connected.
 The graph is promoted to a simplicial complex of 0-simplices, 1-simplices and 2-simplices composed by the nodes, the links and the triplets of connected nodes in $\mathcal{G}$, respectively.
@@ -195,7 +194,7 @@ Compute ratings and rankings from sparsified versiond of the weighted networks o
 Compute ratings and rankings from sparsified versiond of the weighted networks, by removing a varying fraction of the weighted links of the weighted matrix of scores $\phi_{ij}$ sorted in decreasing order of absolute weight.
 
 \item 
-Compute ratings defining the $f_{ij}=\phi_j-\phi_i$ where the strength $\phi_i = \sum_j w_{ij}$ defines a local potential for the $i$-th team.
+Compute ratings defining the 1-cochain coordiantes $f'_{ij}=\phi_j-\phi_i$, where the strength $\phi_i = \sum_j w_{ij}$ defines a local potential for the $i$-th team.
 \end{enumerate}
 
 \begin{figure*}
