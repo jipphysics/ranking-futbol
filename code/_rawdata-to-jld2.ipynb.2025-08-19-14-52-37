@@ -1,0 +1,731 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "92fc835e-f44d-4bdd-a06a-46c4a2ef1222",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Run this cell in a folder contained by the current project\n",
+    "using Pkg\n",
+    "#Pkg.activate()                 # Walks up the path tree until finds Project.toml\n",
+    "#Pkg.activate(\".\")              # \n",
+    "#Pkg.activate(\"@__DIR__\")       # \n",
+    "Pkg.activate(\"../\")            #\n",
+    "Pkg.instantiate()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d205741e-f2c8-420d-b1cc-28572c594d73",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "using Plots\n",
+    "using LaTeXStrings\n",
+    "using Graphs\n",
+    "using GraphPlot\n",
+    "using Karnak\n",
+    "using NetworkLayout\n",
+    "using Colors\n",
+    "using Random\n",
+    "using LinearAlgebra\n",
+    "using OffsetArrays\n",
+    "using SparseArrays\n",
+    "using Serialization\n",
+    "using IterativeSolvers\n",
+    "using Krylov\n",
+    "using BenchmarkTools\n",
+    "using Profile\n",
+    "using ProfileView\n",
+    "using Statistics\n",
+    "using DifferentialEquations\n",
+    "using LoopVectorization\n",
+    "using Folds\n",
+    "using Transducers\n",
+    "using Distributed\n",
+    "using JLD2\n",
+    "using OnlineStats\n",
+    "using ImageFiltering\n",
+    "using SavitzkyGolay\n",
+    "using Interpolations\n",
+    "using DataInterpolations\n",
+    "using Polynomials\n",
+    "using CurveFit\n",
+    "using DataFrames\n",
+    "using LsqFit\n",
+    "using ForwardDiff\n",
+    "using JSON"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "81e53cc4-9713-4b01-8dc9-a813c9cc1a8d",
+   "metadata": {},
+   "source": [
+    "# See what packages should be installed according to Project.toml and Manifest.toml\n",
+    "Pkg.resolve()"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "bb6075e1-9a39-4372-a5d8-3c31c2021b86",
+   "metadata": {},
+   "source": [
+    "# Run this if you want to install a package\n",
+    "using Pkg\n",
+    "for p in [\"Plots\",\"LaTeXStrings\",\"Graphs\",\"GraphPlot\",\"Karnak\",\"NetworkLayout\",\"Colors\",\"Random\",\"LinearAlgebra\",\"OffsetArrays\",\"SparseArrays\",\"Serialization\",\"IterativeSolvers\",\"Krylov\",\"BenchmarkTools\",\"Profile\",\"ProfileView\",\"Statistics\",\"DifferentialEquations\",\"LoopVectorization\",\"Folds\",\"Transducers\",\"Distributed\",\"JLD2\",\"OnlineStats\",\"ImageFiltering\",\"SavitzkyGolay\",\"Interpolations\",\"DataInterpolations\",\"Polynomials\",\"CurveFit\",\"DataFrames\",\"LsqFit\",\"ForwardDiff\",\"JSON\"]\n",
+    "    Pkg.add(p)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4cfb9895-978a-4d31-9723-2ed351c7c925",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function enum!(d,k)\n",
+    "    return get!(d,k,length(d)+1)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "63a50e70-b79c-4f22-a9e9-9bb27a5cfd18",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "### Test"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c7c1b585-b007-4f54-ae5b-24b263e1bb81",
+   "metadata": {},
+   "source": [
+    "d = Dict{Any,Int}()\n",
+    "@show enum!(d,\"a\")\n",
+    "@show enum!(d,\"b\")\n",
+    "@show enum!(d,\"c\")\n",
+    "@show enum!(d,\"b\")\n",
+    "d"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1f265db1-ff47-4cf8-af0a-09e3b131d5b0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mutable struct RunningStat\n",
+    "    n::Int\n",
+    "    m::Real # mean\n",
+    "    s::Real # std\n",
+    "end\n",
+    "\n",
+    "function RunningStat()\n",
+    "    return RunningStat(0,0.0,0.0)\n",
+    "end\n",
+    "\n",
+    "function Base.push!(rs::RunningStat,v::Real)\n",
+    "    if rs.n>0\n",
+    "        rs.n += 1\n",
+    "        new_m = rs.m + (v-rs.m)/rs.n\n",
+    "        rs.s += (v-rs.m)*(v-new_m)\n",
+    "        rs.m = new_m\n",
+    "    else\n",
+    "        rs.n = 1\n",
+    "        rs.m = v\n",
+    "        rs.s = 0\n",
+    "    end\n",
+    "    return rs.m\n",
+    "end\n",
+    "\n",
+    "function Statistics.mean(rs::RunningStat)\n",
+    "    return rs.m \n",
+    "end\n",
+    "\n",
+    "function Statistics.var(rs::RunningStat)\n",
+    "    return rs.s/(rs.n-1)\n",
+    "end\n",
+    "\n",
+    "function Statistics.std(rs::RunningStat)\n",
+    "    return sqrt(var(rs))\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "eeeaace5-918f-4cc3-83db-e9d1a7d9d752",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "### Tests"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "961b3039-31a5-4a2d-b260-d0f646717b29",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "list_v = 10 .+ 5.0*randn(1000)\n",
+    ";"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "46d7bcfd-b404-47c1-9729-04abad062038",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rs = RunningStat()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4cba0393-2420-4d00-aea5-ebbe975fd7ff",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for v in list_v\n",
+    "    push!(rs,v)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6f44f309-7efc-45d5-8112-f06e72a7eb65",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mean(rs),std(rs)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "187c2c78-a5c6-4f1b-bafe-cdcdabed3b1e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mean(list_v),std(list_v)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "680644ba-9b35-470e-b2e6-9dbf9db20d1e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function R_squared(y_data,y_fit)\n",
+    "    y_mean = mean(y_data)\n",
+    "    SS_res = sum((y_data .- y_fit) .^ 2)\n",
+    "    SS_tot = sum((y_data .- y_mean) .^ 2)\n",
+    "    R_sqr = 1 - SS_res / SS_tot\n",
+    "    return R_sqr\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "779d37a3-4254-434e-8233-6de9110349f4",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true
+   },
+   "source": [
+    "### Tests"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c1bd1ff9-b81c-4355-988e-0a788f9ce7d0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Define the model function\n",
+    "@. model(x, p) = p[1] * x + p[2]\n",
+    "\n",
+    "# Sample data (example)\n",
+    "x_data = [1.0, 2.0, 3.0, 4.0, 5.0]\n",
+    "y_data = [2.2, 2.8, 3.6, 4.5, 5.1]\n",
+    "\n",
+    "# Initial guess for parameters\n",
+    "p0 = [1.0, 1.0]\n",
+    "\n",
+    "# Perform curve fitting\n",
+    "fit = LsqFit.curve_fit(model, x_data, y_data, p0)\n",
+    "\n",
+    "# Compute fitted values\n",
+    "y_fit = model(x_data, coef(fit))\n",
+    "\n",
+    "# Compute R_sqr\n",
+    "R_sqr = R_squared(y_data,y_fit)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e7be9149-c2b7-410e-8b76-6cbd85598f94",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot()\n",
+    "#plot!(yscale=:log10)\n",
+    "#plot!(ylim=(0.0,1.0))\n",
+    "plot!(xlabel=L\"x\")\n",
+    "plot!(ylabel=L\"y\")\n",
+    "scatter!(x_data,y_data,label=\"data\")\n",
+    "plot!(x_data,y_fit,label=\"fit, \\$R^2=0.995\\$\")\n",
+    "#plot!(0.0:0.0,x->0.0,label=\"\\$z=1\\$\",width=0.0,c=:white)\n",
+    "#plot!(legendtitle=L\"\\mathrm{1D},\\;z=1\",legendtitlefontsize=8)\n",
+    "#plot!(list_sigma,x->0.6827/2,label=\"\",style=:dash,color=:grey)\n",
+    "#plot!(\n",
+    "#    xticks=([0,1,2,3,4,5],[L\"0\",L\"1\",L\"2\",L\"3\",L\"4\",L\"5\"]),\n",
+    "#    yticks=([0,1,2,3],[L\"0\",L\"1\",L\"2\",L\"3\"]),\n",
+    "#    tickfont=font(11),\n",
+    "#)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ce500cbd-057c-4482-a2bf-d9b97d4ca3a5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x0 = 1.0\n",
+    "A = 1.0\n",
+    "B = 3.0\n",
+    "C = 0.0\n",
+    "p0 = [x0,A,B,C] # p1=x0, p2=A, p3=B, p4=C\n",
+    "@. sigmoid(x,p)  = p[2]/(1+exp(-p[3]*(x-p[1]))) # sigmoid\n",
+    "@. dsigmoid(x,p) = p[2]*p[3]*exp(-p[3]*(x-p[1]))/(1+exp(-p[3]*(x-p[1])))^2 # derivative of sigmoid\n",
+    "@. psigmoid(x,p) = p[2]/p[3]*log(1+exp(p[3]*(x-p[1])))+p[4] # primitive of sigmoid"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d55ce944-ace8-4602-88dc-8ea0b05b4bb6",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "### Test"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0a558e34-e1a9-40e4-8118-3dcb4ff5ab7a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(\n",
+    "    ylims=(-0.1,1.1),\n",
+    "    xlabel=L\"x\",\n",
+    "    ylabel=L\"f(x)\",\n",
+    ")\n",
+    "plot!(-2:0.01:4.0,x->sigmoid(x,p0),label=\"\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "900710fc-66df-4c4d-a954-9168557ffbe0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(\n",
+    "    ylims=(-0.1,1.1),\n",
+    "    xlabel=L\"x\",\n",
+    "    ylabel=L\"df/dx\",    \n",
+    ")\n",
+    "plot!(-2:0.01:4.0,x->dsigmoid(x,p0),label=\"\")\n",
+    "scatter!([x0],[A*B/4],label=\"\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "88a7ade3-5039-44bd-b885-a002bacd29a7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot(\n",
+    "    ylims=(-0.1,1.1),\n",
+    "    xlabel=L\"x\",\n",
+    "    ylabel=L\"F(x)\",\n",
+    ")\n",
+    "plot!(-2:0.01:4.0,x->psigmoid(x,p0),label=\"\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "97e693aa-dac8-4af5-8f6f-279dbbb55640",
+   "metadata": {
+    "tags": [],
+    "toc-hr-collapsed": true
+   },
+   "source": [
+    "# Load networks from raw data and save them in JLD2 format"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "56e0d0b2-4242-4d2a-8f11-e610dc39a66e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "list_nets_dat = \"\"\"../redes/Italy/red_crossing.dat\n",
+    "../redes/Italy/red_counterattack.dat\n",
+    "../redes/Italy/red_pressure_loss.dat\n",
+    "../redes/Italy/red_T_build_up.dat\n",
+    "../redes/Italy/red_direct_play.dat\n",
+    "../redes/Italy/red_pressure_point.dat\n",
+    "../redes/Italy/red_shots.dat\n",
+    "../redes/Italy/red_flow_rate.dat\n",
+    "../redes/Italy/red_T_maintenance.dat\n",
+    "../redes/Italy/red_T_zona_media.dat\n",
+    "../redes/Germany/red_crossing.dat\n",
+    "../redes/Germany/red_counterattack.dat\n",
+    "../redes/Germany/red_pressure_loss.dat\n",
+    "../redes/Germany/red_T_build_up.dat\n",
+    "../redes/Germany/red_direct_play.dat\n",
+    "../redes/Germany/red_pressure_point.dat\n",
+    "../redes/Germany/red_shots.dat\n",
+    "../redes/Germany/red_flow_rate.dat\n",
+    "../redes/Germany/red_T_maintenance.dat\n",
+    "../redes/Germany/red_T_zona_media.dat\n",
+    "../redes/Spain/red_crossing.dat\n",
+    "../redes/Spain/red_counterattack.dat\n",
+    "../redes/Spain/red_pressure_loss.dat\n",
+    "../redes/Spain/red_T_build_up.dat\n",
+    "../redes/Spain/red_direct_play.dat\n",
+    "../redes/Spain/red_pressure_point.dat\n",
+    "../redes/Spain/red_shots.dat\n",
+    "../redes/Spain/red_flow_rate.dat\n",
+    "../redes/Spain/red_T_maintenance.dat\n",
+    "../redes/Spain/red_T_zona_media.dat\n",
+    "../redes/England/red_crossing.dat\n",
+    "../redes/England/red_counterattack.dat\n",
+    "../redes/England/red_pressure_loss.dat\n",
+    "../redes/England/red_T_build_up.dat\n",
+    "../redes/England/red_direct_play.dat\n",
+    "../redes/England/red_pressure_point.dat\n",
+    "../redes/England/red_shots.dat\n",
+    "../redes/England/red_flow_rate.dat\n",
+    "../redes/England/red_T_maintenance.dat\n",
+    "../redes/England/red_T_zona_media.dat\n",
+    "../redes/France/red_crossing.dat\n",
+    "../redes/France/red_counterattack.dat\n",
+    "../redes/France/red_pressure_loss.dat\n",
+    "../redes/France/red_T_build_up.dat\n",
+    "../redes/France/red_direct_play.dat\n",
+    "../redes/France/red_pressure_point.dat\n",
+    "../redes/France/red_shots.dat\n",
+    "../redes/France/red_flow_rate.dat\n",
+    "../redes/France/red_T_maintenance.dat\n",
+    "../redes/France/red_T_zona_media.dat\"\"\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1a54d350-6758-4927-9f9c-3f791e58ab19",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dict_vecs_i_j_phi_jld2 = Dict()\n",
+    "for archivo in split(list_nets_dat)\n",
+    "    println(archivo)\n",
+    "    vec_i = Vector{Int64}()\n",
+    "    vec_j = Vector{Int64}()\n",
+    "    vec_phi_ij = Vector{Float64}()    \n",
+    "    open(archivo) do fh\n",
+    "        for line in readlines(fh)[2:end]\n",
+    "            cols=split(replace(line,\",\" => \" \"))\n",
+    "            #println(cols)\n",
+    "            push!(vec_i,parse(Int64,cols[1]))\n",
+    "            push!(vec_j,parse(Int64,cols[2]))\n",
+    "            push!(vec_phi_ij,parse(Float64,cols[3]))\n",
+    "        end\n",
+    "    end\n",
+    "    tag = replace(archivo, \"../redes/\" => \"\")\n",
+    "    tag = replace(tag, \".dat\" => \"\")\n",
+    "    tag = replace(tag, \"red_\" => \"\")\n",
+    "    tag = replace(tag, \"/\" => \" \")\n",
+    "    tag = split(tag)\n",
+    "    tag = (tag[1],tag[2])\n",
+    "    dict_vecs_i_j_phi_jld2[tag] = (vec_i,vec_j,vec_phi_ij)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "81e069cf-ac0a-4b3d-9329-5ec9bb177561",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@save \"jld2/dict_vecs_i_j_phi.jld2\" dict_vecs_i_j_phi_jld2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "34381c23-0f29-40cf-9527-34ce584fa889",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@load \"jld2/redes/dict_vecs_i_j_phi.jld2\" dict_vecs_i_j_phi_jld2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b2ca7998-fcb6-4e39-aff6-ad552a19f2a3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dict_vecs_i_j_phi_jld2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9e7b2890-a250-4bc9-93fa-0a542f703392",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dict_vecs_i_j_phi_jld2[(\"France\",\"crossing\")]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b5aaad15-f9ad-4fbb-ae28-82d90e58aca9",
+   "metadata": {},
+   "source": [
+    "# Load \"puntos\" per team per league and  save them in JLD2 format"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2927b9b8-c4fc-4c51-9023-b999803b2228",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "data_str = read(\"../data/league2team2ptos.json\",String)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "82cd6c60-f824-42e3-bf9b-f20312d1ec03",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "league2team2ptos = JSON.parse(data_str)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5ac90813-781f-4e95-b801-b98d3422f94b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@save \"jld2/league2team2ptos.jld2\" league2team2ptos"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "783d504d-b729-45eb-b9ca-bead92ed0200",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@load \"jld2/league2team2ptos.jld2\" league2team2ptos"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "724a8c9a-585b-4282-ba2e-e56e8fc33ee0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "league2team2ptos"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c5cc431f-84aa-454e-9fdf-fbfdcb996b5b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "league2team2ptos[\"Germany\"]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ce73ed3c-552b-48bc-89dc-982043185adc",
+   "metadata": {},
+   "source": [
+    "# Load \"redes de estilos\" and save them in JLD2 format"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ddea947d-4599-40d2-97a0-39682d2a57aa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "files_redes_estilos = split(\"\"\"../redes_estilos/Italy/red_S2.dat\n",
+    "../redes_estilos/Italy/red_S4.dat\n",
+    "../redes_estilos/Italy/red_S3.dat\n",
+    "../redes_estilos/Italy/red_S1.dat\n",
+    "../redes_estilos/Germany/red_S2.dat\n",
+    "../redes_estilos/Germany/red_S4.dat\n",
+    "../redes_estilos/Germany/red_S3.dat\n",
+    "../redes_estilos/Germany/red_S1.dat\n",
+    "../redes_estilos/Spain/red_S2.dat\n",
+    "../redes_estilos/Spain/red_S4.dat\n",
+    "../redes_estilos/Spain/red_S3.dat\n",
+    "../redes_estilos/Spain/red_S1.dat\n",
+    "../redes_estilos/England/red_S2.dat\n",
+    "../redes_estilos/England/red_S4.dat\n",
+    "../redes_estilos/England/red_S3.dat\n",
+    "../redes_estilos/England/red_S1.dat\n",
+    "../redes_estilos/France/red_S2.dat\n",
+    "../redes_estilos/France/red_S4.dat\n",
+    "../redes_estilos/France/red_S3.dat\n",
+    "../redes_estilos/France/red_S1.dat\"\"\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "088ad981-d03b-4fd2-a0f3-bccfffeb7d2d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dict_vecs_i_j_phi_estilos_S1_S2_S3_S4_jld2 = Dict()\n",
+    "for archivo in files_redes_estilos\n",
+    "    println(archivo)\n",
+    "    vec_i = Vector{Int64}()\n",
+    "    vec_j = Vector{Int64}()\n",
+    "    vec_phi_ij = Vector{Float64}()    \n",
+    "    open(archivo) do fh\n",
+    "        for line in readlines(fh)[2:end]\n",
+    "            cols=split(replace(line,\",\" => \" \"))\n",
+    "            #println(cols)\n",
+    "            i = parse(Int64,cols[1])\n",
+    "            j = parse(Int64,cols[2])\n",
+    "            phi_ij = parse(Float64,cols[3])\n",
+    "            #@show i,j,phi_ij\n",
+    "            push!(vec_i,i)\n",
+    "            push!(vec_j,j)\n",
+    "            push!(vec_phi_ij,phi_ij)\n",
+    "        end\n",
+    "    end\n",
+    "    tag = replace(archivo, \"../redes_estilos/\" => \"\")\n",
+    "    tag = replace(tag, \".dat\" => \"\")\n",
+    "    tag = replace(tag, \"red_\" => \"\")\n",
+    "    tag = replace(tag, \"/\" => \" \")\n",
+    "    tag = split(tag)\n",
+    "    #@show tag\n",
+    "    tag = (tag[1],tag[2])\n",
+    "    dict_vecs_i_j_phi_estilos_S1_S2_S3_S4_jld2[tag] = (vec_i,vec_j,vec_phi_ij)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8c8b4f44-325e-42d7-92e5-56c0c55bdb56",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@save \"jld2/dict_vecs_i_j_phi_estilos_S1_S2_S3_S4.jld2\" dict_vecs_i_j_phi_estilos_S1_S2_S3_S4_jld2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "50b24a8d-2c23-4f47-9670-1cfe8317c996",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@load \"jld2/dict_vecs_i_j_phi_estilos_S1_S2_S3_S4.jld2\" dict_vecs_i_j_phi_estilos_S1_S2_S3_S4_jld2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7c13d049-4e91-4f18-9270-065a073a9b83",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dict_vecs_i_j_phi_estilos_S1_S2_S3_S4_jld2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b987df96-e1df-4c37-a2d3-2c185d05db32",
+   "metadata": {},
+   "source": [
+    "# References\n",
+    "\n",
+    "[1] ..."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7eae8467-1670-4192-8146-8cfc3742cc6e",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Julia 1.11.5",
+   "language": "julia",
+   "name": "julia-1.11"
+  },
+  "language_info": {
+   "file_extension": ".jl",
+   "mimetype": "application/julia",
+   "name": "julia",
+   "version": "1.11.5"
+  },
+  "toc-autonumbering": false,
+  "toc-showcode": false,
+  "toc-showmarkdowntxt": false,
+  "toc-showtags": false
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
