@@ -145,22 +145,49 @@ Theory
 \label{sec:theory}
 }
 
-\subsection{Inference of ratings and rankings}
+\subsection{HodgeRank for inference of team's ratings and rankings}
 
-Consider a set of $N=n+1$ teams labeled by $\{0,1,...,n\}$ to be rated and ranked.
-For this aim, assume that some set of pairwise comparison scores $\psi_{ij}=-\psi_{ji}$ is provided for each $ij$ of different labels $i$ and $j$.
-Informally, the score $\psi_{ij}$ should be positive if the pairwise comparison indicates that team $i$ should be rated higher than team $j$ and it should be non-positive otherwise.
-One way to infer rating scores somehow consistent with the pairwise comparisons scores, consist in finding ratings $w_i$ for $i=0,1,..,n$ that minimize the sum of squared differences
+%Consider a set of $N=n+1$ teams labeled by $\{0,1,...,n\}$ to be rated and ranked.
+%For this aim, assume that some set of pairwise comparison scores $\psi_{ij}=-\psi_{ji}$ is provided for each pair $ij$ of different teams $i$ and $j$.
+%Informally, the score $\psi_{ij}$ should be positive if the comparison indicates that team $i$ should preferably be rated higher than team $j$ and the opposite otherwise.
+%
+%One way to infer rating scores somehow consistent with the pairwise comparisons scores $\phi_{ij}$, consist in finding ratings $w_i$ for $i=0,1,..,n$ that minimize the sum of squared differences
+%$$
+%\sum_{ij:i<j} |\psi_{ij}-(w_i-w_j)|^2.
+%$$
+%This is a well defined mathematical problem that can be conveniently reformulated in the language of cochains over simplicial complexes, conceiving a method for the inference of ratings and rankings that is named  HodgeRank~\cite{jiang2011statistical,
+%perotti2025analysis}.
+
+
+Consider a set of $N=n+1$ teams labeled $\{0,1,\dots,n\}$ to be rated and ranked.
+Suppose that for each distinct pair of teams $i$ and $j$, a pairwise comparison score $\psi_{ij}=-\psi_{ji}$ is given.
+Informally, $\psi_{ij}>0$ suggests that team $i$ should be rated higher than team $j$, while $\psi_{ij}<0$ suggests the opposite.
+
+A natural approach to inferring rating scores consistent with the pairwise comparisons is to assign ratings $w_i$ (for $i=0,1,\dots,n$) that minimize the sum of squared discrepancies
 $$
-\sum_{ij:i<j} |\psi_{ij}-(w_i-w_j)|^2.
+\sum_{i<j} \bigl(\psi_{ij}-(w_i-w_j)\bigr)^2.
 $$
-This is a well defined mathematical problem that can be conveniently reformulated in the language of cochains over simplicial complexes.
-In fact, this reformulation is known as the HodgeRank method for the inference of ratings and rankings starting from pairwise comparison scores~\cite{jiang2011statistical,
-perotti2025analysis}.
+This yields a well-posed optimization problem that admits an elegant reformulation in the language of cochains over simplicial complexes.
+The resulting framework for the inference of ratings and rankings is known as {\em HodgeRank}~\cite{jiang2011statistical, perotti2025analysis}.
 
-To define HodgeRank, it is convenient to introduce a simplicial complex composed of a 0-simplex $i$ for each team, a 1-simplex $ij$ for each pairwise comparison $\psi_{ij}$ between teams and a 2-simplex $ijk$ for each existing triple $(ij,jk,ki)$ in the set of 1-simplices.
-Recall here that $ij$ and $ji$ are both labels of the same simplex, as well as any permutation of $ijk$ is also a label of the same 2-simplex.
+%To define HodgeRank, it is convenient to introduce a simplicial complex composed of a 0-simplex $i$ for each team, a 1-simplex $ij$ for each pairwise comparison $\psi_{ij}$ between teams and a 2-simplex $ijk$ for each existing triple $(ij,jk,ki)$ in the set of 1-simplices.
+%Recall here that $ij$ and $ji$ are both labels of the same simplex, as well as any permutation of $ijk$ is also a label of the same 2-simplex.
 
+To define HodgeRank, an abstract simplicial complex has to be defined.
+For this, let the vertex set be $V=\{0,1,\dots,n\}$, representing the teams, and let the edge set $E$ consist of the unordered pairs $\{i,j\}$ for which a pairwise comparison score $\psi_{ij}$ is available.
+Then, the associated abstract simplicial complex is
+$$
+K = K_0 \cup K_1 \cup K_2,
+$$
+where
+\begin{eqnarray}
+K_0 &=& \{\{i\} : i \in V\}, \notag \\  
+K_1 &=& \{\{i,j\} : \{i,j\} \in E\}, \notag \\
+K_2 &=& \{\{i,j,k\} : \{i,j\},\{j,k\},\{k,i\} \in E\} \notag
+\end{eqnarray}
+are the sets of 0, 1 and 2 simplices, respectively.
+Thus, each team corresponds to a 0-simplex, each comparison to a 1-simplex, and each closed triple of comparisons to a 2-simplex.
+By convention, $\{i,j\}=\{j,i\}$ denotes the same 1-simplex, and any permutation of $\{i,j,k\}$ denotes the same 2-simplex.
 
 \section{
 Methods
