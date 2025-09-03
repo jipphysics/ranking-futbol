@@ -158,7 +158,7 @@ Data
 }
 
 The dataset covers five soccer leagues: England, France, Germany, Italy, and Spain.
-Each league consists of 20 teams, except for Germany, which has 18.
+Each league consists of $N=20$ teams, except for Germany, which has $N=18$.
 Every pair of teams $i,j$ plays two matches: one with $i$ as the home team and $j$ as the away team, and in the other match it is the other way around.
 The teams are indexed or ranked according to their position in that year’s final standings.
 The standings is characterized by some tournament points $\pi_i$ for each team $i$ in each league.
@@ -181,18 +181,20 @@ The different types of empirically determined metrics being considered are:
 \end{enumerate}
 Namely, $m_{ij}$ corresponds to $i$ being the home team and $j$ being the away team.
 Additionally, metric-styles derived from the Singular Value Decomposition of previous metrics are also considered~\cite{chacoma2025data}.
-Moreover, in order to test the inference of ratings, two types of ground-truth metrics are also defined.
-Namely, the rank-based metric $m_{ij}=\frac{1}{2}(i-j)$ and the tournament point metric $m_{ij}=\frac{1}{2}(\sigma_j-\sigma_i)$.
 Notice, $m_{ij}$ is generally independent of the metric $m_{ji}$ since they belong to different matches between $i$ and $j$.
-In the case of the ground-truth metrics, it holds that $m_{ij}=-m_{ji}$.
+As a consequence, $m_{ij}+m_{ji}$ is generally different from zero and is the net contribution between teams $i$ and $j$.
 
-
-{\color{red}[HERE...]}
-
-Each matrix $\phi$ of scores $\phi_{ij}$ defines a fully connected undirected network for the teams in a league.
-In some experiments, some fraction of links is removed from the network according to some criterium, defining a graph $\mathcal{G}$ that is not fully connected.
-The graph is promoted to a simplicial complex of 0-simplices, 1-simplices and 2-simplices composed by the nodes, the links and the triplets of connected nodes in $\mathcal{G}$, respectively.
-A triplet $ijk$ of the nodes $i$, $j$ and $k$ of $\mathcal{G}$ is connected if the links $ij$, $ik$ and $jk$ belong to $\mathcal{G}$.
+With each metric, a 1-cochain is defined as
+$$
+f_{ij}
+=
+\frac{1}{2}(m_{ij}+m_{ji})
+$$
+Moreover, in order to test the inference method, two types of ground-truth 1-cochains are also defined.
+Namely, the rank-based 1-cochain $f_{ij}=\frac{1}{2}(i-j)$ and the tournament point 1-cochain $f_{ij}=\frac{1}{2}(\pi_j-\pi_i)$.
+Note, $f_{ij}=-f_{ji}$ holds by definition.
+These 1-cochains $f$ define a fully connected network or graph, since all pairs of teams play two matches against each other in each league.
+Each of these fully connected graphs of $N=n+1$ nodes is promoted to a simplicial complex compose of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ and 2-simplices labeled by $ijk$ where $i,j,k$ are different elements in $\{0,1,2,...,n\}$.
 
 From a score $\phi$, a corresponding cochain $f\in C_1^*$ of coordinates $f_{ij}=\phi_{ji}-\phi_{ij}$ is defined.
 Also, the cochain $f'\in C_1^*$ of coordinates $f'_{ij}=\phi_j-\phi_i$ with team strengths $\phi_i=\sum_j \phi_{ij}$ is considered.
