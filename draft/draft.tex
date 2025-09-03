@@ -159,10 +159,14 @@ Data
 
 The dataset covers five soccer leagues: England, France, Germany, Italy, and Spain.
 Each league consists of 20 teams, except for Germany, which has 18.
-Every pair of teams $i,j$ plays two matches: one with $i$ as the home team and $j$ as the away team, and the other with the reverse condition.
-The teams are indexed according to their position in that year’s final standings.
-For each pair of teams $i$ and $j$ in a given league, a metric $m_{ij}\in \mathbb{R}$ is provided, which takes a positive value if it presumably favors team $i$ over team $j$, and a negative value otherwise.
-Different types of empirically determined metrics are considered:
+Every pair of teams $i,j$ plays two matches: one with $i$ as the home team and $j$ as the away team, and in the other match it is the other way around.
+The teams are indexed or ranked according to their position in that year’s final standings.
+The standings is characterized by some tournament points $\pi_i$ for each team $i$ in each league.
+Therefore, the condition $i<j$ holds if and only if $\pi_i>\pi_j$ for any two teams $i$ and $j$ in a given league.
+
+For each pair of teams $i$ and $j$ in a given league, several pairwise metrics $m_{ij}\in \mathbb{R}$ are provided.
+Each metric takes a positive value if it presumably favors team $i$ over team $j$, and a negative value otherwise.
+The different types of empirically determined metrics being considered are:
 \begin{enumerate}
 \item {\bf crossings:}
 \item {\bf counterattacks:}
@@ -173,11 +177,15 @@ Different types of empirically determined metrics are considered:
 \item {\bf shots:}
 \item {\bf flow rate:}
 \item {\bf maintenance time:}
-\item {\bf middle-zone time:} bla bla,
+\item {\bf middle-zone time:} bla bla.
 \end{enumerate}
-and metric-styles are also considered~\cite{chacoma2025data}.
-Additionally, in order to test the inference of ratings, two types of ground truth metrics are also defined $m_{ij}=\frac{1}{2}(i-j)$ and $m_{ij}=\frac{1}{2}(\sigma_j-\sigma_i)$ using the rankings $i$ and scores $\sigma_i$ at the end of the season.
-Note, $i<j$ if $\sigma_i>\sigma_j$ by definition.
+Namely, $m_{ij}$ corresponds to $i$ being the home team and $j$ being the away team.
+Additionally, metric-styles derived from the Singular Value Decomposition of previous metrics are also considered~\cite{chacoma2025data}.
+Moreover, in order to test the inference of ratings, two types of ground-truth metrics are also defined.
+Namely, the rank-based metric $m_{ij}=\frac{1}{2}(i-j)$ and the tournament point metric $m_{ij}=\frac{1}{2}(\sigma_j-\sigma_i)$.
+Notice, $m_{ij}$ is generally independent of the metric $m_{ji}$ since they belong to different matches between $i$ and $j$.
+In the case of the ground-truth metrics, it holds that $m_{ij}=-m_{ji}$.
+
 
 {\color{red}[HERE...]}
 
