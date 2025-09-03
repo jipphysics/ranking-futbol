@@ -150,10 +150,14 @@ Theory
 Consider a set of $N=n+1$ teams labeled by $\{0,1,...,n\}$ to be rated and ranked.
 For this aim, assume that some set of pairwise comparison scores $\psi_{ij}=-\psi_{ji}$ is provided for each $ij$ of different labels $i$ and $j$.
 Informally, the score $\psi_{ij}$ should be positive if the pairwise comparison indicates that team $i$ should be rated higher than team $j$ and it should be non-positive otherwise.
-One way to obtain rating scores somehow consistent with the pairwise comparisons scores, consist in finding ratings $w_i$ for $i=0,1,..,n$ such that minimize the sum of squared differences
+One way to infer rating scores somehow consistent with the pairwise comparisons scores, consist in finding ratings $w_i$ for $i=0,1,..,n$ that minimize the sum of squared differences
 $$
 \sum_{ij:i<j} |\psi_{ij}-(w_i-w_j)|^2.
 $$
+This is a well defined mathematical problem that can be conveniently reformulated in the language of cochains over simplicial complexes.
+In fact, this reformulation is known as the HodgeRank method for the inference of ratings and rankings starting from pairwise comparison scores~\cite{jiang2011statistical,
+perotti2025analysis}.
+
 
 
 \section{
