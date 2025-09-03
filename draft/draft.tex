@@ -184,22 +184,26 @@ Additionally, metric-styles derived from the Singular Value Decomposition of pre
 Notice, $m_{ij}$ is generally independent of the metric $m_{ji}$ since they belong to different matches between $i$ and $j$.
 As a consequence, $m_{ij}+m_{ji}$ is generally different from zero and is the net contribution between teams $i$ and $j$.
 
-\subsection{Definition of 1-cochains}
+\subsection{Inference of ratings and rankings}
 
-With each metric, a 1-cochain is defined as
+With each metric, the coefficients
 $$
 f_{ij}
 =
 \frac{1}{2}(m_{ij}+m_{ji})
 $$
-Moreover, in order to test the inference method, two types of ground-truth 1-cochains are also defined.
-Namely, the rank-based 1-cochain $f_{ij}=i-j$ and the tournament points based 1-cochain $f_{ij}=\pi_j-\pi_i$.
-Note, $f_{ij}=-f_{ji}$ holds by definition.
-These 1-cochains $f$ define a fully connected network or graph since, as already mentioned, all pairs of teams play two matches against each other in each league.
-Each of these fully connected graphs of $N=n+1$ nodes is promoted to a simplicial complex composed of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ and 2-simplices labeled by $ijk$ where $i,j$ and $k$ run over all choices in $\{0,1,2,...,n\}$ such that $i<j$ or $i<j<k$, depending on the case.
+are defined for each $i$ and $j$ in $\{0,1,...,n\}$ such that $i<j$ and where $N=n+1$ is the number of teams in the corresponding league.
+Moreover, in order to test the inference method, two types of ground-truth coefficients are also defined.
+Namely, the rank-based coefficients $f_{ij}=i-j$ and the tournament points based coefficients $f_{ij}=\pi_j-\pi_i$.
+These coefficients correspond to a fully connected network or graph with $N$ nodes since, as already mentioned, all pairs of teams play two matches against each other in each league.
+Next, each fully connected graphs is promoted to a simplicial complex composed of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ with $i<j$ and 2-simplices labeled by $ijk$ with $i<j<k$.
+Finally, the coefficients $f_{ij}$ are promoted to be the components of a 1-cochain  $f$, where the anti-symmetric relation $f_{ji}=-f_{ij}$ must hold by definition.
 
-From a score $\phi$, a corresponding cochain $f\in C_1^*$ of coordinates $f_{ij}=\phi_{ji}-\phi_{ij}$ is defined.
-Also, the cochain $f'\in C_1^*$ of coordinates $f'_{ij}=\phi_j-\phi_i$ with team strengths $\phi_i=\sum_j \phi_{ij}$ is considered.
+%From a score $\phi$, a corresponding cochain $f\in C_1^*$ of coordinates $f_{ij}=\phi_{ji}-\phi_{ij}$ is defined.
+%Also, the cochain $f'\in C_1^*$ of coordinates $f'_{ij}=\phi_j-\phi_i$ with team strengths $\phi_i=\sum_j \phi_{ij}$ is considered.
+
+{\color{red}[JUAN: Write here the inference problem.]}
+
 
 \section{
 Results
