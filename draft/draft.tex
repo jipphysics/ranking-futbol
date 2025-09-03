@@ -158,6 +158,8 @@ This is a well defined mathematical problem that can be conveniently reformulate
 In fact, this reformulation is known as the HodgeRank method for the inference of ratings and rankings starting from pairwise comparison scores~\cite{jiang2011statistical,
 perotti2025analysis}.
 
+To define HodgeRank, it is convenient to introduce a simplicial complex composed of a 0-simplex $i$ for each team, a 1-simplex $ij$ for each pairwise comparison $\psi_{ij}$ between teams and a 2-simplex $ijk$ for each existing triple $(ij,jk,ki)$ in the set of 1-simplices.
+Recall here that $ij$ and $ji$ are both labels of the same simplex, as well as any permutation of $ijk$ is also a label of the same 2-simplex.
 
 
 \section{
