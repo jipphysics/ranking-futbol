@@ -253,7 +253,7 @@ This induces the following direct sum decomposition
 $$
 \partial = \partial_0 \oplus \partial_1 \oplus \partial_2
 $$
-where $\partial_k$ is the restriction of $\partial$ to the subspace $C_k$ and, in particular, $\partial_0=0$.
+where $\partial_k(C)=\partial(C_k)\subseteq C_{k-1}$ and, in particular, $\partial_0=0$.
 
 Since the application of any cochain $f$ to any chain $c$ is a bilinear form, the coboundary linear operator $d:C^*\to C^*$ is univocally defined by the relation
 $$
@@ -261,6 +261,11 @@ df(c) = f(\partial c)
 $$
 for any $f\in C^*$ and $c\in C$.
 Note, $d(C_k^*)\subset C_{k+1}^*$ where $C_3^*=\{0\}$ denotes the trivial subspace of $C^*$ of dimension 0.
+As before, this induces the following direct sum decomposition
+$$
+d = d_0 \oplus d_1 \oplus d_2
+$$
+where $d_k(C^*)=d(C_k^*)\subseteq C_{k+1}^*$ and, in particular, $d_2=0$.
 
 Since the inner products on $C$ and $C^*$ are also bilinear forms, then the dual boundary $\partial^*:C\to C$ and the dual coboundary $d^*:C^*\to C^*$ linear operators can be univocally defined by
 $$
@@ -275,7 +280,16 @@ d^*f.g
 f.d g,
 $$
 for any chains $c,q\in C$ and any cochains $f,g\in C^*$, respectively.
-Note, $\partial^*(C_{k-1})\subseteq C_k$ and $d^*(C_{k+1}^*)\subseteq C_k^*$.
+Note, that $\partial^*(C_{k-1})\subseteq C_k$ and $d^*(C_{k+1}^*)\subseteq C_k^*$, indicing the follow direct sum decompositions
+$$
+\partial^* = \partial_0^* \oplus \partial_1^* \oplus \partial_2^*
+$$
+and
+$$
+d^* = d_0^* \oplus d_1^* \oplus d_2^*
+$$
+where $\partial_k^*(C)=\partial^*(C_{k-1})\subseteq C_k$ and $d_k^*(C^*)=d(C_{k+1}^*)\subseteq C_k^*$.
+
 
 
 \section{
