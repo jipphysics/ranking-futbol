@@ -290,6 +290,51 @@ d^* = d_0^* \oplus d_1^* \oplus d_2^*
 $$
 where $\partial_k^*(C)=\partial^*(C_{k-1})\subseteq C_k$ and $d_k^*(C^*)=d(C_{k+1}^*)\subseteq C_k^*$.
 
+The boundary and coboundary operators and their duals can be used to define the so called Hodge Laplacians
+$$
+\mathcal{L} = (\partial + \partial^*)^2 = \partial \partial^* + \partial^* \partial
+: C\to C
+$$
+and
+$$
+L = (d+d^*)^2 = dd^* + d^*d : C^*\to C^*
+$$
+where the fact that $\partial^2 = (\partial^*)^2 = 0$ and $d^2=(d^*)^2=0$ is used.
+The first identity $\partial^2=0$ is implied by the alternating properties of the definition of $\partial$, from where the other identities follow.
+These Hodge Laplacians satisfy the following decomposition in direct sums
+$$
+\mathcal{L}
+=
+\mathcal{L}_0
+\oplus
+\mathcal{L}_1
+\oplus
+\mathcal{L}_2
+$$
+and
+$$
+L = L_0 \oplus L_1 \oplus L_2,
+$$
+where in turn
+$$
+\mathcal{L}_k = \mathcal{L}_k^{\downarrow} \oplus \mathcal{L}_k^{\uparrow} : C_k\to C_k,
+$$
+$$
+L_k = L_k^{\downarrow} \oplus L_k^{\uparrow} : C_k^* \to C_k^*,
+$$
+$$
+\mathcal{L}_k^{\downarrow} = \partial_k^*\partial_k : C_k \to C_{k-1} \to C_k,
+$$
+$$
+\mathcal{L}_k^{\uparrow} = \partial_{k+1}\partial_{k+1}^* : C_k \to C_{k+1} \to C_k,
+$$
+$$
+L_k^{\uparrow} = d_k^*d_k : C_k^* \to C_{k+1}^* \to C_k^*,
+$$
+and
+$$
+L_k^{\downarrow} = d_{k-1}d_{k-1}^* : C_k^* \to C_{k-1}^* \to C_k^*.
+$$
 
 
 \section{
