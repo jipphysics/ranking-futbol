@@ -160,18 +160,20 @@ Theory
 
 
 Consider a set of $N=n+1$ teams labeled $\{0,1,\dots,n\}$ to be rated and ranked.
-Suppose that for each distinct pair of teams $i$ and $j$, a pairwise comparison score $\psi_{ij}=-\psi_{ji}$ is given.
-Informally, $\psi_{ij}>0$ suggests that team $i$ should be rated higher than team $j$, while $\psi_{ij}<0$ suggests the opposite.
+Suppose that for each distinct pair of teams $i$ and $j$, a pairwise comparison score $f_{ij}=-f_{ji}$ is given.
+Informally, $f_{ij}>0$ suggests that team $i$ should be rated higher than team $j$, while $f_{ij}<0$ suggests the opposite.
 
 A natural approach to inferring rating scores consistent with the pairwise comparisons is to assign ratings $w_i$ (for $i=0,1,\dots,n$) that minimize the sum of squared discrepancies
 $$
-\sum_{i<j} \bigl(\psi_{ij}-(w_i-w_j)\bigr)^2.
+\sum_{i<j} \bigl(f_{ij}-(w_i-w_j)\bigr)^2.
 $$
 This yields a well-posed optimization problem that admits an elegant reformulation in the language of cochains over simplicial complexes.
 The resulting framework for the inference of ratings and rankings is known as {\em HodgeRank}~\cite{jiang2011statistical, perotti2025analysis}.
 
 %To define HodgeRank, it is convenient to introduce a simplicial complex composed of a 0-simplex $i$ for each team, a 1-simplex $ij$ for each pairwise comparison $\psi_{ij}$ between teams and a 2-simplex $ijk$ for each existing triple $(ij,jk,ki)$ in the set of 1-simplices.
 %Recall here that $ij$ and $ji$ are both labels of the same simplex, as well as any permutation of $ijk$ is also a label of the same 2-simplex.
+
+\subsection{Discrete calculus on simplicial complexes}
 
 To define HodgeRank, an abstract simplicial complex has to be defined.
 For this, let the vertex set be $V=\{0,1,\dots,n\}$, representing the teams, and let the edge set $E$ consist of the unordered pairs $\{i,j\}$ for which a pairwise comparison score $\psi_{ij}$ is available.
@@ -188,6 +190,88 @@ K_2 &=& \{\{i,j,k\} : \{i,j\},\{j,k\},\{k,i\} \in E\} \notag
 are the sets of 0, 1 and 2 simplices, respectively.
 Thus, each team corresponds to a 0-simplex, each comparison to a 1-simplex, and each closed triple of comparisons to a 2-simplex.
 By convention, $\{i,j\}=\{j,i\}$ denotes the same 1-simplex, and any permutation of $\{i,j,k\}$ denotes the same 2-simplex.
+
+Next, the simplicial complex is equipped with a vector space $C$ of vectors called chains, whose canonical basis is denoted by $\{e_s:s\in K\}$.
+
+The vector space of chains $C$ is equipped with the trivial inner product
+$$
+e_r.e_s = \delta_{rs}
+$$
+for each pair $r,s \in K$.
+Using Einstein's implicit summation convention, an arbitrary chain $c$ in $C$ can be linearly decomposed in the canonical basis as $c=c^se_s$ where the $c^s$ are coefficients in $\RR$.
+The vector space of chains admits the following decomposition in direct sums
+$$
+C = C_0\oplus C_1\oplus C_2
+$$
+where $C_k$ is the subspace of $C$ spanned by the basis of $k$-chains, i.e. by $\{e_s:s\in K_k\}$.
+
+The covectors $f$ in the dual space $C^*$ of $C$ are called cochains.
+The dual basis is denoted by $\{e^s:s\in K\}$ and satisfies
+$$
+e^r(e_s) = \delta^r{}_s
+$$
+for each $s,r\in K$.
+An arbitrary cochain $f$ in $C^*$ can be linearly decomposed in the dual basis as $f=f_se^s$ where the $f_s$ are coefficients in $\RR$.
+The vector space of cochains admits the following decomposition in direct sums
+$$
+C^* = C_0^*\oplus C_1^*\oplus C_2^*
+$$
+where $C_k^*$ is the subspace of $C^*$ spanned by the dual basis of $k$-cochains, i.e. by $\{e^s:s\in K_k\}$.
+
+
+Riesz's theorem establishes that for any cochain $f\in C^*$, there is an unique chain in $C$ denoted by $f^{\flat}$ such that $f(q) = f^{\flat}.c$ for any chain $c\in C$.
+This results, induces an inner product on on $C^*$ given by
+$$
+f.g = f^{\flat}.g^{\flat}
+$$
+for any pair of cochains $f,g\in C^*$.
+The map $C^*\ni f\to f^{\flat}\in C$ is an isomorphism, whose inverse is denoted by $C\ni c\to c^{\sharp}\in C^*$.
+
+A notion of orientation is imposed to the vector space of chains, by requering that
+$$
+e_s
+=
+e_{i_0...i_k}
+=
+(-1)^p
+e_{j_0...j_k}
+$$
+for each simplex $s=\{i_0,...,i_k\}$ of $K$
+when $0\leq i_0<i_1<...<i_k\leq n$ and $p$ is the parity of the permutation taking the sequence $i_0...i_k$ into the sequence $j_0...j_k$.
+
+Thanks to the notion of orientation, a boundary linear operator $\partial:C\to C$ can be defined by its action on the vectors of the canonical basis, i.e. by
+$$
+\partial e_{i_0...i_k}
+=
+\sum_{j=0}^k
+(-1)^j
+e_{i_0...i_{j-1}i_{j+1}...i_k}
+$$
+for any $e_{i_0...i_k}\in C$.
+Note that $\partial(C_k) \subseteq C_{k-1}$, where $C_{-1}=\{0\}$ denotes the trivial subspace of $C$ of dimension 0.
+
+Since the application of any cochain $f$ to any chain $c$ is a bilinear form, the coboundary linear operator $d:C^*\to C^*$ is univocally defined by the relation
+$$
+df(c) = f(\partial c)
+$$
+for any $f\in C^*$ and $c\in C$.
+Note, $d(C_k^*)\subset C_{k+1}^*$ where $C_3^*=\{0\}$ denotes the trivial subspace of $C^*$ of dimension 0.
+
+Since the inner products on $C$ and $C^*$ are also bilinear forms, then the dual boundary $\partial^*:C\to C$ and the dual coboundary $d^*:C^*\to C^*$ linear operators can be univocally defined by
+$$
+\partial^*c.q
+=
+c.\partial q
+$$
+and
+$$
+d^*f.g
+=
+f.d g,
+$$
+for any chains $c,q\in C$ and any cochains $f,g\in C^*$, respectively.
+Note, $\partial^*(C_{k-1})\subseteq C_k$ and $d^*(C_{k+1}^*)\subseteq C_k^*$.
+
 
 \section{
 Methods
