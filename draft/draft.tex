@@ -163,9 +163,9 @@ Consider a set of $N=n+1$ teams labeled $\{0,1,\dots,n\}$ to be rated and ranked
 Suppose that for each distinct pair of teams $i$ and $j$, a pairwise comparison score $f_{ij}=-f_{ji}$ is given.
 Informally, $f_{ij}>0$ suggests that team $i$ should be rated higher than team $j$, while $f_{ij}<0$ suggests the opposite.
 
-A natural approach to inferring rating scores consistent with the pairwise comparisons is to assign ratings $w_i$ (for $i=0,1,\dots,n$) that minimize the sum of squared discrepancies
+A natural approach to inferring rating scores consistent with the pairwise comparisons is to assign ratings $f_i$ (for $i=0,1,\dots,n$) that minimize the sum of squared discrepancies
 $$
-\sum_{i<j} \bigl(f_{ij}-(w_i-w_j)\bigr)^2.
+\sum_{i<j} \bigl(f_{ij}-(f_i-f_j)\bigr)^2.
 $$
 This yields a well-posed optimization problem that admits an elegant reformulation in the language of cochains over simplicial complexes.
 The resulting framework for the inference of ratings and rankings is known as {\em HodgeRank}~\cite{jiang2011statistical, perotti2025analysis}.
@@ -336,6 +336,53 @@ $$
 L_k^{\downarrow} = d_{k-1}d_{k-1}^* : C_k^* \to C_{k-1}^* \to C_k^*.
 $$
 
+Any $k$-cochain $f$ admits the so called Hodge decomposition
+$$
+f = g\oplus h\oplus s
+$$
+where the direct sum components $g\in \rng d_{k-1}$, $h\in \krn L_k$ and $s\in \rng d_k^*$ are unique and are called the gradient, the harmonic and the solenoid components, respectively.
+As a consequence, there exists non-unique cochains $w\in C_{k-1}^*$ and $u\in C_{k+1}^*$ such that $g=d_{k-1}w$ and $s=d_k^*u$, that can be found solving for
+\begin{eqnarray}
+d_kf 
+&=&
+d_k(g+h+s)
+\notag
+\\
+&=&
+d_k s
+\notag
+\\
+&=&
+d_k d_k^* u
+\notag
+\\
+&=&
+L_{k+1}^{\downarrow} u
+\notag
+\end{eqnarray}
+and
+\begin{eqnarray}
+d_{k-1}^* f 
+&=&
+d_{k-1}^*(g+h+s)
+\notag
+\\
+&=&
+d_{k-1}^* g
+\notag
+\\
+&=&
+d_{k-1}^*d_{k-1} w
+\notag
+\\
+&=&
+L_{k-1}^{\uparrow} w,
+\notag
+\end{eqnarray}
+while the harmonic component can be found from $h=f-g-s$.
+
+
+\subsection{Discrete calculus reformulation of the infererence of ratings}
 
 \section{
 Methods
