@@ -146,24 +146,25 @@ See~\cite{perotti2025analysis,chacoma2025data}.
 \subsection{Least-squares inference of team ratings and rankings}
 
 Consider a set of $N=n+1$ teams labeled $\{0,1,\dots,n\}$.
-For each distinct pair of teams $i$ and $j$, assume a pairwise comparison score $f_{ij}=-f_{ji}$ is available.
-Informally, $f_{ij}>0$ indicates that team $i$ is rated higher than team $j$, whereas $f_{ij}<0$ suggests the opposite.
+For each distinct pair of teams $i$ and $j$, assume that a pairwise comparison score $f_{ij}=-f_{ji}$ is available.
+Intuitively, $f_{ij}>0$ indicates that team $i$ should be rated higher than team $j$, whereas $f_{ij}<0$ suggests the opposite.
 
-A natural approach to inferring consistent ratings is to assign scores $w_i$ ($i=0,1,\dots,n$) that minimize the total squared discrepancy
+A natural approach to inferring ratings consistent with these comparisons is to assign scores $w_i$ (for $i=0,1,\dots,n$) that minimize the sum of squared discrepancies:
 \begin{equation}
 \label{eq:1}
 \sum_{i<j} \bigl(f_{ij}-(w_i-w_j)\bigr)^2.
 \end{equation}
-Once the team ratings $w_0,w_1,\dots,w_n$ have been obtained, the ranking $r_0,r_1,\dots,r_n$ follows from the ordering condition $r_i<r_j$ whenever $w_i>w_j$.
-This least-squares formulation defines a well-posed optimization problem that admits an elegant reformulation in terms of cochains over simplicial complexes.
+Once the team ratings $w_0,w_1,\dots,w_n$ have been inferred, the ranking $r_0,r_1,\dots,r_n$ is obtained by requiring that $r_i<r_j$ whenever $w_i>w_j$.
+This setup leads to a well-posed optimization problem that admits an elegant reformulation in terms of cochains over simplicial complexes.
 The resulting framework for rating and ranking inference is known as \emph{HodgeRank}~\cite{jiang2011statistical, perotti2025analysis}.
 
 \subsection{Discrete exterior calculus on simplicial complexes}
 
-To review the HodgeRank method, we recall the basic elements of discrete exterior calculus on simplicial complexes.  
-Let $V=\{0,1,\dots,n\}$ denote a set of vertices, and define a simplicial complex as a collection
+To review the HodgeRank method, we summarize the basic elements of discrete exterior calculus on simplicial complexes.  
+Let $V=\{0,1,\dots,n\}$ denote a set of vertices.  
+A simplicial complex is a collection
 \[
-K = K_0 \cup K_1 \cup \dots \cup K_n,
+K = K_0 \cup K_1 \cup \dots \cup K_n
 \]
 where
 \[
@@ -172,25 +173,25 @@ K_k
 \bigl\{
 \{i_0,\dots,i_k\}
 :
-0\leq i_0<\dots<i_k\leq n
-\bigr\}
+0\leq i_0<\dots<i_k\leq n\bigr
+\},
 \]
-is the set of $k$-simplices, i.e., unordered subsets $\{i_0,\dots,i_k\}$ of vertices satisfying the closure condition: if $s\in K$ and $r\subset s$ with $r\neq \emptyset$, then $r\in K$.
+of $k$-simplices, i.e. unordered subsets $\{i_0,\dots,i_k\}$ of the vertex set satisfying the closure condition: if $s\in K$ and $r\subset s$ with $r\neq \emptyset$, then $r\in K$.
 
-The set $K$ of simplices is associated with a vector space $C$ of \emph{chains}, with canonical basis $\{e_s:s\in K\}$.
-We equip $C$ with the inner product
+The set $K$ of simplices is associated with a vector space $C$ of vectors called chains, whose canonical basis is denoted by $\{e_s:s\in K\}$.
+We equip $C$ with the trivial inner product
 \[
 e_r \cdot e_s = \delta_{rs}, \qquad r,s \in K.
 \]
-With Einstein summation convention, any chain $c\in C$ can be written as $c=c^s e_s$ with coefficients $c^s\in \mathbb{R}$.
-The chain space decomposes as
+Using Einstein summation convention, any chain $c\in C$ can be written as $c=c^se_s$ with coefficients $c^s\in \mathbb{R}$.
+The chain space decomposes into
 \[
 C = C_0 \oplus C_1 \oplus C_2,
 \]
-where $C_k$ is spanned by $\{e_s:s\in K_k\}$.
+where $C_k$ is the subspace spanned by $\{e_s:s\in K_k\}$.
 
-The dual space $C^*$ of \emph{cochains} is spanned by $\{e^s:s\in K\}$, where $e^r(e_s)=\delta^r{}_s$.
-Any $f\in C^*$ decomposes as $f=f_s e^s$ with coefficients $f_s\in \mathbb{R}$, and
+Dually, the space of cochains $C^*$ is spanned by $\{e^s:s\in K\}$, where $e^r(e_s)=\delta^r{}_s$.
+Any $f\in C^*$ decomposes as $f=f_se^s$ with coefficients $f_s\in \mathbb{R}$, and
 \[
 C^* = C_0^* \oplus C_1^* \oplus C_2^*.
 \]
@@ -200,16 +201,16 @@ This induces an inner product on $C^*$:
 \[
 f\cdot g = f^\flat \cdot g^\flat.
 \]
-The map $f\mapsto f^\flat$ is an isomorphism, with inverse denoted $c\mapsto c^\sharp$.
+The map $f\mapsto f^\flat$ is an isomorphism, with inverse denoted by $c\mapsto c^\sharp$.
 
 \medskip
 
 \noindent\textbf{Orientation and boundary.}  
-An orientation is fixed by requiring
+An orientation is imposed on chains by requiring
 \[
-e_{i_0\dots i_k} = (-1)^p e_{j_0\dots j_k},
+e_s = e_{i_0\dots i_k} = (-1)^p e_{j_0\dots j_k},
 \]
-for each simplex $s=\{i_0,\dots,i_k\}\in K$, where $p$ is the parity of the permutation mapping $(i_0,\dots,i_k)$ to $(j_0,\dots,j_k)$.
+for each simplex $s=\{i_0,\dots,i_k\}\in K$, where $0\leq i_0<\dots<i_k\leq n$ and $p$ is the parity of the permutation taking $(i_0,\dots,i_k)$ into $(j_0,\dots,j_k)$.
 
 The boundary operator $\partial:C\to C$ is defined on basis elements as
 \[
@@ -217,20 +218,22 @@ The boundary operator $\partial:C\to C$ is defined on basis elements as
 =
 \sum_{j=0}^k (-1)^j e_{i_0\dots i_{j-1}i_{j+1}\dots i_k}.
 \]
-Thus $\partial(C_k)\subseteq C_{k-1}$, with $C_{-1}=\{0\}$, yielding the decomposition
+Thus $\partial(C_k)\subseteq C_{k-1}$, with $C_{-1}=\{0\}$.
+This yields the decomposition
 \[
 \partial = \partial_0 \oplus \partial_1 \oplus \partial_2,
-\qquad \partial_k(C_k)\subseteq C_{k-1}, \ \partial_0=0.
 \]
+where $\partial_k(C_k)\subseteq C_{k-1}$ and $\partial_0=0$.
 
 \medskip
 
 \noindent\textbf{Coboundary.}  
 The coboundary operator $d:C^*\to C^*$ is defined by
 \[
-df(c) = f(\partial c), \qquad f\in C^*, \ c\in C.
+df(c) = f(\partial c),
 \]
-Hence $d(C_k^*) \subseteq C_{k+1}^*$, with $C_3^*=\{0\}$, and
+for all $f\in C^*$ and $c\in C$.
+Thus $d(C_k^*) \subseteq C_{k+1}^*$, with $C_3^*=\{0\}$, and
 \[
 d = d_0 \oplus d_1 \oplus d_2, \qquad d_2=0.
 \]
@@ -238,35 +241,31 @@ d = d_0 \oplus d_1 \oplus d_2, \qquad d_2=0.
 \medskip
 
 \noindent\textbf{Adjoint operators.}  
-The adjoints $\partial^*:C\to C$ and $d^*:C^*\to C^*$ are defined by
+Since the inner products on $C$ and $C^*$ are bilinear, the adjoint operators $\partial^*:C\to C$ and $d^*:C^*\to C^*$ are defined by
 \[
 \partial^*c \cdot q = c\cdot \partial q, 
 \qquad 
 d^*f \cdot g = f\cdot dg,
 \]
 for all $c,q\in C$ and $f,g\in C^*$.
-They decompose as
+These satisfy
 \[
 \partial^* = \partial_0^* \oplus \partial_1^* \oplus \partial_2^*, 
 \qquad 
 d^* = d_0^* \oplus d_1^* \oplus d_2^*.
 \]
 
+\medskip
+
 \noindent\textbf{Hodge Laplacians.}  
 The boundary and coboundary operators define the Hodge Laplacians
-\begin{eqnarray}
-\mathcal{L} 
-&=&
-(\partial+\partial^*)^2 
-=
-\partial \partial^* + \partial^* \partial : C\to C,
-\mbox{and}
-\notag
-\\
-L &=& (d+d^*)^2 = dd^* + d^*d : C^*\to C^*,
-\notag
-\end{eqnarray}
-with $\partial^2=(\partial^*)^2=d^2=(d^*)^2=0$.
+\[
+\mathcal{L} = (\partial+\partial^*)^2 = \partial\partial^* + \partial^*\partial : C\to C,
+\]
+\[
+L = (d+d^*)^2 = dd^* + d^*d : C^*\to C^*,
+\]
+where $\partial^2=(\partial^*)^2=d^2=(d^*)^2=0$.
 These decompose as
 \[
 \mathcal{L} = \mathcal{L}_0 \oplus \mathcal{L}_1 \oplus \mathcal{L}_2, 
@@ -288,6 +287,8 @@ L_k^{\uparrow} = d_k^*d_k, \quad
 L_k^{\downarrow} = d_{k-1}d_{k-1}^*.
 \]
 
+\medskip
+
 \noindent\textbf{Hodge decomposition.}  
 Every $k$-cochain $f$ admits the Hodge decomposition
 \[
@@ -307,76 +308,77 @@ d_{k-1}^* f &= L_{k-1}^{\uparrow} w,
 \end{align}
 while $h=f-g-s$.
 
-%\subsection{HodgeRank}
+\subsection{HodgeRank}
 
-The least-squares problem~\eqref{eq:1} admits a reformulation in the language of discrete calculus:
+Expression~\eqref{eq:1} can be reformulated in the language of discrete calculus as
 \begin{equation}
 \label{eq:4}
 \lVert f - d_0(w) \rVert,
 \end{equation}
-where the scalar entries $f_{ij}$ of the $1$-cochain $f=f_{ij}e^{ij}$ encode the pairwise comparison scores, and the components $w_i$ of the $0$-cochain $w=w_ie^i$ represent the team ratings.
+where the scalar components $f_{ij}$ of the $1$-cochain $f=f_{ij}e^{ij}$ encode the pairwise comparison scores, and the components $w_i$ of the $0$-cochain $w=w_ie^i$ represent the ratings.
 The minimizer of~\eqref{eq:4} coincides with the solution of Eq.~\eqref{eq:3} for $k=1$.
 
-In this setting, the set of $0$-simplices $K_0$ corresponds to the teams $V$, the set of $1$-simplices $K_1$ to the pairwise comparisons $E$, and the set of $2$-simplices $K_2$ to the closed triples of comparisons:
+In this setting, the set of $0$-simplices $K_0$ corresponds to the teams $V$, the set of $1$-simplices $K_1$ to the comparisons $E$, and the set of $2$-simplices $K_2$ to the closed triples of comparisons:
 \[
 K_2 = \bigl\{ \{i,j,k\} : \{i,j\},\{j,k\},\{i,k\}\in E \bigr\}.
 \]
 For $k>2$, $K_k=\emptyset$.
 
-\section{Methods}
+\section{
+Methods
 \label{sec:methods}
+}
 
-The dataset covers five major soccer leagues: England, France, Germany, Italy, and Spain.
-Each league consists of $N=20$ teams, except Germany, which has $N=18$.
+The dataset covers five soccer leagues: England, France, Germany, Italy and Spain.
+Each league consists of $N=20$ teams, except for Germany, which has $N=18$.
 
-In these competitions (e.g., Premier League, La Liga, Serie A, Bundesliga, Ligue 1), the final standings are determined by a points system based on match results throughout the season.
-In the standard system, a win yields 3 points, a draw 1 point, and a loss 0 points.
-Each team plays every other team twice (home and away) in a round-robin format. 
-Over the season, the $i$-th team accumulates $\pi_i$ total points.
-At the end of the season, teams are ranked in descending order of $\pi_i$.
-If two or more teams tie on points, tiebreakers are applied, typically in the following order (with minor variations across leagues):  
-goal difference (GD: goals scored minus goals conceded),  
-goals scored (GF),  
-head-to-head record,  
-and, in rare cases, a playoff or extra match.  
-Thus, the final table is determined primarily by total points, with tiebreakers resolving ties.
+in the major European soccer leagues (e.g., Premier League, La Liga, Serie A, Bundesliga, Ligue 1), the final standings are determined by a points system based on the results of matches during the season.
+In the standard system, a win adds 3 points, a draw 1 point and a loss 0 points.
+Each team plays every other team in the league twice (home and away) in what is called a round-robin format. 
+Over the course of the season, the $i$-th team accumulates a total of $\pi_i$ points.
+At the end of the season, the teams are ranked in descending order of total points.
+If two or more teams have the same number of points, tiebreakers are applied. The exact rules vary slightly by league, but usually the order is something like:
+Goal difference (GD): goals scored minus goals conceded.
+Goals scored (GF): total number of goals scored during the season.
+Head-to-head record: results of the matches between the tied teams (some leagues use this before GD).
+Playoff or extra match: in rare cases (e.g., for the title, relegation, or European qualification) if all other criteria fail.
+So the final standing (the ranking table at the end of the season) is determined by total points, with tiebreakers applied as needed.
 
-%\subsection{Data}
+\subsection{
+Data
 \label{sec:data}
+}
 
-For each pair $\{i,j\}$ of teams in a given league, several pairwise metrics $m_{ij}$ and $m_{ji}$ are recorded.
-Each metric $m_{ij}$ takes a positive value when it favors team $i$ over $j$, and a negative value otherwise.
-The metrics considered include:
+For each pair $\{i,j\}$ of teams in a given league, several pairwise metrics $m_{ij}$ and $m_{ji}$ are provided.
+Each metric $m_{ij}$ takes a positive value when it presumably favors the home team $i$ over away team $j$, and takes a negative value otherwise.
+The different types of empirically determined metrics being considered are:
 \begin{enumerate}
-\item \textbf{crossings}
-\item \textbf{counterattacks}
-\item \textbf{pressure loss}
-\item \textbf{build-up time}
-\item \textbf{direct play}
-\item \textbf{pressure points}
-\item \textbf{shots}
-\item \textbf{flow rate}
-\item \textbf{maintenance time}
-\item \textbf{middle-zone time} (etc.)
+\item {\bf crossings:}
+\item {\bf counterattacks:}
+\item {\bf pressure loss:}
+\item {\bf build-up time:}
+\item {\bf direct play:}
+\item {\bf pressure points:}
+\item {\bf shots:}
+\item {\bf flow rate:}
+\item {\bf maintenance time:}
+\item {\bf middle-zone time:} bla bla.
 \end{enumerate}
-Additionally, the Singular Value Decomposition of these empirical metrics is considered to define higher-level descriptors called \emph{styles}~\cite{chacoma2025data}.
+Moreover, the Singular Value Decomposition of previous emprically determined metrics are also considered in order define the so-called {\em styles}~\cite{chacoma2025data}.
 
 \subsection{HodgeRank inference via metrics}
 
 Given a metric, the coefficients
-\[
+$$
 f_{ij}
 =
 \frac{1}{2}(m_{ij}+m_{ji})
-\]
-are defined for each $i<j$.
-To test the HodgeRank inference method, two types of ground-truth coefficients are also introduced:  
-(i) \emph{rank-based} coefficients $f_{ij}=i-j$, and  
-(ii) \emph{points-based} coefficients $f_{ij}=\pi_j-\pi_i$.
-
-In all cases, the underlying structure is a fully connected graph with $N$ nodes, promoted to a simplicial complex composed of $0$-simplices labeled by $i$, $1$-simplices labeled by $ij$ with $i<j$, and $2$-simplices labeled by $ijk$ with $i<j<k$.
-Correspondingly, the coefficients $f_{ij}$ form the components of a $1$-cochain $f$, where the antisymmetry $f_{ji}=-f_{ij}$ is imposed by definition.
-There are no $k$-simplices for $k>2$.
+$$
+are defined for each $i$ and $j$ such that $i<j$.
+Moreover, in order to test the HodgeRank inference method, two types of ground-truth coefficients are also defined.
+Namely, the rank-based coefficients $f_{ij}=i-j$ and the tournament points based coefficients $f_{ij}=\pi_j-\pi_i$.
+In all cases, there is an underlying fully connected network or graph with $N$ nodes that is promoted to a simplicial complex composed of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ with $i<j$ and 2-simplices labeled by $ijk$ with $i<j<k$.
+Correspondingly, the coefficients $f_{ij}$ are promoted to be the components of a 1-cochain  $f$, where the anti-symmetric relation $f_{ji}=-f_{ij}$ is imposed by definition.
 
 \section{
 Results
