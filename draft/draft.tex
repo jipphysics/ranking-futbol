@@ -168,7 +168,13 @@ K = K_0 \cup K_1 \cup \dots \cup K_n
 \]
 where
 \[
-K_k \subseteq \bigl\{\{i_0,\dots,i_k\} : 0\leq i_0<\dots<i_k\leq n,\ i_j\in V\bigr\},
+K_k
+\subseteq
+\bigl\{
+\{i_0,\dots,i_k\}
+:
+0\leq i_0<\dots<i_k\leq n\bigr
+\},
 \]
 of $k$-simplices, i.e. unordered subsets $\{i_0,\dots,i_k\}$ of the vertex set satisfying the closure condition: if $s\in K$ and $r\subset s$ with $r\neq \emptyset$, then $r\in K$.
 
@@ -358,29 +364,21 @@ The different types of empirically determined metrics being considered are:
 \item {\bf maintenance time:}
 \item {\bf middle-zone time:} bla bla.
 \end{enumerate}
-Moreover, the Singular Value Decomposition of previous emprically determined metrics are considered in order to define the so-called {\em styles} which are also some kind of metric~\cite{chacoma2025data}.
+Moreover, the Singular Value Decomposition of previous emprically determined metrics are also considered in order define the so-called {\em styles}~\cite{chacoma2025data}.
 
-\subsection{Inference of ratings and rankings}
+\subsection{HodgeRank inference via metrics}
 
-With each metric, the coefficients
+Given a metric, the coefficients
 $$
 f_{ij}
 =
 \frac{1}{2}(m_{ij}+m_{ji})
-=
-- f_{ji}
 $$
 are defined for each $i$ and $j$ such that $i<j$.
 Moreover, in order to test the HodgeRank inference method, two types of ground-truth coefficients are also defined.
 Namely, the rank-based coefficients $f_{ij}=i-j$ and the tournament points based coefficients $f_{ij}=\pi_j-\pi_i$.
-In all cases there is an underlying fully connected network or graph with $N$ nodes, that is promoted to a simplicial complex composed of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ with $i<j$ and 2-simplices labeled by $ijk$ with $i<j<k$.
-Correspondingly, the coefficients $f_{ij}$ are promoted to be the components of a 1-cochain  $f$, where the anti-symmetric relation $f_{ji}=-f_{ij}$ must hold by definition.
-
-%From a score $\phi$, a corresponding cochain $f\in C_1^*$ of coordinates $f_{ij}=\phi_{ji}-\phi_{ij}$ is defined.
-%Also, the cochain $f'\in C_1^*$ of coordinates $f'_{ij}=\phi_j-\phi_i$ with team strengths $\phi_i=\sum_j \phi_{ij}$ is considered.
-
-{\color{red}[JUAN: Write here the inference problem.]}
-
+In all cases, there is an underlying fully connected network or graph with $N$ nodes that is promoted to a simplicial complex composed of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ with $i<j$ and 2-simplices labeled by $ijk$ with $i<j<k$.
+Correspondingly, the coefficients $f_{ij}$ are promoted to be the components of a 1-cochain  $f$, where the anti-symmetric relation $f_{ji}=-f_{ij}$ is imposed by definition.
 
 \section{
 Results
