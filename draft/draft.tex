@@ -140,291 +140,211 @@ Bla bla...
 
 See~\cite{perotti2025analysis,chacoma2025data}.
 
-\section{
-Theory
+\section{Theory}
 \label{sec:theory}
-}
 
-\subsection{HodgeRank for inference of team's ratings and rankings}
+\subsection{Least-squares inference of team ratings and rankings}
 
-%Consider a set of $N=n+1$ teams labeled by $\{0,1,...,n\}$ to be rated and ranked.
-%For this aim, assume that some set of pairwise comparison scores $\psi_{ij}=-\psi_{ji}$ is provided for each pair $ij$ of different teams $i$ and $j$.
-%Informally, the score $\psi_{ij}$ should be positive if the comparison indicates that team $i$ should preferably be rated higher than team $j$ and the opposite otherwise.
-%
-%One way to infer rating scores somehow consistent with the pairwise comparisons scores $\phi_{ij}$, consist in finding ratings $w_i$ for $i=0,1,..,n$ that minimize the sum of squared differences
-%$$
-%\sum_{ij:i<j} |\psi_{ij}-(w_i-w_j)|^2.
-%$$
-%This is a well defined mathematical problem that can be conveniently reformulated in the language of cochains over simplicial complexes, conceiving a method for the inference of ratings and rankings that is named  HodgeRank~\cite{jiang2011statistical,
-%perotti2025analysis}.
+Consider a set of $N=n+1$ teams labeled $\{0,1,\dots,n\}$.
+For each distinct pair of teams $i$ and $j$, assume that a pairwise comparison score $f_{ij}=-f_{ji}$ is available.
+Intuitively, $f_{ij}>0$ indicates that team $i$ should be rated higher than team $j$, whereas $f_{ij}<0$ suggests the opposite.
 
-
-Consider a set of $N=n+1$ teams labeled $\{0,1,\dots,n\}$ to be rated and ranked.
-Suppose that for each distinct pair of teams $i$ and $j$, a pairwise comparison score $f_{ij}=-f_{ji}$ is given.
-Informally, $f_{ij}>0$ suggests that team $i$ should be rated higher than team $j$, while $f_{ij}<0$ suggests the opposite.
-
-A natural approach to inferring rating scores consistent with the pairwise comparisons is to assign ratings $w_i$ (for $i=0,1,\dots,n$) that minimize the sum of squared discrepancies
+A natural approach to inferring ratings consistent with these comparisons is to assign scores $w_i$ (for $i=0,1,\dots,n$) that minimize the sum of squared discrepancies:
 \begin{equation}
 \label{eq:1}
 \sum_{i<j} \bigl(f_{ij}-(w_i-w_j)\bigr)^2.
 \end{equation}
-This yields a well-posed optimization problem that admits an elegant reformulation in the language of cochains over simplicial complexes.
-The resulting framework for the inference of ratings and rankings is known as {\em HodgeRank}~\cite{jiang2011statistical, perotti2025analysis}.
-
-%To define HodgeRank, it is convenient to introduce a simplicial complex composed of a 0-simplex $i$ for each team, a 1-simplex $ij$ for each pairwise comparison $\psi_{ij}$ between teams and a 2-simplex $ijk$ for each existing triple $(ij,jk,ki)$ in the set of 1-simplices.
-%Recall here that $ij$ and $ji$ are both labels of the same simplex, as well as any permutation of $ijk$ is also a label of the same 2-simplex.
+Once the team ratings $w_0,w_1,\dots,w_n$ have been inferred, the ranking $r_0,r_1,\dots,r_n$ is obtained by requiring that $r_i<r_j$ whenever $w_i>w_j$.
+This setup leads to a well-posed optimization problem that admits an elegant reformulation in terms of cochains over simplicial complexes.
+The resulting framework for rating and ranking inference is known as \emph{HodgeRank}~\cite{jiang2011statistical, perotti2025analysis}.
 
 \subsection{Discrete exterior calculus on simplicial complexes}
 
-To review the HodgeRank method for the infrence of ratings and rankings, the theory of discrete exterior calculus on simplicial complexes has to be reviewed first.
-For this, consider a vertex set $V=\{0,1,\dots,n\}$.
-A simplicial complex is a set
-$$
-K = K_0 \cup K_1 \cup ... \cup K_n
-$$
-of $k$-simplices
-$$
-K_k \subseteq \{\{i_0,...,i_k\} : i_0,...,i_k \in V\}
-$$
-that satisfies the closure condition: if $s\in K$ and $r\subset s$ is non-empty, then $r\in K$.
+To review the HodgeRank method, we summarize the basic elements of discrete exterior calculus on simplicial complexes.  
+Let $V=\{0,1,\dots,n\}$ denote a set of vertices.  
+A simplicial complex is a collection
+\[
+K = K_0 \cup K_1 \cup \dots \cup K_n
+\]
+where
+\[
+K_k \subseteq \bigl\{\{i_0,\dots,i_k\} : 0\leq i_0<\dots<i_k\leq n,\ i_j\in V\bigr\},
+\]
+of $k$-simplices, i.e. unordered subsets $\{i_0,\dots,i_k\}$ of the vertex set satisfying the closure condition: if $s\in K$ and $r\subset s$ with $r\neq \emptyset$, then $r\in K$.
 
-To define discrete calculus, the simplicial complex is equipped with a vector space $C$ of vectors called chains, whose canonical basis is denoted by $\{e_s:s\in K\}$.
+The set $K$ of simplices is associated with a vector space $C$ of vectors called chains, whose canonical basis is denoted by $\{e_s:s\in K\}$.
+We equip $C$ with the trivial inner product
+\[
+e_r \cdot e_s = \delta_{rs}, \qquad r,s \in K.
+\]
+Using Einstein summation convention, any chain $c\in C$ can be written as $c=c^se_s$ with coefficients $c^s\in \mathbb{R}$.
+The chain space decomposes into
+\[
+C = C_0 \oplus C_1 \oplus C_2,
+\]
+where $C_k$ is the subspace spanned by $\{e_s:s\in K_k\}$.
 
-The vector space of chains $C$ is equipped with the trivial inner product
-$$
-e_r.e_s = \delta_{rs}
-$$
-for each pair $r,s \in K$.
-Using Einstein's convention where repeated indices assume an implicit summation, an arbitrary chain $c$ in $C$ can be linearly decomposed in the canonical basis as $c=c^se_s$ where the $c^s$ are coefficients in $\RR$.
-The vector space of chains admits the following decomposition in direct sums
-$$
-C = C_0\oplus C_1\oplus C_2
-$$
-where $C_k$ is the subspace of $C$ spanned by the basis of $k$-chains, i.e. by $\{e_s:s\in K_k\}$.
+Dually, the space of cochains $C^*$ is spanned by $\{e^s:s\in K\}$, where $e^r(e_s)=\delta^r{}_s$.
+Any $f\in C^*$ decomposes as $f=f_se^s$ with coefficients $f_s\in \mathbb{R}$, and
+\[
+C^* = C_0^* \oplus C_1^* \oplus C_2^*.
+\]
 
-The covectors $f$ in the dual space $C^*$ of $C$ are called cochains.
-The dual basis is denoted by $\{e^s:s\in K\}$ and satisfies
-$$
-e^r(e_s) = \delta^r{}_s
-$$
-denotes Kronecker's delta for each $s,r\in K$.
-An arbitrary cochain $f$ in $C^*$ can be linearly decomposed in the dual basis as $f=f_se^s$ where the $f_s$ are coefficients in $\RR$.
-The vector space of cochains admits the following decomposition in direct sums
-$$
-C^* = C_0^*\oplus C_1^*\oplus C_2^*
-$$
-where $C_k^*$ is the subspace of $C^*$ spanned by the dual basis of $k$-cochains, i.e. by $\{e^s:s\in K_k\}$.
+By Riesz’s theorem, every cochain $f\in C^*$ corresponds uniquely to a chain $f^\flat \in C$ such that $f(c) = f^\flat \cdot c$ for all $c\in C$.
+This induces an inner product on $C^*$:
+\[
+f\cdot g = f^\flat \cdot g^\flat.
+\]
+The map $f\mapsto f^\flat$ is an isomorphism, with inverse denoted by $c\mapsto c^\sharp$.
 
+\medskip
 
-Riesz's theorem establishes that for any cochain $f\in C^*$, there is an unique chain in $C$ denoted by $f^{\flat}$ such that $f(q) = f^{\flat}.c$ for any chain $c\in C$.
-This results, induces an inner product on on $C^*$ given by
-$$
-f.g = f^{\flat}.g^{\flat}
-$$
-for any pair of cochains $f,g\in C^*$.
-The map $C^*\ni f\to f^{\flat}\in C$ is an isomorphism, whose inverse is denoted by $C\ni c\to c^{\sharp}\in C^*$.
+\noindent\textbf{Orientation and boundary.}  
+An orientation is imposed on chains by requiring
+\[
+e_s = e_{i_0\dots i_k} = (-1)^p e_{j_0\dots j_k},
+\]
+for each simplex $s=\{i_0,\dots,i_k\}\in K$, where $0\leq i_0<\dots<i_k\leq n$ and $p$ is the parity of the permutation taking $(i_0,\dots,i_k)$ into $(j_0,\dots,j_k)$.
 
-A notion of orientation is imposed to the vector space of chains, by requering that
-$$
-e_s
+The boundary operator $\partial:C\to C$ is defined on basis elements as
+\[
+\partial e_{i_0\dots i_k}
 =
-e_{i_0...i_k}
-=
-(-1)^p
-e_{j_0...j_k}
-$$
-for each simplex $s=\{i_0,...,i_k\}$ of $K$
-when $0\leq i_0<i_1<...<i_k\leq n$ and $p$ is the parity of the permutation taking the sequence $i_0...i_k$ into the sequence $j_0...j_k$.
+\sum_{j=0}^k (-1)^j e_{i_0\dots i_{j-1}i_{j+1}\dots i_k}.
+\]
+Thus $\partial(C_k)\subseteq C_{k-1}$, with $C_{-1}=\{0\}$.
+This yields the decomposition
+\[
+\partial = \partial_0 \oplus \partial_1 \oplus \partial_2,
+\]
+where $\partial_k(C_k)\subseteq C_{k-1}$ and $\partial_0=0$.
 
-Thanks to the notion of orientation, a boundary linear operator $\partial:C\to C$ can be defined by its action on the vectors of the canonical basis, i.e. by
-$$
-\partial e_{i_0...i_k}
-=
-\sum_{j=0}^k
-(-1)^j
-e_{i_0...i_{j-1}i_{j+1}...i_k}
-$$
-for any $e_{i_0...i_k}\in C$.
-Note that $\partial(C_k) \subseteq C_{k-1}$, where $C_{-1}=\{0\}$ denotes the trivial subspace of $C$ of dimension 0.
-This induces the following direct sum decomposition
-$$
-\partial = \partial_0 \oplus \partial_1 \oplus \partial_2
-$$
-where $\partial_k(C)=\partial(C_k)\subseteq C_{k-1}$ and, in particular, $\partial_0=0$.
+\medskip
 
-Since the application of any cochain $f$ to any chain $c$ is a bilinear form, the coboundary linear operator $d:C^*\to C^*$ is univocally defined by the relation
-$$
-df(c) = f(\partial c)
-$$
-for any $f\in C^*$ and $c\in C$.
-Note, $d(C_k^*)\subset C_{k+1}^*$ where $C_3^*=\{0\}$ denotes the trivial subspace of $C^*$ of dimension 0.
-As before, this induces the following direct sum decomposition
-$$
-d = d_0 \oplus d_1 \oplus d_2
-$$
-where $d_k(C^*)=d(C_k^*)\subseteq C_{k+1}^*$ and, in particular, $d_2=0$.
+\noindent\textbf{Coboundary.}  
+The coboundary operator $d:C^*\to C^*$ is defined by
+\[
+df(c) = f(\partial c),
+\]
+for all $f\in C^*$ and $c\in C$.
+Thus $d(C_k^*) \subseteq C_{k+1}^*$, with $C_3^*=\{0\}$, and
+\[
+d = d_0 \oplus d_1 \oplus d_2, \qquad d_2=0.
+\]
 
-Since the inner products on $C$ and $C^*$ are also bilinear forms, then the dual boundary $\partial^*:C\to C$ and the dual coboundary $d^*:C^*\to C^*$ linear operators can be univocally defined by
-$$
-\partial^*c.q
-=
-c.\partial q
-$$
-and
-$$
-d^*f.g
-=
-f.d g,
-$$
-for any chains $c,q\in C$ and any cochains $f,g\in C^*$, respectively.
-Note, that $\partial^*(C_{k-1})\subseteq C_k$ and $d^*(C_{k+1}^*)\subseteq C_k^*$, indicing the follow direct sum decompositions
-$$
-\partial^* = \partial_0^* \oplus \partial_1^* \oplus \partial_2^*
-$$
-and
-$$
-d^* = d_0^* \oplus d_1^* \oplus d_2^*
-$$
-where $\partial_k^*(C)=\partial^*(C_{k-1})\subseteq C_k$ and $d_k^*(C^*)=d(C_{k+1}^*)\subseteq C_k^*$.
+\medskip
 
-The boundary and coboundary operators and their duals can be used to define the so called Hodge Laplacians
-$$
-\mathcal{L} = (\partial + \partial^*)^2 = \partial \partial^* + \partial^* \partial
-: C\to C
-$$
-and
-$$
-L = (d+d^*)^2 = dd^* + d^*d : C^*\to C^*
-$$
-where the fact that $\partial^2 = (\partial^*)^2 = 0$ and $d^2=(d^*)^2=0$ is used.
-The first identity $\partial^2=0$ is implied by the alternating properties of the definition of $\partial$, from where the other identities follow.
-These Hodge Laplacians satisfy the following decomposition in direct sums
-$$
-\mathcal{L}
-=
-\mathcal{L}_0
-\oplus
-\mathcal{L}_1
-\oplus
-\mathcal{L}_2
-$$
-and
-$$
+\noindent\textbf{Adjoint operators.}  
+Since the inner products on $C$ and $C^*$ are bilinear, the adjoint operators $\partial^*:C\to C$ and $d^*:C^*\to C^*$ are defined by
+\[
+\partial^*c \cdot q = c\cdot \partial q, 
+\qquad 
+d^*f \cdot g = f\cdot dg,
+\]
+for all $c,q\in C$ and $f,g\in C^*$.
+These satisfy
+\[
+\partial^* = \partial_0^* \oplus \partial_1^* \oplus \partial_2^*, 
+\qquad 
+d^* = d_0^* \oplus d_1^* \oplus d_2^*.
+\]
+
+\medskip
+
+\noindent\textbf{Hodge Laplacians.}  
+The boundary and coboundary operators define the Hodge Laplacians
+\[
+\mathcal{L} = (\partial+\partial^*)^2 = \partial\partial^* + \partial^*\partial : C\to C,
+\]
+\[
+L = (d+d^*)^2 = dd^* + d^*d : C^*\to C^*,
+\]
+where $\partial^2=(\partial^*)^2=d^2=(d^*)^2=0$.
+These decompose as
+\[
+\mathcal{L} = \mathcal{L}_0 \oplus \mathcal{L}_1 \oplus \mathcal{L}_2, 
+\qquad 
 L = L_0 \oplus L_1 \oplus L_2,
-$$
-where in turn
-$$
-\mathcal{L}_k = \mathcal{L}_k^{\downarrow} \oplus \mathcal{L}_k^{\uparrow} : C_k\to C_k,
-$$
-$$
-L_k = L_k^{\downarrow} \oplus L_k^{\uparrow} : C_k^* \to C_k^*,
-$$
-$$
-\mathcal{L}_k^{\downarrow} = \partial_k^*\partial_k : C_k \to C_{k-1} \to C_k,
-$$
-$$
-\mathcal{L}_k^{\uparrow} = \partial_{k+1}\partial_{k+1}^* : C_k \to C_{k+1} \to C_k,
-$$
-$$
-L_k^{\uparrow} = d_k^*d_k : C_k^* \to C_{k+1}^* \to C_k^*,
-$$
-and
-$$
-L_k^{\downarrow} = d_{k-1}d_{k-1}^* : C_k^* \to C_{k-1}^* \to C_k^*.
-$$
+\]
+with
+\[
+\mathcal{L}_k = \mathcal{L}_k^{\downarrow}\oplus \mathcal{L}_k^{\uparrow}, 
+\qquad 
+L_k = L_k^{\downarrow}\oplus L_k^{\uparrow},
+\]
+\[
+\mathcal{L}_k^{\downarrow} = \partial_k^*\partial_k, \quad 
+\mathcal{L}_k^{\uparrow} = \partial_{k+1}\partial_{k+1}^*, 
+\]
+\[
+L_k^{\uparrow} = d_k^*d_k, \quad 
+L_k^{\downarrow} = d_{k-1}d_{k-1}^*.
+\]
 
-Any $k$-cochain $f$ admits the so called Hodge decomposition
-$$
-f = g\oplus h\oplus s
-$$
-where the direct sum components $g\in \rng d_{k-1}$, $h\in \krn L_k$ and $s\in \rng d_k^*$ are unique and are called the gradient, the harmonic and the solenoid components, respectively.
-As a consequence, there exists non-unique cochains $w\in C_{k-1}^*$ and $u\in C_{k+1}^*$ such that $g=d_{k-1}w$ and $s=d_k^*u$, that can be found solving for
-\begin{eqnarray}
+\medskip
+
+\noindent\textbf{Hodge decomposition.}  
+Every $k$-cochain $f$ admits the Hodge decomposition
+\[
+f = g \oplus h \oplus s,
+\]
+where $g\in \operatorname{im} d_{k-1}$ (gradient), $h\in \ker L_k$ (harmonic), and $s\in \operatorname{im} d_k^*$ (solenoidal).
+Equivalently, there exist $w\in C_{k-1}^*$ and $u\in C_{k+1}^*$ such that
+\[
+g = d_{k-1}w, \qquad s = d_k^* u,
+\]
+with $w$ and $u$ determined by
+\begin{align}
 \label{eq:2}
-d_kf 
-&=&
-d_k(g+h+s)
-%\notag
-\\
-&=&
-d_k s
-\notag
-\\
-&=&
-d_k d_k^* u
-\notag
-\\
-&=&
-L_{k+1}^{\downarrow} u
-\notag
-\end{eqnarray}
-and
-\begin{eqnarray}
+d_k f &= L_{k+1}^{\downarrow} u, \\
 \label{eq:3}
-d_{k-1}^* f 
-&=&
-d_{k-1}^*(g+h+s)
-%\notag
-\\
-&=&
-d_{k-1}^* g
-\notag
-\\
-&=&
-d_{k-1}^*d_{k-1} w
-\notag
-\\
-&=&
-L_{k-1}^{\uparrow} w,
-\notag
-\end{eqnarray}
-while
- the harmonic component can be found from $h=f-g-s$.
-
+d_{k-1}^* f &= L_{k-1}^{\uparrow} w,
+\end{align}
+while $h=f-g-s$.
 
 \subsection{HodgeRank}
 
-Expression~\ref{eq:1} can be reformulated in the language of discrete calculuas as
+Expression~\eqref{eq:1} can be reformulated in the language of discrete calculus as
 \begin{equation}
 \label{eq:4}
-|f-d_0(w)|
+\lVert f - d_0(w) \rVert,
 \end{equation}
-if the scalar components $f_{ij}$ of the 1-cochain $f=f_{ij}e^{ij}$ are identified with the pairwise comparison socres and the 0-cochain scalar components $w_i$ are identified with the ratings.
-In fact, the vector of ratings minimizing expression~\ref{eq:4} is the solution of Eq.~\ref{eq:3} for the case $k=1$.
-For this, the set of 0-simplices $K_0$ is identified with a set $V$ of teams on a league, the set of 1-simplices $K_1$ is identified with the set $E$ of links or pairwise comparison of teams in the league.
-Additionally, to compute the 2-cochain $u$ in order to obtain the solenoid component of the Hodge decomposition of $f$ from Eq.~\ref{eq:2}, the set of 2-simplices is identified with the set of connected triples in the set of comparisons; i.e.
-$$
-K_2
-=
-\{
-\{i,j,k\}
-:
-\{i,j\}\in E,
-\{j,k\}\in E,
-\{i,k\}\in E
-\}.
-$$
-In this setting, $K_k=\emptyset$ for  $k>2$.
+where the scalar components $f_{ij}$ of the $1$-cochain $f=f_{ij}e^{ij}$ encode the pairwise comparison scores, and the components $w_i$ of the $0$-cochain $w=w_ie^i$ represent the ratings.
+The minimizer of~\eqref{eq:4} coincides with the solution of Eq.~\eqref{eq:3} for $k=1$.
+
+In this setting, the set of $0$-simplices $K_0$ corresponds to the teams $V$, the set of $1$-simplices $K_1$ to the comparisons $E$, and the set of $2$-simplices $K_2$ to the closed triples of comparisons:
+\[
+K_2 = \bigl\{ \{i,j,k\} : \{i,j\},\{j,k\},\{i,k\}\in E \bigr\}.
+\]
+For $k>2$, $K_k=\emptyset$.
 
 \section{
 Methods
 \label{sec:methods}
 }
 
+The dataset covers five soccer leagues: England, France, Germany, Italy and Spain.
+Each league consists of $N=20$ teams, except for Germany, which has $N=18$.
+
+in the major European soccer leagues (e.g., Premier League, La Liga, Serie A, Bundesliga, Ligue 1), the final standings are determined by a points system based on the results of matches during the season.
+In the standard system, a win adds 3 points, a draw 1 point and a loss 0 points.
+Each team plays every other team in the league twice (home and away) in what is called a round-robin format. 
+Over the course of the season, the $i$-th team accumulates a total of $\pi_i$ points.
+At the end of the season, the teams are ranked in descending order of total points.
+If two or more teams have the same number of points, tiebreakers are applied. The exact rules vary slightly by league, but usually the order is something like:
+Goal difference (GD): goals scored minus goals conceded.
+Goals scored (GF): total number of goals scored during the season.
+Head-to-head record: results of the matches between the tied teams (some leagues use this before GD).
+Playoff or extra match: in rare cases (e.g., for the title, relegation, or European qualification) if all other criteria fail.
+So the final standing (the ranking table at the end of the season) is determined by total points, with tiebreakers applied as needed.
+
 \subsection{
 Data
 \label{sec:data}
 }
 
-The dataset covers five soccer leagues: England, France, Germany, Italy, and Spain.
-Each league consists of $N=20$ teams, except for Germany, which has $N=18$.
-Every pair of teams $i,j$ plays two matches: one with $i$ as the home team and $j$ as the away team, and in the other match it is the other way around.
-The teams are indexed or ranked according to their position in that year’s final standings.
-The standings is characterized by some tournament points $\pi_i$ for each team $i$ in each league.
-Therefore, the condition $i<j$ holds if and only if $\pi_i>\pi_j$ for any two teams $i$ and $j$ in a given league.
-
-For each pair of teams $i$ and $j$ in a given league, several pairwise metrics $m_{ij}\in \mathbb{R}$ are provided.
-Each metric takes a positive value if it presumably favors team $i$ over team $j$, and a negative value otherwise.
+For each pair $\{i,j\}$ of teams in a given league, several pairwise metrics $m_{ij}$ and $m_{ji}$ are provided.
+Each metric $m_{ij}$ takes a positive value when it presumably favors the home team $i$ over away team $j$, and takes a negative value otherwise.
 The different types of empirically determined metrics being considered are:
 \begin{enumerate}
 \item {\bf crossings:}
@@ -438,10 +358,7 @@ The different types of empirically determined metrics being considered are:
 \item {\bf maintenance time:}
 \item {\bf middle-zone time:} bla bla.
 \end{enumerate}
-Namely, $m_{ij}$ corresponds to $i$ being the home team and $j$ being the away team.
-Additionally, metric-styles derived from the Singular Value Decomposition of previous metrics are also considered~\cite{chacoma2025data}.
-Notice, $m_{ij}$ is generally independent of the metric $m_{ji}$ since they belong to different matches between $i$ and $j$.
-As a consequence, $m_{ij}+m_{ji}$ is generally different from zero and is the net contribution between teams $i$ and $j$.
+Moreover, the Singular Value Decomposition of previous emprically determined metrics are considered in order to define the so-called {\em styles} which are also some kind of metric~\cite{chacoma2025data}.
 
 \subsection{Inference of ratings and rankings}
 
@@ -453,12 +370,11 @@ f_{ij}
 =
 - f_{ji}
 $$
-are defined for each $i$ and $j$ in $\{0,1,...,n\}$ such that $i<j$ and where $N=n+1$ is the number of teams in the corresponding league.
-Moreover, in order to test the inference method, two types of ground-truth coefficients are also defined.
+are defined for each $i$ and $j$ such that $i<j$.
+Moreover, in order to test the HodgeRank inference method, two types of ground-truth coefficients are also defined.
 Namely, the rank-based coefficients $f_{ij}=i-j$ and the tournament points based coefficients $f_{ij}=\pi_j-\pi_i$.
-These coefficients correspond to a fully connected network or graph with $N$ nodes since, as already mentioned, all pairs of teams play two matches against each other in each league.
-Next, each fully connected graphs is promoted to a simplicial complex composed of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ with $i<j$ and 2-simplices labeled by $ijk$ with $i<j<k$.
-Finally, the coefficients $f_{ij}$ are promoted to be the components of a 1-cochain  $f$, where the anti-symmetric relation $f_{ji}=-f_{ij}$ must hold by definition.
+In all cases there is an underlying fully connected network or graph with $N$ nodes, that is promoted to a simplicial complex composed of 0-simplices labeled by $i$, 1-simplices labeled by $ij$ with $i<j$ and 2-simplices labeled by $ijk$ with $i<j<k$.
+Correspondingly, the coefficients $f_{ij}$ are promoted to be the components of a 1-cochain  $f$, where the anti-symmetric relation $f_{ji}=-f_{ij}$ must hold by definition.
 
 %From a score $\phi$, a corresponding cochain $f\in C_1^*$ of coordinates $f_{ij}=\phi_{ji}-\phi_{ij}$ is defined.
 %Also, the cochain $f'\in C_1^*$ of coordinates $f'_{ij}=\phi_j-\phi_i$ with team strengths $\phi_i=\sum_j \phi_{ij}$ is considered.
