@@ -146,7 +146,7 @@ See~\cite{perotti2025analysis,chacoma2025data}.
 \subsection{Least-squares inference of team ratings and rankings}
 
 Consider a set of $N=n+1$ teams labeled $\{0,1,\dots,n\}$.
-For each distinct pair of teams $i$ and $j$, assume a pairwise comparison score $f_{ij}=-f_{ji}$ is available.
+For each distinct pair of teams $i$ and $j$, assume a pairwise antisymmetric comparison score $f_{ij}=-f_{ji}$ is available.
 Informally, $f_{ij}>0$ indicates that team $i$ is rated higher than team $j$, whereas $f_{ij}<0$ suggests the opposite.
 
 A natural approach to inferring consistent ratings is to assign scores $w_i$ ($i=0,1,\dots,n$) that minimize the total squared discrepancy
@@ -344,22 +344,22 @@ Thus, the final table is determined primarily by total points, with tiebreakers 
 %\subsection{Data}
 \label{sec:data}
 
-For each pair $\{i,j\}$ of teams in a given league, several pairwise metrics $m_{ij}$ and $m_{ji}$ are recorded.
-Each metric $m_{ij}$ takes a positive value when it favors team $i$ over $j$, and a negative value otherwise.
-The metrics considered include:
+For each pair $\{i,j\}$ of teams in a given league, several pairwise antisymmetric comparison scores $f_{ij}$ are defined:
 \begin{enumerate}
-\item \textbf{crossings}
-\item \textbf{counterattacks}
-\item \textbf{pressure loss}
-\item \textbf{build-up time}
-\item \textbf{direct play}
-\item \textbf{pressure points}
-\item \textbf{shots}
-\item \textbf{flow rate}
-\item \textbf{maintenance time}
-\item \textbf{middle-zone time} (etc.)
+\item \textbf{crossings:} ...
+\item \textbf{counterattacks:} ...
+\item \textbf{pressure loss:} ...
+\item \textbf{build-up time:} ...
+\item \textbf{direct play:} ...
+\item \textbf{pressure points:} ...
+\item \textbf{shots:} ...
+\item \textbf{flow rate:} ...
+\item \textbf{maintenance time:} ...
+\item \textbf{middle-zone time:} ...
+\item \textbf{style:} the Singular Value Decomposition (SVD) of previous metrics is used to define higher-level descriptors called \emph{styles}, so $f_{ij}=...$~\cite{chacoma2025data}.
+\item \textbf{rank based ground-truth:} $f_{ij}=i-j$.
+\item \textbf{point based ground-truth:} $f_{ij}=\pi_j-\pi_i$.
 \end{enumerate}
-Additionally, the Singular Value Decomposition of these empirical metrics is considered to define higher-level descriptors called \emph{styles}~\cite{chacoma2025data}.
 
 \subsection{HodgeRank inference via metrics}
 
