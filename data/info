@@ -10,6 +10,14 @@ matches.csv:
 metrics.csv:
 
     cada fila tiene las metricas asociadas a un partido de un equipo
+    
+metrics_2.csv:
+
+    idem metricas pero con datos sin transformacion lognormal
+    
+metrics_2_first6.csv:
+
+    idem metricas_2 pero para los primeros 6 equipos
 
 ligue2team2rank.json:
 

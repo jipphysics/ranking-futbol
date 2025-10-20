@@ -1,0 +1,14 @@
+
+all_1: 
+red de todos los equipos, con transformacion lognormal a los datos,
+para que los datos sean normales
+
+all_2:
+red de todos los equipos, datos sin transformar por lo tanto
+las columnas siguen una dist lognormal
+
+
+first6_2:
+me quedo con los partidos entre los 6 primeros, los datos no
+fueron transformados
+
