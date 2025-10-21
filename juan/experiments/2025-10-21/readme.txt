@@ -22,10 +22,10 @@ Cuando puedas Juan calculale los ratings y avisame así sigo con el análisis,
 Saludos!
 AC
 ********************************************************************************
-We move the following files with code to the current folder E4 in order to avoid
-confusion of the source programs for the different experiments.
+We have copied the following files 
 
-rawdata-to-jld2.ipynb
-hon-ranking-futbol.ipynb  
+  rawdata-to-jld2.ipynb
+  hon-ranking-futbol.ipynb  
 
+within code (now deprectaded into juan/_code) to the current folder experiments/2025-10-21 in order to avoid confusion of the source programs for the different experiments.
 ********************************************************************************
