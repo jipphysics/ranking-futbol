@@ -1,0 +1,2341 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "92fc835e-f44d-4bdd-a06a-46c4a2ef1222",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Run this cell in a folder contained by the current project\n",
+    "using Pkg\n",
+    "#Pkg.activate()                 # Walks up the path tree until finds Project.toml\n",
+    "#Pkg.activate(\".\")              # \n",
+    "#Pkg.activate(\"@__DIR__\")       # \n",
+    "Pkg.activate(\"../\")            #\n",
+    "Pkg.instantiate()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b2057b3f-705c-40b1-ba90-d808b93c0f39",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "using Plots\n",
+    "using LaTeXStrings\n",
+    "using Graphs\n",
+    "#using MetaGraphs\n",
+    "#using MetaGraphsNext\n",
+    "using GraphPlot\n",
+    "using SimpleWeightedGraphs\n",
+    "using Karnak\n",
+    "using NetworkLayout\n",
+    "using Colors\n",
+    "using Random\n",
+    "using LinearAlgebra\n",
+    "using OffsetArrays\n",
+    "using SparseArrays\n",
+    "using Serialization\n",
+    "using IterativeSolvers\n",
+    "using Krylov\n",
+    "using BenchmarkTools\n",
+    "using Profile\n",
+    "using ProfileView\n",
+    "using Statistics\n",
+    "using DifferentialEquations\n",
+    "using LoopVectorization\n",
+    "using Folds\n",
+    "using Transducers\n",
+    "using Distributed\n",
+    "using JLD2\n",
+    "using OnlineStats\n",
+    "using ImageFiltering\n",
+    "using SavitzkyGolay\n",
+    "using Interpolations\n",
+    "using DataInterpolations\n",
+    "using Polynomials\n",
+    "using CurveFit\n",
+    "using DataFrames\n",
+    "using LsqFit\n",
+    "using ForwardDiff\n",
+    "using DelimitedFiles\n",
+    "using JSON\n",
+    "using Dates"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "0c3f0d14-ae86-4e16-8cfe-b95a0418ae8a",
+   "metadata": {},
+   "source": [
+    "# See what packages should be installed according to Project.toml and Manifest.toml\n",
+    "Pkg.resolve()"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "6a533943-1a75-4b25-b13e-e6dc218eb82b",
+   "metadata": {},
+   "source": [
+    "# Run this if you want to install a package\n",
+    "pkgs = [\"Plots\",\"LaTeXStrings\",\"Graphs\",\"SimpleWeightedGraphs\",\"GraphPlot\",\"Karnak\",\"NetworkLayout\",\"Colors\",\"Random\",\"LinearAlgebra\",\"OffsetArrays\",\"SparseArrays\",\"Serialization\",\"IterativeSolvers\",\"Krylov\",\"BenchmarkTools\",\"Profile\",\"ProfileView\",\"Statistics\",\"DifferentialEquations\",\"LoopVectorization\",\"Folds\",\"Transducers\",\"Distributed\",\"JLD2\",\"OnlineStats\",\"ImageFiltering\",\"SavitzkyGolay\",\"Interpolations\",\"DataInterpolations\",\"Polynomials\",\"CurveFit\",\"DataFrames\",\"LsqFit\",\"ForwardDiff\",\"JSON\",\"Dates\"]\n",
+    "#for p in pkgs\n",
+    "#    Pkg.add(p)\n",
+    "#end\n",
+    "Pkg.add(pkgs[end])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2627b369-35f9-4769-a881-8cda7b00fe68",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "# Utils"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fdcf0200-d3be-4cd1-819c-3ce7d24a9f29",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "## Enumerator\n",
+    "\n",
+    "Tools to compute a running enumeration of a \"list\" of objects."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4cfb9895-978a-4d31-9723-2ed351c7c925",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function enum!(d,k)\n",
+    "    return get!(d,k,length(d)+1)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "63a50e70-b79c-4f22-a9e9-9bb27a5cfd18",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Test"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c7c1b585-b007-4f54-ae5b-24b263e1bb81",
+   "metadata": {},
+   "source": [
+    "d = Dict{Any,Int}()\n",
+    "@show enum!(d,\"a\")\n",
+    "@show enum!(d,\"b\")\n",
+    "@show enum!(d,\"c\")\n",
+    "@show enum!(d,\"b\")\n",
+    "d"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2eb74874-43ef-4f72-8971-aa4e5cc81f6d",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "## Running Statistics\n",
+    "\n",
+    "Tools to compute running statistics such as mean and std from a stream of numbers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1f265db1-ff47-4cf8-af0a-09e3b131d5b0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mutable struct RunningStat\n",
+    "    n::Int\n",
+    "    m::Real # mean\n",
+    "    s::Real # std\n",
+    "end\n",
+    "\n",
+    "function RunningStat()\n",
+    "    return RunningStat(0,0.0,0.0)\n",
+    "end\n",
+    "\n",
+    "function Base.push!(rs::RunningStat,v::Real)\n",
+    "    if rs.n>0\n",
+    "        rs.n += 1\n",
+    "        new_m = rs.m + (v-rs.m)/rs.n\n",
+    "        rs.s += (v-rs.m)*(v-new_m)\n",
+    "        rs.m = new_m\n",
+    "    else\n",
+    "        rs.n = 1\n",
+    "        rs.m = v\n",
+    "        rs.s = 0\n",
+    "    end\n",
+    "    return rs.m\n",
+    "end\n",
+    "\n",
+    "function Statistics.mean(rs::RunningStat)\n",
+    "    return rs.m \n",
+    "end\n",
+    "\n",
+    "function Statistics.var(rs::RunningStat)\n",
+    "    return rs.s/(rs.n-1)\n",
+    "end\n",
+    "\n",
+    "function Statistics.std(rs::RunningStat)\n",
+    "    return sqrt(var(rs))\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "eeeaace5-918f-4cc3-83db-e9d1a7d9d752",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Tests"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "f97155dd-f549-44d2-9e0e-d861d3d474c2",
+   "metadata": {},
+   "source": [
+    "list_v = 10 .+ 5.0*randn(1000)\n",
+    ";"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "ed6abaef-2a2b-4fdd-bc36-1819dfeaec11",
+   "metadata": {},
+   "source": [
+    "rs = RunningStat()"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "1437d9d6-6296-4586-b47f-66cb268e3f2b",
+   "metadata": {},
+   "source": [
+    "for v in list_v\n",
+    "    push!(rs,v)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "edff5a6e-1344-464f-838d-278d888037ae",
+   "metadata": {},
+   "source": [
+    "mean(rs),std(rs)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "9d137423-bb16-4b6b-ba12-f418ce98da1f",
+   "metadata": {},
+   "source": [
+    "mean(list_v),std(list_v)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3d486905-7f4b-4bf4-8557-37107ca9a5c3",
+   "metadata": {},
+   "source": [
+    "## Coefficient of determiantion, $R^2$\n",
+    "\n",
+    "Tools to compute the $R^2$ coefficient to evaluate the fit of functions."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "680644ba-9b35-470e-b2e6-9dbf9db20d1e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function R_squared(y_data,y_fit)\n",
+    "    y_mean = mean(y_data)\n",
+    "    SS_res = sum((y_data .- y_fit) .^ 2)\n",
+    "    SS_tot = sum((y_data .- y_mean) .^ 2)\n",
+    "    R_sqr = 1 - SS_res / SS_tot\n",
+    "    return R_sqr\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "779d37a3-4254-434e-8233-6de9110349f4",
+   "metadata": {},
+   "source": [
+    "### Tests"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "904ec2d0-3469-4117-a061-275951137d15",
+   "metadata": {},
+   "source": [
+    "# Define the model function\n",
+    "@. model(x, p) = p[1] * x + p[2]\n",
+    "\n",
+    "# Sample data (example)\n",
+    "x_data = [1.0, 2.0, 3.0, 4.0, 5.0]\n",
+    "y_data = [2.2, 2.8, 3.6, 4.5, 5.1]\n",
+    "\n",
+    "# Initial guess for parameters\n",
+    "p0 = [1.0, 1.0]\n",
+    "\n",
+    "# Perform curve fitting\n",
+    "fit = LsqFit.curve_fit(model, x_data, y_data, p0)\n",
+    "\n",
+    "# Compute fitted values\n",
+    "y_fit = model(x_data, coef(fit))\n",
+    "\n",
+    "# Compute R_sqr\n",
+    "R_sqr = R_squared(y_data,y_fit)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "ab709d43-a408-4288-b109-75fb6d59656f",
+   "metadata": {},
+   "source": [
+    "plot()\n",
+    "#plot!(yscale=:log10)\n",
+    "#plot!(ylim=(0.0,1.0))\n",
+    "plot!(xlabel=L\"x\")\n",
+    "plot!(ylabel=L\"y\")\n",
+    "scatter!(x_data,y_data,label=\"data\")\n",
+    "plot!(x_data,y_fit,label=\"fit, \\$R^2=0.995\\$\")\n",
+    "#plot!(0.0:0.0,x->0.0,label=\"\\$z=1\\$\",width=0.0,c=:white)\n",
+    "#plot!(legendtitle=L\"\\mathrm{1D},\\;z=1\",legendtitlefontsize=8)\n",
+    "#plot!(list_sigma,x->0.6827/2,label=\"\",style=:dash,color=:grey)\n",
+    "#plot!(\n",
+    "#    xticks=([0,1,2,3,4,5],[L\"0\",L\"1\",L\"2\",L\"3\",L\"4\",L\"5\"]),\n",
+    "#    yticks=([0,1,2,3],[L\"0\",L\"1\",L\"2\",L\"3\"]),\n",
+    "#    tickfont=font(11),\n",
+    "#)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "89dac828-f026-4e39-b039-129ea214fa0b",
+   "metadata": {},
+   "source": [
+    "## Log-range\n",
+    "\n",
+    "Tools to create a range of numbers but in logarithmic scale."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "25b51d57-e027-46b1-a140-8c9e9d3985cc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function logrange(start,stepmul,stop)\n",
+    "    @assert start>0\n",
+    "    @assert stepmul>1\n",
+    "    r = []\n",
+    "    s = start\n",
+    "    while s <= stop\n",
+    "        push!(r,s)\n",
+    "        s *= stepmul\n",
+    "    end\n",
+    "    return r\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d76c801d-cc0c-42b6-b5c7-d5798d0a394f",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Test"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "7af403cb-1ebe-4cec-9b09-ba6de9f942f1",
+   "metadata": {},
+   "source": [
+    "logrange(1e-4,1.1,1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ab715120-06c8-4795-84a9-a6873c6bd716",
+   "metadata": {},
+   "source": [
+    "## Network stuff"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "168aa645-7cbb-4e94-88e7-4c859d2ab001",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function main_component(g)\n",
+    "    c = connected_components(g)\n",
+    "    _,i = findmax(length.(c))\n",
+    "    return g[c[i]]\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5e6b9e62-cfe6-430f-bdce-50a9b138e638",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "# Simplicial Complex\n",
+    "\n",
+    "Tools to represent simplicial complexes and associated operators in matrix form. For further details, please read de manuscript.\n",
+    "\n",
+    "The array `K[k]` is a representation of $K_k$ and has dimensions $m_k\\times(k+1)$ and is used to enumerate the $k$-simplices of the complex.\n",
+    "Here $m_k=|K_k|=\\dim C_k=\\dim C_k^*$ is the number of $k$-simplices in the simplicial complex.\n",
+    "Especifically, `K[k][l,:]` is an array `[i_0,i_1,...,i_k]` denoting the $l$-th $k$-simplex of the complex.\n",
+    "By assumption, $i_0<i_1<...<i_k$.\n",
+    "The dictionary `I[k]` is the inverse mapping of `K[k]`.\n",
+    "It maps arrays `[i_0,i_1,...,i_k]` to their corresponding index `l` in the enumeration."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b66c7574-8237-47bf-b43f-4714649fa2c0",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "## Matricial representation of the (co)-boundary and (co)-differential operators\n",
+    "\n",
+    "Recall that, if\n",
+    "\n",
+    "$$\n",
+    "\\partial_k(e_s) = (\\alpha_k)_s{}^r e_r\n",
+    "$$\n",
+    "$$\n",
+    "\\partial_k^*(e_s) = (\\mu_k)_s{}^r e_r \n",
+    "$$\n",
+    "$$\n",
+    "d_k(e^s) = (\\beta_k)^s{}_r e^r\n",
+    "$$\n",
+    "$$\n",
+    "d_k^*(e^s) = (\\mu_k)^s{}_r e^r\n",
+    "$$\n",
+    "\n",
+    "and $m_{sr}=\\delta_{sr}$, then\n",
+    "\n",
+    "$$\n",
+    "(\\beta_k)^s{}_r = (\\alpha_{k+1})_r{}^s\n",
+    "$$\n",
+    "$$\n",
+    "(\\mu_k)_s{}^r = (\\alpha_{k})_r{}^s\n",
+    "$$\n",
+    "$$\n",
+    "(\\nu_k)^s{}_r = (\\beta_{k})^r{}_s = (\\alpha_{k+1})_s{}^r\n",
+    "$$\n",
+    "\n",
+    "and, therefore\n",
+    "\n",
+    "$$\n",
+    "(\\partial_k(c))^r = (\\alpha_k^T)^r{}_sc^s\n",
+    "$$\n",
+    "$$\n",
+    "(\\partial_k^*(c))^r = (\\alpha_k)^r{}_sc^s\n",
+    "$$\n",
+    "$$\n",
+    "(d_k(f))_r = (\\alpha_{k+1})_r{}^sf_s\n",
+    "$$\n",
+    "$$\n",
+    "(d_k^*(f))_r = (\\alpha_{k+1}^T)_r{}^sf_s\n",
+    "$$\n",
+    "\n",
+    "Finally, note that $\\alpha_k\\in \\mathbb{R}^{m_{k}\\times m_{k-1}}$ for $k\\in 1,2,...,\\kappa$ and\n",
+    "\n",
+    "$$\n",
+    "(\\alpha_{k})_{i_0...i_j...i_k}{}^{i_0...\\hat{i}_j...i_k} = (-1)^j\n",
+    "$$\n",
+    "\n",
+    "Here, $d_0$ and $d_1$ are needed. \n",
+    "Hence, the matrices $\\beta_0=\\alpha_1$ and $\\beta_1=\\alpha_2$ have to be computed, respectively. \n",
+    "In particular, assuming $i<j<k$, it is found that\n",
+    "\n",
+    "$$(\\alpha_1)_{ij}{}^{j} = 1$$\n",
+    "$$(\\alpha_1)_{ij}{}^{i} = -1$$\n",
+    "\n",
+    "and\n",
+    "\n",
+    "$$(\\alpha_2)_{ijk}{}^{jk} = 1$$\n",
+    "$$(\\alpha_2)_{ijk}{}^{ik} = -1$$\n",
+    "$$(\\alpha_2)_{ijk}{}^{ij} = 1$$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "50579bd5-9f20-4288-9eb7-7328f0cd449a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "struct SimplicialComplex\n",
+    "    K::Any\n",
+    "    I::Any\n",
+    "    alpha::Any\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4aaed4f9-b7ba-4319-a67d-d86888b1651a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "Number of dimensions (kappa+1) of a simplicial complex, k = 0,1,...,kappa.\n",
+    "\"\"\"\n",
+    "function ndim(sc::SimplicialComplex)\n",
+    "    return length(sc.K)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "69939792-04a5-48c2-95ce-28cfdac18233",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "Maximum dimension of a simplicial complex.\n",
+    "\"\"\"\n",
+    "function kappa(sc::SimplicialComplex)\n",
+    "    return ndim(sc)-1\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4ea109a6-a266-48ae-93d3-02fbbf0f129e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "m_k = dim C_k = dim C_k^*.\n",
+    "\"\"\"\n",
+    "function m_k(sc::SimplicialComplex,k::Int)\n",
+    "    if k>=0 && k<=kappa(sc)\n",
+    "        return size(sc.K[k])[1]\n",
+    "    end\n",
+    "    return 0\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "cd10bb3b-593e-42b5-965f-a5ce279fe2f8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "List of the numbers of non-zero elements in the matricial representations of the (dual)-(co)-boundary operators, alpha_k.\n",
+    "\"\"\"\n",
+    "function nnz_alpha(sc::SimplicialComplex)\n",
+    "    return [nnz(sc.alpha[k]) for k in 1:length(sc.alpha)] \n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ead17c73-6ac6-42ca-91ef-479d101d2cb6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "Takes as input a list I of dictionaries I_k mapping simplices [i_0,i_1,...,i_k] to their corresponding enumeration numbers l.\n",
+    "Returns a SimplicialComplex containing:\n",
+    "    K : the list of the inverse mappings K_k of the I_k, and\n",
+    "    I : the list of the mappings I_k passed as input,\n",
+    "    alpha : the list alpha of the corresponding matrices alpha_k.\n",
+    "\"\"\"\n",
+    "function I_to_SC(I)\n",
+    "    # Create K\n",
+    "    K = []\n",
+    "    for k in 0:(length(I)-1)\n",
+    "        Kk = zeros(Int64,(length(I[k]),k+1))\n",
+    "        for (s,l) in I[k]\n",
+    "            Kk[l,:] = s\n",
+    "        end\n",
+    "        push!(K,Kk)\n",
+    "    end\n",
+    "    K = OffsetArray(K,0:(length(I)-1))\n",
+    "\n",
+    "    # Create A\n",
+    "    alpha = []\n",
+    "    for k in 1:(length(I)-1)\n",
+    "        #@show k\n",
+    "        Kk=K[k]\n",
+    "        Kp=K[k-1] # p = k-1\n",
+    "        Ik=I[k]\n",
+    "        Ip=I[k-1]\n",
+    "        n_k = size(Kk)[1]\n",
+    "        n_p = size(Kp)[1]        \n",
+    "        rows = zeros(Int64,(k+1)*n_k)\n",
+    "        cols = zeros(Int64,(k+1)*n_k)\n",
+    "        vals = zeros(Float64,(k+1)*n_k)\n",
+    "        t = 0 # To enumerate the entries of the sparse matrix.\n",
+    "        for l in 1:n_k\n",
+    "            s = Kk[l,:]\n",
+    "            for j in 1:(k+1)\n",
+    "                r = vcat(s[1:(j-1)],s[(j+1):end])\n",
+    "                m = Ip[r]\n",
+    "                t+=1\n",
+    "                rows[t] = l\n",
+    "                cols[t] = m\n",
+    "                vals[t] = 1-2*((j-1)%2)\n",
+    "                #@show s,l,r,m,t,vals[t]\n",
+    "            end\n",
+    "        end\n",
+    "        alpha_k = sparse(rows,cols,vals,n_k,n_p)\n",
+    "        push!(alpha,alpha_k)\n",
+    "    end\n",
+    "    return SimplicialComplex(K,I,alpha)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b63491a9-ad0d-4bc2-96d5-c23c094caeec",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "Takes as input a graph g and returns the list of I_k for k=0,1,2.\n",
+    "\"\"\"\n",
+    "function g_to_3_cliques(g)\n",
+    "    # Generate I_0\n",
+    "    I0 = Dict([i] => i for i in 1:nv(g))    \n",
+    "    \n",
+    "    # Generate I_1\n",
+    "    I1 = Dict()    \n",
+    "    for (l,e) in enumerate(edges(g))\n",
+    "        i = src(e)\n",
+    "        j = dst(e)\n",
+    "        I1[[i,j]] = l\n",
+    "    end\n",
+    "    \n",
+    "    # Generate I_2\n",
+    "    I2 = Dict()\n",
+    "    t = 0\n",
+    "    for i in 1:nv(g)\n",
+    "        for j in neighbors(g,i)\n",
+    "            if i<j\n",
+    "                for k in neighbors(g,j)\n",
+    "                    if j<k && has_edge(g,k,i)\n",
+    "                        t += 1\n",
+    "                        I2[[i,j,k]] = t\n",
+    "                    end\n",
+    "                end\n",
+    "            end\n",
+    "        end\n",
+    "    end\n",
+    "    \n",
+    "    I = OffsetArray([I0,I1,I2],0:2)\n",
+    "    return I\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bd2f3e46-172c-49a7-8bc9-992659675d22",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Tests"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "31db079b-1d81-4aec-a68b-278716e356f1",
+   "metadata": {},
+   "source": [
+    "#### Testing `g_to_3_cliques` and `I_to_SC` "
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "1ac612b0-3165-482a-9ed2-168ccb78ca4a",
+   "metadata": {},
+   "source": [
+    "g = erdos_renyi(6, 0.4)\n",
+    "g = main_component(g)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "35e2fd58-6b52-46c8-9a79-55d31e2d68fb",
+   "metadata": {},
+   "source": [
+    "I_3c = g_to_3_cliques(g) # We use I123 instead of I since in Julia I is a reserved name for the identity matrix."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "8c464186-24c0-4baa-9a9d-812255a7d13a",
+   "metadata": {},
+   "source": [
+    "sc = I_to_SC(I_3c)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "20284e5a-da48-415f-bcac-daf0c4111265",
+   "metadata": {},
+   "source": [
+    "sc.K[1]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "6d01f1f3-1a22-4f81-8f83-2f293134a175",
+   "metadata": {},
+   "source": [
+    "sc.I[1]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "4ddc0f49-a6b4-4626-a45c-044407fbca05",
+   "metadata": {},
+   "source": [
+    "sc.K[2]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "173a1d7c-686b-455e-981a-6270be01714e",
+   "metadata": {},
+   "source": [
+    "sc.I[2]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "d1f91d19-fb39-42fc-9b9b-4ecd82638f8c",
+   "metadata": {},
+   "source": [
+    "sc.alpha[1]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "24e7576b-1a96-4dd7-8d56-883dbdd21b27",
+   "metadata": {},
+   "source": [
+    "sc.alpha[2]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "6ed432eb-9902-487a-a7b9-7460ca59e66d",
+   "metadata": {},
+   "source": [
+    "nnz_alpha(sc)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "44689a3e-9f2f-40f2-9fed-fb073fdbeba7",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "# Hodge decomposition of $f$\n",
+    "\n",
+    "Tools to compute the Hodge decomposition of a 1-chain $f$.\n",
+    "\n",
+    "Recall that any $f\\in C_1^*$ admits an unique decomposition $f=s+h+g$, where there exists $w\\in C_0^*$ such that \n",
+    "\n",
+    "$$\n",
+    "L_0(w)=L^{\\uparrow}_0(w)=d_0^*(d_0(w))=d_0^*(g)=d_0^*(f)\n",
+    "$$\n",
+    "\n",
+    "and there exists $u\\in C_2^*$ such that\n",
+    "\n",
+    "$$\n",
+    "L_2^{\\downarrow}(u)=d_1(d_1^*(u))=d_1(s)=d_1(f)\n",
+    "$$\n",
+    "\n",
+    "In this way, we can find $w$ by solving $L^{\\uparrow}_0(w)=d_0^*(f)$ and $u$ by solving $L_2^{\\downarrow}(u)=d_1(f)$. Then, we can find $g=d_0(w)$, $s=d_1^*(u)$ and $h=f-g-s$."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c1facf4d-47f7-4300-a47c-dcb5f683d1ef",
+   "metadata": {
+    "tags": [],
+    "toc-hr-collapsed": true
+   },
+   "source": [
+    "## Matricial form\n",
+    "\n",
+    "The component-wise form of equation $d_0^*(d_0(w))=d_0^*(f)$ is\n",
+    "\n",
+    "$$\n",
+    "(\\alpha_1^T)_r{}^s(\\alpha_1)_s{}^qw_q = (\\alpha_1^T)_r{}^sf_s\n",
+    "$$\n",
+    "\n",
+    "or, matricially\n",
+    "\n",
+    "$$\n",
+    "\\alpha_1^T \\alpha_1 w = \\alpha_1^T f \\;\\;\\;\\; (1)\n",
+    "$$\n",
+    "\n",
+    "Similarly, the component-wise form of equation $g = d_0(w)$ is\n",
+    "\n",
+    "$$\n",
+    "(\\alpha_1)_r{}^s w_s\n",
+    "$$\n",
+    "\n",
+    "or, matricially\n",
+    "\n",
+    "$$\n",
+    "g = \\alpha_1 w\n",
+    "$$\n",
+    "\n",
+    "Similarly, the matricial form of equation $d_1(d_1^*(u))=d_1(f)$ is\n",
+    "\n",
+    "$$\n",
+    "\\alpha_2 \\alpha_2^T u = \\alpha_2 f \\;\\;\\;\\; (2)\n",
+    "$$\n",
+    "\n",
+    "and, the matricial form of equation $s=d_1^*(u)$ is\n",
+    "\n",
+    "$$\n",
+    "s = \\alpha_2^T u\n",
+    "$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4bf193c2-5042-4fe8-bc8f-2b4a68afc0b6",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": [],
+    "toc-hr-collapsed": true
+   },
+   "source": [
+    "### Test example of Eqs. (18) and (20) in [2].\n",
+    "\n",
+    "Eq. (18) of [2] is the analogous of Eq. (1) where $w$ in Eq. (1) is $\\alpha$ in Eq. (18) of [2] and $f$ in Eq. (1) is the analogous of $w$ in Eq. (18) of [2].\n",
+    "The matrix of Eq. (18) in [2] is analogous to our $L_0=\\alpha_1^T\\alpha_1$.\n",
+    "Similarly, Eq. (20) of [2] is the analogous of Eq. (2) where $u$ in Eq. (2) is the analogous of $\\gamma$ in Eq. (20) of [2] and $f$ in Eq. (2) is the analogous of $w$ in Eq. (20) of [2].\n",
+    "The matrix of Eq. (20) in [2] is analogous to our $L_2^{\\downarrow}=\\alpha_2\\alpha_2^T$."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3f950bcd-7973-4855-98fe-1588bd660c14",
+   "metadata": {},
+   "source": [
+    "The $k$-clique complex of $g$ is the simplicial complex obtained by considering all the $q$-cliques of $g$ for $q\\leq k$.\n",
+    "\n",
+    "First, the 3-clique complex of the network of Fig. (1) in [2] is created."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "f9829314-0a71-4eae-854c-56a14a7fe0ab",
+   "metadata": {},
+   "source": [
+    "I0 = Dict{Any,Int}()\n",
+    "I1 = Dict{Any,Int}()\n",
+    "I2 = Dict{Any,Int}()\n",
+    "\n",
+    "for i in 1:8\n",
+    "    enum!(I0,[i])\n",
+    "end\n",
+    "I0\n",
+    "\n",
+    "enum!(I1,[1,2])\n",
+    "enum!(I1,[1,8])\n",
+    "enum!(I1,[2,3])\n",
+    "enum!(I1,[2,6])\n",
+    "enum!(I1,[3,4])\n",
+    "enum!(I1,[3,5])\n",
+    "enum!(I1,[3,6])\n",
+    "enum!(I1,[3,8])\n",
+    "enum!(I1,[4,5])\n",
+    "enum!(I1,[4,6])\n",
+    "enum!(I1,[5,6])\n",
+    "enum!(I1,[6,7])\n",
+    "enum!(I1,[7,8])\n",
+    "I1\n",
+    "\n",
+    "enum!(I2,[2,3,6])\n",
+    "enum!(I2,[3,4,5])\n",
+    "enum!(I2,[3,4,6])\n",
+    "enum!(I2,[3,5,6])\n",
+    "enum!(I2,[4,5,6])\n",
+    "I2"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "d14255c8-ebd9-4750-bb42-337fa85ab1be",
+   "metadata": {},
+   "source": [
+    "I_vs_k = g_to_3_cliques(g)\n",
+    "sc = I_to_SC(I_vs_k)\n",
+    "sc.alpha[2]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "e6c57827-51bc-4023-94b7-483ef7194f01",
+   "metadata": {},
+   "source": [
+    "#w = zeros(dim_Ck(sc,0))\n",
+    "f = zeros(m_k(sc,1))\n",
+    "\n",
+    "I1 = sc.I[1]\n",
+    "\n",
+    "f[I1[[1,2]]] = -1   # 1\n",
+    "f[I1[[1,8]]] = 4.2  # 2\n",
+    "f[I1[[2,3]]] = -2   # 3\n",
+    "f[I1[[2,6]]] = 8.1  # 4\n",
+    "f[I1[[3,4]]] = 3.1  # 5\n",
+    "f[I1[[3,5]]] = 5.9  # 6\n",
+    "f[I1[[3,6]]] = 9.8  # 7\n",
+    "f[I1[[3,8]]] = 7.1  # 8\n",
+    "f[I1[[4,5]]] = 3.1  # 9\n",
+    "f[I1[[4,6]]] = 6.9  # 10\n",
+    "f[I1[[5,6]]] = 4.1  # 11\n",
+    "f[I1[[6,7]]] = -1   # 12\n",
+    "f[I1[[7,8]]] = -2   # 13\n",
+    "\n",
+    "f"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "b201c5a7-2be0-4b52-9056-eb9bac308976",
+   "metadata": {},
+   "source": [
+    "alpha_1 = sc.alpha[1]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "f9240ab2-9022-45ca-ac53-e9cb57fcc90f",
+   "metadata": {},
+   "source": [
+    "alpha_1'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "09a29168-4dfc-45c7-9ff1-8ced7c9c473c",
+   "metadata": {},
+   "source": [
+    "Here, $z:=d_0^*(f)$ should equal the r.h.s. of Eq. (18) in [2]."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "16b8bd48-0c01-4ffa-8b91-91cc525809c8",
+   "metadata": {},
+   "source": [
+    "z = alpha_1'*f"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5d76ba53-2c4d-4bb5-beaf-e1469afb693c",
+   "metadata": {},
+   "source": [
+    "Here, $L_0$ should equal the matrix at the l.h.s. of Eq. (18) in [2]."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "29b0db51-15a2-47f1-a8d8-13bed5d8eb8e",
+   "metadata": {},
+   "source": [
+    "L0 = alpha_1'*alpha_1"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "5732a9c6-299a-4dd1-9aaf-9e49931fcd35",
+   "metadata": {},
+   "source": [
+    "w = L0 \\ z"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "05d51fd6-682e-4f51-b320-41de9c069b4d",
+   "metadata": {},
+   "source": [
+    "Next vector should be equal to the vector $\\alpha$ reported in Table 5 of [2]."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "6ecfd4ed-a3bb-4faf-bdaa-3b124dc0520e",
+   "metadata": {},
+   "source": [
+    "w .- w[1]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9e51b9d4-0e93-459b-8bd4-d39179f90a3b",
+   "metadata": {},
+   "source": [
+    "Next vector should equal the r.h.s. of Eq. (18) in [2]."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "b553c435-78cd-480c-aa20-6cd5239ff9a5",
+   "metadata": {},
+   "source": [
+    "L0*w"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "eba5024f-37d8-4489-ace9-203188b9450c",
+   "metadata": {},
+   "source": [
+    "Check that vector $g=d_0(w)=\\alpha_1 w$ equals the vector $w_g$ of Table 4 in [2]."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "d3f8ca27-38f3-44eb-b9d6-19c3ad91c3b7",
+   "metadata": {},
+   "source": [
+    "g = alpha_1*w"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d26368aa-31ba-4651-a354-ec58e975e5fc",
+   "metadata": {},
+   "source": [
+    "Check equality up to numerical tolerance that $d_1(f)=d_1(g)$."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "43fc4a78-d7f9-405c-b514-2da8c08f06b3",
+   "metadata": {},
+   "source": [
+    "norm( alpha_1'*f - alpha_1'*g )"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "4243ffb3-b6b7-4c4f-92e5-73b3120963bd",
+   "metadata": {},
+   "source": [
+    "alpha_2 = sc.alpha[2]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "65fbe56f-4e21-498f-980d-0d7428ef77be",
+   "metadata": {},
+   "source": [
+    "Check the form of $L_2^{\\downarrow}=\\alpha_2\\alpha_2^T$. It should equal the matrix at the l.h.s. of Eq. (20) in [2]."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "491f8c92-92d8-4d0b-86e1-2906caf79e49",
+   "metadata": {},
+   "source": [
+    "L2d = alpha_2 * alpha_2'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cc57cc62-b3c4-4ae7-ae08-4e685f38f773",
+   "metadata": {},
+   "source": [
+    "Here, $y:=d_1(f)$ should equal the r.h.s. of Eq. (20) in [2]."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "61e0606a-84e2-4d00-a88a-613f383ffcbe",
+   "metadata": {},
+   "source": [
+    "y = alpha_2 * f"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "229bd88b-2547-41cf-85f8-5a9113a72261",
+   "metadata": {},
+   "source": [
+    "# See \n",
+    "#    https://stackoverflow.com/questions/38486697/solve-a-particular-linear-system-efficiently-in-julia\n",
+    "#    https://iterativesolvers.julialinearalgebra.org/dev/\n",
+    "#    https://jso.dev/Krylov.jl/dev/solvers/ls/\n",
+    "# on different alternatives about how to solve the linear systems in consideration.\n",
+    "\n",
+    "#u = L2d \\ y\n",
+    "#u = pinv(Symmetric(Matrix(L2d)))*y\n",
+    "#u = IterativeSolvers.cg(L2d,y)     # this is faster than lsmr in the example, according to @btime\n",
+    "#u = IterativeSolvers.minres(L2d,y)\n",
+    "#u = IterativeSolvers.lsqr(L2d,y)\n",
+    "#u = IterativeSolvers.lsmr(L2d,y)\n",
+    "#u = Krylov.cg(L2d,y)[1]    \n",
+    "#u = Krylov.lslq(L2d,y)[1]\n",
+    "#u = Krylov.lsqr(L2d,y)[1]\n",
+    "u = Krylov.minres_qlp(L2d,y)[1]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "db7971d0-8243-4489-b4d2-eb57785880d9",
+   "metadata": {},
+   "source": [
+    "The vector $u$ obtained is different from the vector $\\gamma$ reported in Table (5) of [2], which is the following one:"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "b244dded-8cf9-4cd8-82aa-1811c1d1771b",
+   "metadata": {},
+   "source": [
+    "u_johnson = [-0.08 -1.1309 1.2359 -1.1759 1.2809]'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8e64a450-8aba-4ca5-8620-40850213caa4",
+   "metadata": {},
+   "source": [
+    "Is the vector $u_{\\mathrm{johnson}}$ (i.e. $\\gamma$) reported in [2] also a solution of Eq. (20) of [2]? We check:"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "68dbbe46-d547-4971-baeb-60248020f0c9",
+   "metadata": {},
+   "source": [
+    "norm(L2d*u_johnson - y)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "37c17e84-31f1-4064-aebb-b35aca246b3a",
+   "metadata": {},
+   "source": [
+    "It actually is! What about our solution? Let us check:"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "3fbcae02-39a6-4198-af19-0cea921d9375",
+   "metadata": {},
+   "source": [
+    "norm(L2d*u - y)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d443cfae-24ce-4a78-a3bf-a954e64c85e8",
+   "metadata": {},
+   "source": [
+    "It is as well! Hence, there are multiple solutions, so $L_2^{\\downarrow}(u)=y$ is a degenerate (i.e. underdetermined) linear system. \n",
+    "\n",
+    "Only one of the solutions of degenerate linear systems of a positive semidefinite linear operator has minimum norm $|x|$. Therefore, we ask ourselves which of the solutions to $L_2^{\\downarrow}u=y$ we have found, has the smallest norm? Let us see:"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "40c14d0a-cf1b-4ae7-ab35-81b0212ffa94",
+   "metadata": {},
+   "source": [
+    "norm(u)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "36b95401-c633-4f87-bf7f-8dedabd0caee",
+   "metadata": {},
+   "source": [
+    "norm(u_johnson)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e1528d75-c2ff-469d-989f-4c7ced31c9a8",
+   "metadata": {},
+   "source": [
+    "So our solution has smaller norm than that of [2]. Hence, it is a better candidate for the unique solution of minimum norm."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "89a5fd4a-10c8-4942-b5a7-8b9cd2b5d23a",
+   "metadata": {},
+   "source": [
+    "Next, compute $s=d_1^*(u)=\\alpha_2^T u$."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "4eb6fd13-1ffc-4e32-b744-d4c4aa8f5f50",
+   "metadata": {},
+   "source": [
+    "s = alpha_2'*u"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "063cfdd5-3c93-4bf8-b51e-59521f6a8a68",
+   "metadata": {},
+   "source": [
+    "Check the \"equality\" of $\\alpha_2 s = d_1(s) = d_1(f) = \\alpha_2 f$."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "759d38e9-42f5-4fb1-88e9-42b6b909b920",
+   "metadata": {},
+   "source": [
+    "norm( alpha_2*s - alpha_2*f )"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1f772f57-3ccd-4674-b441-190ed8638865",
+   "metadata": {},
+   "source": [
+    "Compute $h$."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c6d9b387-a9dc-4a87-8c2b-7d135762c5a8",
+   "metadata": {},
+   "source": [
+    "h = f-s-g"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c711ae31-4c55-42db-a587-76b5f4fe1a26",
+   "metadata": {},
+   "source": [
+    "L1u = alpha_2'*alpha_2\n",
+    "L1d = alpha_1*alpha_1'\n",
+    "L1 = L1u + L1d"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "16d10d3d-9118-4fed-bb99-bbd67fc50c6b",
+   "metadata": {},
+   "source": [
+    "Finally check that $L_1(h)=0$."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "97fdb134-2b58-4a87-a2a7-43f5fa6ea8b8",
+   "metadata": {},
+   "source": [
+    "norm(L1*h)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7fdb63ae-c7e2-4e15-a0c8-3896d1c1823f",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "## Compute Hodge decomposition\n",
+    "\n",
+    "The linear equations that should be solved are numerically challenging. Hence, we use the **MINRES-QLP** algoritm, which is specifically devised to solve least square problems of singular or nearly singular linear equations  [9,10,11,12]."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f395ffa3-bf6d-4610-9699-90cb44674889",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "struct HodgeDecomposition\n",
+    "    f::Array{Real}\n",
+    "    s::Array{Real}\n",
+    "    h::Array{Real}\n",
+    "    g::Array{Real}\n",
+    "    u::Array{Real}\n",
+    "    w::Array{Real}    \n",
+    "    k::Int    \n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "76153bea-e8a9-418f-a918-c5977bc9ee51",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function compute_k_th_solenoid_hodge_decomposition(sc,f,k)\n",
+    "    if k<kappa(sc)\n",
+    "        alpha = sc.alpha[k+1]\n",
+    "        y = alpha*f\n",
+    "        L = alpha*alpha'\n",
+    "        u = Krylov.minres_qlp(L,y)[1]\n",
+    "        #u = Krylov.lsqr(L,y)[1]\n",
+    "        s = alpha'*u\n",
+    "        return s,u\n",
+    "    else\n",
+    "        s = zeros(m_k(sc,k)) # s = 0 as a vector enables f=s+h+g to be computed without dimensional problems.\n",
+    "        u = zeros(m_k(sc,k+1))        \n",
+    "        return s,u\n",
+    "    end\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "047ba906-51c5-48b0-8688-62b27b577bb6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function compute_k_th_gradient_hodge_decomposition(sc,f,k)\n",
+    "    if k>=1\n",
+    "        alpha = sc.alpha[k]\n",
+    "        z = alpha'*f\n",
+    "        L = alpha'*alpha\n",
+    "        w = Krylov.minres_qlp(L,z)[1]\n",
+    "        #w = Krylov.lsqr(L,z)[1]\n",
+    "        g = alpha*w\n",
+    "        return g,w\n",
+    "    else\n",
+    "        g = zeros(m_k(sc,k)) # g = 0 as a vector enables f=s+h+g to be computed without dimensional problems.\n",
+    "        w = zeros(m_k(sc,k-1))        \n",
+    "        return g,w\n",
+    "    end\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "49541cc6-7255-4798-b652-d4aca720ee2b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function compute_k_th_hodge_decomposition(sc,f,k)\n",
+    "    @assert length(f) == m_k(sc,k)\n",
+    "    s,u = compute_k_th_solenoid_hodge_decomposition(sc,f,k)\n",
+    "    g,w = compute_k_th_gradient_hodge_decomposition(sc,f,k)\n",
+    "    h=f-s-g\n",
+    "    return HodgeDecomposition(f,s,h,g,u,w,k)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "776ed9dc-d9ed-4aca-a96c-b879f9f79dd1",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "### Test"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a7acf217-60bd-42ac-a719-029b974b1b18",
+   "metadata": {},
+   "source": [
+    "#### Basic test"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "14b5ec29-f8a3-4bf8-836e-99e4101fdcb7",
+   "metadata": {},
+   "source": [
+    "g = erdos_renyi(10, 0.4)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "046809b8-1614-46a8-a56b-7c79cae26ef1",
+   "metadata": {},
+   "source": [
+    "I_3c = g_to_3_cliques(g)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "56456c56-2a11-48f8-87f9-56006f4a6038",
+   "metadata": {},
+   "source": [
+    "sc = I_to_SC(I_3c)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "dcfaa580-0dc9-49ac-a749-28f801b3054d",
+   "metadata": {},
+   "source": [
+    "for k in 0:kappa(sc)\n",
+    "   println(\"m_$k=$(m_k(sc,k))\")\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "35478f15-dfd3-42eb-a3d4-39fd5d8ccbbf",
+   "metadata": {},
+   "source": [
+    "Next, we create a 1-chain $f$ of components $f_{ij}=w_i-w_j$ where $w$ is the 0-chain of components $w_i=i$."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "4655c083-33bf-4a1e-a34a-5f5db4994296",
+   "metadata": {},
+   "source": [
+    "m0=m_k(sc,0)\n",
+    "m1=m_k(sc,1)\n",
+    "w = collect(1:m0)\n",
+    "f = zeros(m1)\n",
+    "K1 = sc.K[1]\n",
+    "for l in 1:m1\n",
+    "    i,j = K1[l,:]\n",
+    "    f[l] = w[i]-w[j]\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c448a93d-90fb-4e0d-a2f0-21f90fca2e9d",
+   "metadata": {},
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,w,0)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "d2980304-6621-4841-8b74-cedc8985db27",
+   "metadata": {},
+   "source": [
+    "hd.g"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "dd71c81c-70a2-4fec-9928-87c167daec72",
+   "metadata": {},
+   "source": [
+    "hd.w"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "bdbf7b08-7e6e-4042-96a2-6a68bbab9198",
+   "metadata": {},
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,f,1)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "60d88d96-259c-4c4e-b387-bbd6e70b44e9",
+   "metadata": {},
+   "source": [
+    "hd.w .- minimum(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "74d62d87-1f76-4d00-8c46-516748f1c5b7",
+   "metadata": {},
+   "source": [
+    "u = collect(1:m_k(sc,2))"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "bb01eedd-35e7-48bb-be2e-bac886b7eb66",
+   "metadata": {},
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,u,2)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "49d9f324-3e9d-4cde-b6a9-fd163335bc2e",
+   "metadata": {},
+   "source": [
+    "hd.s"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2c164c80-7020-4e73-b269-b56974c7e944",
+   "metadata": {},
+   "source": [
+    "#### Test with futbol networks"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "a680c2a4-b610-48d0-8cd2-4a0ebdb6acf9",
+   "metadata": {},
+   "source": [
+    "(g,phi_ij) = dict_g_phi_jld2[(\"Italy\", \"crossing\")]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "480ac374-a7b4-41a5-a23f-4451d5f156a7",
+   "metadata": {},
+   "source": [
+    "I_3c = g_to_3_cliques(g)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "5a899a91-bee0-4d56-8789-3ff0111900ab",
+   "metadata": {},
+   "source": [
+    "sc = I_to_SC(I_3c)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "b258369e-f1ba-4cee-ad98-e9a495fd30c0",
+   "metadata": {},
+   "source": [
+    "f = phi_ij_to_f(sc,phi_ij)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "e17bfe78-15b4-4a5b-9e34-942c83fb0fab",
+   "metadata": {},
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,f,1)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "73b8f909-3cab-4264-abd9-1ff7f5997e41",
+   "metadata": {},
+   "source": [
+    "hd.w"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "d9269184-020d-41e9-a1c5-73b89072906e",
+   "metadata": {},
+   "source": [
+    "plot(\n",
+    "    xlabel=L\"i\",\n",
+    "    ylabel=L\"w_i\",\n",
+    ")\n",
+    "plot!(hd.w,label=\"Italy\"*\", \"*\"crossing\",c=1)\n",
+    "scatter!(hd.w,label=\"\",c=1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "56f1e133-8107-4d83-bc8c-8c10a369b6b6",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "# Ranking tools\n",
+    "\n",
+    "Tools to generate **true** ratings and rankings for a given network."
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "6adac70c-5af9-42a9-bedf-d0dae8802dcd",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "\"\"\"\n",
+    "Generator of artificial ratings.\n",
+    "    agents : iterable over the agents.\n",
+    "    noise : Gaussian additive noise\n",
+    "    scale : sepparation scale between ratings\n",
+    "\"\"\"\n",
+    "function gen_artificial_ratings(agents,noise=0.0,scale=1.0)\n",
+    "    #@show agents\n",
+    "    N = length(agents)\n",
+    "    w = collect(agents)+noise*randn(N)\n",
+    "    w = ratings(N .- w)\n",
+    "    return scale*w\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "d2c22796-57d7-4372-8506-e1dc9d9d667a",
+   "metadata": {},
+   "source": [
+    "\"\"\"\n",
+    "Takes a simplicial complex and a vector of ratings and generates the 1-cochain\n",
+    "\n",
+    "    f_{ij} = w_i - w_j + noise*randn()\n",
+    "\"\"\"\n",
+    "function gen_artificial_f(sc,w,noise=0.0)\n",
+    "    m_0 = m_k(sc,0)\n",
+    "    m_1 = m_k(sc,1)\n",
+    "    @assert length(w) == m_0\n",
+    "    f = zeros(m_1)\n",
+    "    K1 = sc.K[1]\n",
+    "    for l in 1:m_1\n",
+    "        i,j = K1[l,:]\n",
+    "        f[l] = w[j]-w[i] + noise*randn()\n",
+    "    end\n",
+    "    return f\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2b477c9b-bd91-4b3f-8aad-7a94aeb66661",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "Takes a vector and shifts the values of its components by a constant to make all of them non-negative.\n",
+    "\"\"\"\n",
+    "function ratings(w)\n",
+    "    return w .- minimum(w)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f465bc16-059e-4641-9195-a31faccbede4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "Normalizes a vector of ratings to have values between 0 and 1 inclusive.\n",
+    "\"\"\"\n",
+    "function normalized_ratings(w)\n",
+    "    minw = minimum(w)\n",
+    "    #maxw = maximum(w)\n",
+    "    #return (w .- minw)/(maxw-minw)\n",
+    "    return (w .- minw)/length(w)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "162eaeac-b326-4423-89ee-4ac3e0c23515",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# OLD incorrect version\n",
+    "#\"\"\"\n",
+    "#Takes a vector of ratings and computes the corresponding ranking\n",
+    "#\"\"\"\n",
+    "#function ranking(w)\n",
+    "#    return sortperm(w,rev=true)\n",
+    "#end\n",
+    "\n",
+    "# NEW this version is correct, but the version below is more \"compact\".\n",
+    "#\"\"\"\n",
+    "#Takes a vector of ratings and computes the corresponding ranking\n",
+    "#\"\"\"\n",
+    "#function ranking(w)\n",
+    "#    r = zeros(Int64,length(w))\n",
+    "#    for (k,i_k) in enumerate(sortperm(w,rev=true))\n",
+    "#        r[i_k]=k\n",
+    "#    end\n",
+    "#    return r\n",
+    "#end\n",
+    "\n",
+    "\"\"\"\n",
+    "Takes a vector of ratings and computes the corresponding ranking\n",
+    "\"\"\"\n",
+    "function ranking(w)\n",
+    "    return invperm(sortperm(w,rev=true))\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f124a91f-a0ff-4f13-909a-a7ce32bd9e98",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "Given two vectors v and u, this computes the absolute differences\n",
+    "\n",
+    "    x_i = |v_i-u_i|\n",
+    "\n",
+    "And returns the vector w of cumulative diferences\n",
+    "\n",
+    "    w_i = sum_{j <= i} x_j\n",
+    "\n",
+    "This can be used to compare two vectors of ratings or rankings\n",
+    "\"\"\"\n",
+    "function compute_cumulative_abs_diff(v,u)\n",
+    "    n = length(v)\n",
+    "    @assert length(u) == n\n",
+    "    cumulative_abs_diff = zeros(n)\n",
+    "    sum = 0\n",
+    "    for i in 1:n\n",
+    "         sum += abs.(v[i]-u[i])\n",
+    "         cumulative_abs_diff[i] = sum\n",
+    "    end\n",
+    "    return cumulative_abs_diff\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b564ac09-edfd-4950-86e3-88af38fe2987",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Test"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "20dc954d-a26b-4bd7-9151-a87be521b432",
+   "metadata": {},
+   "source": [
+    "g = erdos_renyi(6, 0.4)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "36b662c8-b182-4e0e-89bc-be1109b2ca9d",
+   "metadata": {},
+   "source": [
+    "w = gen_artificial_ratings(1:nv(g))"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "b9cff5ee-5d1d-4234-b40e-511039c43f2a",
+   "metadata": {},
+   "source": [
+    "I_3c = g_to_3_cliques(g)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "872eae6c-4cd6-4cb6-b7bd-66a2c9f78b33",
+   "metadata": {},
+   "source": [
+    "sc = I_to_SC(I_3c)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "cadd04df-2ab8-4ea4-a836-de3bd2d294a6",
+   "metadata": {},
+   "source": [
+    "f = gen_artificial_f(sc,w)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "ed62cefb-a2a5-443f-8422-f22676db1a7f",
+   "metadata": {},
+   "source": [
+    "ratings(w .- 5)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "443eac66-36f2-489a-8e86-a5da6f3fc53b",
+   "metadata": {},
+   "source": [
+    "ranking(w)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "566e1e1c-bdc0-4a43-bc55-7d184f7e5c47",
+   "metadata": {},
+   "source": [
+    "normalized_ratings(w)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2c9f5bc6-86e0-46c2-be32-4e1ae7b89b00",
+   "metadata": {},
+   "source": [
+    "## Load dict of weighted g's"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "13d76399-48be-402c-8f10-a27235579e07",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "jld2_files = \"25-09-12-dict-weighted-g.jld2\"\n",
+    "#dict_weighted_g_jld2 = Dict()\n",
+    "@load \"jld2/\"*jld2_files dict_weighted_g_jld2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e656d555-59c8-4dbf-ab44-1aed91162345",
+   "metadata": {},
+   "source": [
+    "### Test"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a6912640-3e89-4f36-8267-a9277d7937d3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dict_weighted_g_jld2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "97ab1c39-6730-4c26-8fe8-19d905a3ccf2",
+   "metadata": {},
+   "source": [
+    "## Weighted $g$ to ($K$,$f$)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "81c2f9b2-13be-4ca8-bc8e-83aaa5791684",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function g_to_sc_f(g)\n",
+    "    I_3c = g_to_3_cliques(g)\n",
+    "    sc = I_to_SC(I_3c)\n",
+    "    #m_0 = m_k(sc,0)\n",
+    "    m_1 = m_k(sc,1)\n",
+    "    f = zeros(m_1)\n",
+    "    K1 = sc.K[1]\n",
+    "    for l in 1:m_1\n",
+    "        i,j = K1[l,:]\n",
+    "        f[l] = get_weight(g,i,j)\n",
+    "    end\n",
+    "    return (sc,f)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8ec5ef89-8291-4804-ac52-c310736c5542",
+   "metadata": {},
+   "source": [
+    "## Inferere of ratings and rankings"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fd887d4e-d64a-4603-88a9-d51bb1efe709",
+   "metadata": {},
+   "source": [
+    "### Test with points"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "416a1745-0339-44f2-a408-7e716880da8a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "g = dict_weighted_g_jld2[(\"Italy\", \"puntos\")]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "17b4f547-d494-4e5b-88b8-47e108048229",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sc,f = g_to_sc_f(g)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4b37a08d-6052-47f1-94d9-4ef7efcd8c4f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sc"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "12d8c553-a72f-4a25-81a5-8d89eadc13d6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "f"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "939acbf0-e4b1-4dea-99ce-e946d602ccab",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,f,1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3129f740-f57d-42a9-b0f1-f53fb8896589",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ratings(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "fda48ad3-906e-430e-b57d-380b25d41cfd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ranking(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "005e1da9-2c67-4c1a-a705-a7739be3458d",
+   "metadata": {},
+   "source": [
+    "### Test with ranks"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1ba9d955-5afa-427d-86bd-54e8fded9dec",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "g = dict_weighted_g_jld2[(\"Spain\", \"ranks\")]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a4b69420-6db8-41be-bece-5f2b137259a6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sc,f = g_to_sc_f(g)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "99cf53eb-724e-46bd-84c6-9bc1a91d2d6e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,f,1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8d8ddfdd-c26d-4c43-862c-5207b1e2a857",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ratings(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "05ffa5b7-2fed-4ee2-8a4b-b1a26ec92287",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ranking(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f1267c71-3f5c-4a53-af96-3b92453d033f",
+   "metadata": {},
+   "source": [
+    "### Test with shots"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "732217aa-39d0-4bc4-bd47-66b10c573bd1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "league = \"Italy\"\n",
+    "metric = \"shots\"\n",
+    "g = dict_weighted_g_jld2[(league,metric)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "272521b1-ac81-45ed-bd4f-ccd27a4ba160",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sc,f = g_to_sc_f(g)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3b06fa90-4bb5-4f43-bbc0-6d65fd808884",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,f,1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "062ca3b2-150f-42f5-95cb-a9a7176c3a7a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w = ratings(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4817b70d-0384-4949-991a-bdb7f840fad6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "r = ranking(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "da0afe95-18a3-4126-b262-53ea46982fa2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "p = plot(\n",
+    "    xlabel=\"true ranking\",\n",
+    "    ylabel=\"rating [\"*metric*\"]\",\n",
+    ")\n",
+    "plot!(w,c=1,label=\"\")\n",
+    "scatter!(w,c=1,label=league*\" \"*metric)\n",
+    "fname = \"plots/tmp/\"*league*\"-\"*metric*\"-rating.pdf\"\n",
+    "#@show fname\n",
+    "savefig(p,fname)\n",
+    "display(p)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ecc77c7a-7a78-48de-9392-bd97bc60cf25",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "p = plot(\n",
+    "    xlabel=\"true ranking\",\n",
+    "    ylabel=\"inferred ranking [\"*metric*\"]\",\n",
+    ")\n",
+    "plot!(r,c=2,label=\"\")\n",
+    "scatter!(r,c=2,label=league*\" \"*metric)\n",
+    "plot!(x->x,c=:black,style=:dash,label=\"ideal\")\n",
+    "fname = \"plots/tmp/\"*league*\"-\"*metric*\"-ranking.pdf\"\n",
+    "#@show fname\n",
+    "savefig(p,fname)\n",
+    "display(p)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0b30fa5f-5cd4-4eb2-b646-e4655d09d7db",
+   "metadata": {},
+   "source": [
+    "### Systematic computation of ratings and rankings"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4a6b8066-7ea0-41e1-907e-1028f986500d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function save_ratings_and_rankings_as_txt(fname,w,r)\n",
+    "    fhw = open(fname,\"w\")\n",
+    "    println(fhw,\"i w_i r_i\")\n",
+    "    for i in 1:length(w)\n",
+    "        println(fhw,i,\" \",w[i],\" \",r[i])\n",
+    "    end\n",
+    "    close(fhw)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "98593d8e-7248-411a-80fa-3ce6b0daa9f4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for (k,g) in dict_weighted_g_jld2\n",
+    "    #@show k,g\n",
+    "    (league,metric) = k\n",
+    "    @show league,metric\n",
+    "    sc,f = g_to_sc_f(g)\n",
+    "    hd = compute_k_th_hodge_decomposition(sc,f,1)\n",
+    "    w = ratings(hd.w)\n",
+    "    r = ranking(hd.w)\n",
+    "    #@show k,w,r\n",
+    "    # Plot inferred rating\n",
+    "    p = plot(\n",
+    "        xlabel=\"true ranking\",\n",
+    "        ylabel=\"rating [\"*metric*\"]\",\n",
+    "    )\n",
+    "    plot!(w,c=1,label=\"\")\n",
+    "    scatter!(w,c=1,label=league*\" \"*metric)\n",
+    "    fname = \"plots/E3/\"*league*\"-\"*metric*\"-rating.pdf\"\n",
+    "    #@show fname\n",
+    "    savefig(p,fname)\n",
+    "    fname = \"txt/E3/\"*league*\"-\"*metric*\"-rating.txt\"    \n",
+    "    #display(p)\n",
+    "    # Plot inferred ranking\n",
+    "    p = plot(\n",
+    "        xlabel=\"true ranking\",\n",
+    "        ylabel=\"inferred ranking [\"*metric*\"]\",\n",
+    "    )\n",
+    "    plot!(r,c=2,label=\"\")\n",
+    "    scatter!(r,c=2,label=league*\" \"*metric)\n",
+    "    plot!(x->x,c=:black,style=:dash,label=\"ideal\")\n",
+    "    fname = \"plots/E3/\"*league*\"-\"*metric*\"-ranking.pdf\"\n",
+    "    #@show fname\n",
+    "    savefig(p,fname)\n",
+    "    #display(p)\n",
+    "    # Save ratings and rankings as txt\n",
+    "    fname = \"txt/E3/\"*league*\"-\"*metric*\".txt\"    \n",
+    "    save_ratings_and_rankings_as_txt(fname,w,r)        \n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6350a507-d21c-414d-b2c4-a1d5451c6f3e",
+   "metadata": {},
+   "source": [
+    "### CHECK (2025-10-03)\n",
+    "\n",
+    "There is something strange in, for instance:\n",
+    "\n",
+    "1. `code/plots/E3/Italy-counterattack-rating.pdf`\n",
+    "2. `code/plots/E3/Italy-counterattack-ranking.pdf`\n",
+    "\n",
+    "In the inferred ratings observed in `1.`, the first 3 points do not follow a monotonous trend. In fact, it is found that $w_2>w_3>w_1$. On the other hand, a monotonous trend is found in `2.` with the corresponding inferred rankings. Namely, $r_1<r_2<r_3$. This is an inconsistency. Below we inspect what is going on."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a78ecf9d-3a6a-4471-9cab-8513280796fd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "league = \"Italy\"\n",
+    "metric = \"counterattack\"\n",
+    "g = dict_weighted_g_jld2[(league,metric)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a4170798-8d21-479f-a843-cae61eef79f6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sc,f = g_to_sc_f(g)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "073748ed-8bc6-4f86-80bf-3293c5852632",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hd = compute_k_th_hodge_decomposition(sc,f,1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "addc0dc9-ba73-406e-9c46-7a1914c50a27",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w = ratings(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3c5c287d-f2d4-4300-b171-89d58b899830",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "r = ranking(hd.w)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2be274ef-d4ea-468d-8d7c-019d0e10436e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "p = plot(\n",
+    "    xlabel=\"true ranking\",\n",
+    "    ylabel=\"rating [\"*metric*\"]\",\n",
+    ")\n",
+    "plot!(w,c=1,label=\"\")\n",
+    "scatter!(w,c=1,label=league*\" \"*metric)\n",
+    "fname = \"plots/tmp/\"*league*\"-\"*metric*\"-rating.pdf\"\n",
+    "#@show fname\n",
+    "savefig(p,fname)\n",
+    "display(p)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ef14fef9-c8b0-4aee-a82a-869409007730",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "p = plot(\n",
+    "    xlabel=\"true ranking\",\n",
+    "    ylabel=\"inferred ranking [\"*metric*\"]\",\n",
+    "    #xlim = (1,20),\n",
+    "    #ylim = (1,20),\n",
+    ")\n",
+    "plot!(r,c=2,label=\"\")\n",
+    "scatter!(r,c=2,label=league*\" \"*metric)\n",
+    "plot!(x->x,c=:black,style=:dash,label=\"ideal\")\n",
+    "fname = \"plots/tmp/\"*league*\"-\"*metric*\"-ranking.pdf\"\n",
+    "#@show fname\n",
+    "savefig(p,fname)\n",
+    "display(p)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "617ddadb-8e5d-461b-8029-5482130ca020",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Julia 1.11.5",
+   "language": "julia",
+   "name": "julia-1.11"
+  },
+  "language_info": {
+   "file_extension": ".jl",
+   "mimetype": "application/julia",
+   "name": "julia",
+   "version": "1.11.5"
+  },
+  "toc-autonumbering": false,
+  "toc-showcode": false,
+  "toc-showmarkdowntxt": false,
+  "toc-showtags": false
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
