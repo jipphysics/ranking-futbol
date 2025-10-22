@@ -32,5 +32,5 @@ within code (now deprectaded into juan/_code) to the current folder experiments/
 ********************************************************************************
 Here we run the experiments for
 
-  redes/all_2
+  redes/first6_2
 ********************************************************************************
