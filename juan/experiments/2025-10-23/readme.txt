@@ -1,3 +1,4 @@
+********************************************************************************
 Network sparsification via Maximum Spanning "Trees" 
 
 Input data: 
@@ -8,3 +9,7 @@ To compute the Maximum Spanning Tree (MST) of a network of $n$ nodes, the wedges
 Note that, in the title, we use the word "Tree" between quotes. This is because we are using the version of the process that accepts loops and, therefore, it does not necessarily generates a tree. We made this choice because the results look better. We may change this choice in the future if we like.
 
 [1] Actually, the standard definition is Minimum Spanning Tree because the weighted edges are sorted in increasing order of "cost", since the usual goal is the identification of the spanning tree that reduces the sum of the costs of its links.
+********************************************************************************
+2025-10-31
+Redo the experiment but using the all_2 dataset.
+********************************************************************************
