@@ -9,3 +9,12 @@ For this, the true ratings can be found in the files
   ~/data/true_ratings/England.txt
   ~/data/true_ratings/France.txt
   ...
+
+
+
+UTILS
+
+To merge several .PDF files into one, run something like
+
+  convert *distr* merged.pdf
+  satril merged.pdf
