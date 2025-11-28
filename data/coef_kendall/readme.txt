@@ -1,7 +1,6 @@
-los archivos kendall_{liga}.csv tienen las columnas
+en true_ranking tenemos la comparacion del ranking final
+con los rankings parciales que se observaron en las distintas
+fechas
 
-t: matchday, fecha
-tau :coef de kendall
-pval:p-value 
-
-el coeficiente a tiempo t lo calculo comparando los rankings "parciales" en las fechas t y t-1
+en trueRankings_vs_metricas calculo el kendall del tru ranking final
+versus el ranking de cada metrica, para cada liga
