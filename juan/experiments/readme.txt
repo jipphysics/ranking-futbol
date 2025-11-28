@@ -13,3 +13,8 @@ TODO
     - Agregar barras de error (desviacion estandard) a los graficos de ratings.
     - Agregar ratings de la MST.
     - Calcular distribuciones ratigns SST sin shiftear a cero.
+    - Calcular MST and SSTs to the networks obtained at the 3rd match.
+
+  2025-11-28
+    - Terminar lo de la fecha anterior, 2025-11-14.
+    - Comparar distribuciones de ratings inferidos con metricas originales.
