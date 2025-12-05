@@ -130,7 +130,6 @@
    "cell_type": "markdown",
    "id": "63a50e70-b79c-4f22-a9e9-9bb27a5cfd18",
    "metadata": {
-    "jp-MarkdownHeadingCollapsed": true,
     "tags": []
    },
    "source": [
@@ -153,6 +152,120 @@
   {
    "cell_type": "markdown",
    "id": "2eb74874-43ef-4f72-8971-aa4e5cc81f6d",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "## ApproxDict\n",
+    "\n",
+    "To use rounded floating numbers as dictionary keys"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "629bbd36-a82a-4366-8d12-ac070b1b7e28",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\"\"\"\n",
+    "    ApproxDict(tol; init=())\n",
+    "\n",
+    "A dictionary where floating-point keys are considered equal if\n",
+    "`|a - b| ≤ tol`.\n",
+    "\n",
+    "Internally it uses bucketed integer keys based on `round(x / tol)`.\n",
+    "\n",
+    "Example:\n",
+    "    d = ApproxDict(1e-6)\n",
+    "    d[0.1] = \"hello\"\n",
+    "    println(d[0.1000003])   # prints \"hello\"\n",
+    "\"\"\"\n",
+    "struct ApproxDict{V}\n",
+    "    tol::Float64\n",
+    "    data::Dict{Any,V}\n",
+    "end\n",
+    "\n",
+    "# constructor\n",
+    "ApproxDict(tol::Real) = ApproxDict{Any}(abs(float(tol)), Dict{Any,Any}())\n",
+    "ApproxDict(tol::Real,::Type{V}) where {V} = ApproxDict{V}(abs(float(tol)), Dict{Any,V}())\n",
+    "\n",
+    "# convert float to bucket\n",
+    "bucket(x,tol) = (tol > 0.0) ? round(Int,x/tol) : x\n",
+    "\n",
+    "# ------------------------------------------\n",
+    "# get & set\n",
+    "# ------------------------------------------\n",
+    "import Base: getindex, setindex!, haskey, keys, values, iterate, length\n",
+    "\n",
+    "function setindex!(d::ApproxDict{V}, v::V, x::Real) where {V}\n",
+    "    d.data[bucket(x,d.tol)] = v\n",
+    "end\n",
+    "\n",
+    "function getindex(d::ApproxDict,x::Real)\n",
+    "    return d.data[bucket(x,d.tol)]\n",
+    "end\n",
+    "\n",
+    "function haskey(d::ApproxDict, x::Real)\n",
+    "    return haskey(d.data, bucket(x,d.tol))\n",
+    "end\n",
+    "\n",
+    "keys(d::ApproxDict) = keys(d.data)\n",
+    "values(d::ApproxDict) = values(d.data)\n",
+    "iterate(d::ApproxDict, args...) = iterate(d.data, args...)\n",
+    "length(d::ApproxDict) = length(d.data)\n",
+    "\n",
+    "\"\"\"\n",
+    "    get!(d::ApproxDict, key, default)\n",
+    "\n",
+    "If `key` exists (approximately), return its value.\n",
+    "\n",
+    "Otherwise insert `default` under that approximate key and return it.\n",
+    "\"\"\"\n",
+    "function Base.get!(d::ApproxDict{V}, x::Real, default) where {V}\n",
+    "    b = bucket(x, d.tol)\n",
+    "    return get!(d.data, b, default)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "89fbddb5-08f8-4cfa-ba0c-712f0204df66",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Test\n",
+    "d = ApproxDict(0.1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0f47ddb4-2d03-4198-a93c-92ede9cee0b7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#d = Dict()\n",
+    "d[0.1] = 120\n",
+    "d[0.1001] = 130\n",
+    "d[0.2] = 140\n",
+    "d"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7312b77d-a7c0-46d1-b5bb-3d2726a4c205",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "round(Int,0.1001 / 0.1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7d517c2c-3279-49a8-b664-547ec2f699c2",
    "metadata": {
     "tags": []
    },
@@ -207,10 +320,61 @@
    ]
   },
   {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6653657e-a473-45a7-9eb6-f04945b45634",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rs = RunningStat()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "560cc743-1fd5-4d59-b5b8-052ec061265c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for i in 1:1_000_000\n",
+    "    push!(rs,rand())\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5bf907ce-ad93-47cc-a6da-6cbeb0fe123c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "std(rs)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a73c0659-4f1a-4fe0-96f0-d86aedeeac08",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mean(rs)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3a071f9e-08e4-45f6-b6a0-cbc29a426b69",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sqrt(rs.s/(rs.n-1))"
+   ]
+  },
+  {
    "cell_type": "markdown",
    "id": "eeeaace5-918f-4cc3-83db-e9d1a7d9d752",
    "metadata": {
-    "jp-MarkdownHeadingCollapsed": true,
     "tags": []
    },
    "source": [
@@ -258,6 +422,94 @@
    "metadata": {},
    "source": [
     "mean(list_v),std(list_v)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e525c342-1e29-4be4-b806-08b0f466ccaf",
+   "metadata": {},
+   "source": [
+    "## Approx Dict Running Stats"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "dec33c9f-f00b-4768-b67e-fd806b7b08c3",
+   "metadata": {},
+   "source": [
+    "function Base.push!(ad::ApproxDict,kv)\n",
+    "    (k,v) = kv\n",
+    "    return push!(get!(ad,k,RunningStat()),v)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "67dc20c6-7828-424f-9ea3-c2af3ea21bda",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function Base.push!(ad::ApproxDict,k::Real,v::Real)\n",
+    "    return push!(get!(ad,k,RunningStat()),v)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "492cabeb-d9f2-49ab-b7b8-f4af72a73a23",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "function Base.push!(ad::ApproxDict, xvals::AbstractVector{<:Number}, yvals::AbstractVector{<:Number})\n",
+    "    if length(xvals) != length(yvals)\n",
+    "        error(\"Input vectors must have the same length\")\n",
+    "    end\n",
+    "    for (x,v) in zip(xvals,yvals)\n",
+    "        push!(ad,x,v)\n",
+    "    end\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f5b8cd88-4208-4b2d-959f-f0aad2f304a6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ad = ApproxDict(1e-5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5e0c3ba2-4a92-41dd-adff-72a0ce6a44f1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "push!(ad,0.1,130)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "72fd8d0c-3dfe-45ad-ae7e-5b0c44cfe27b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "push!(ad,[0.1,0.2,0.101,0.3],[100,110,120,130])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3de4c3a3-4933-4d72-9b23-8fdec115716b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "keys(ad)"
    ]
   },
   {
@@ -327,9 +579,7 @@
   {
    "cell_type": "markdown",
    "id": "2d81b296-50f5-4669-8c3e-bbfcc237f8b8",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "### Test"
    ]
@@ -411,9 +661,7 @@
   {
    "cell_type": "markdown",
    "id": "779d37a3-4254-434e-8233-6de9110349f4",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "### Tests"
    ]
@@ -499,7 +747,6 @@
    "cell_type": "markdown",
    "id": "d76c801d-cc0c-42b6-b5c7-d5798d0a394f",
    "metadata": {
-    "jp-MarkdownHeadingCollapsed": true,
     "tags": []
    },
    "source": [
@@ -809,7 +1056,6 @@
    "cell_type": "markdown",
    "id": "bd2f3e46-172c-49a7-8bc9-992659675d22",
    "metadata": {
-    "jp-MarkdownHeadingCollapsed": true,
     "tags": []
    },
    "source": [
@@ -982,7 +1228,6 @@
    "cell_type": "markdown",
    "id": "4bf193c2-5042-4fe8-bc8f-2b4a68afc0b6",
    "metadata": {
-    "jp-MarkdownHeadingCollapsed": true,
     "tags": [],
     "toc-hr-collapsed": true
    },
@@ -1516,7 +1761,6 @@
    "cell_type": "markdown",
    "id": "776ed9dc-d9ed-4aca-a96c-b879f9f79dd1",
    "metadata": {
-    "jp-MarkdownHeadingCollapsed": true,
     "tags": []
    },
    "source": [
@@ -1863,7 +2107,6 @@
    "cell_type": "markdown",
    "id": "b564ac09-edfd-4950-86e3-88af38fe2987",
    "metadata": {
-    "jp-MarkdownHeadingCollapsed": true,
     "tags": []
    },
    "source": [
@@ -1967,9 +2210,7 @@
   {
    "cell_type": "markdown",
    "id": "e656d555-59c8-4dbf-ab44-1aed91162345",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "### Test"
    ]
@@ -2031,9 +2272,7 @@
   {
    "cell_type": "markdown",
    "id": "fd887d4e-d64a-4603-88a9-d51bb1efe709",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "### Test with points"
    ]
@@ -2097,9 +2336,7 @@
   {
    "cell_type": "markdown",
    "id": "005e1da9-2c67-4c1a-a705-a7739be3458d",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "### Test with ranks"
    ]
@@ -2147,9 +2384,7 @@
   {
    "cell_type": "markdown",
    "id": "f1267c71-3f5c-4a53-af96-3b92453d033f",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "### Test with shots"
    ]
@@ -2274,9 +2509,7 @@
   {
    "cell_type": "markdown",
    "id": "c437ccb7-37c9-418a-b739-64277327c56b",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "#### Test"
    ]
@@ -2340,9 +2573,7 @@
   {
    "cell_type": "markdown",
    "id": "4a37ff07-da17-41e7-bc4d-f49803fbed73",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "#### Test with MST"
    ]
@@ -2483,9 +2714,7 @@
   {
    "cell_type": "markdown",
    "id": "b71ef73d-9bf9-4dd1-900b-62209bb49580",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "#### Test with Shuffled Spanning Tree"
    ]
@@ -2652,9 +2881,7 @@
   {
    "cell_type": "markdown",
    "id": "596de129-1e02-4516-a260-0b8bd635823e",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
+   "metadata": {},
    "source": [
     "#### Test"
    ]
@@ -2786,6 +3013,101 @@
   },
   {
    "cell_type": "markdown",
+   "id": "fdaa5655-1234-4985-8347-392795546d65",
+   "metadata": {},
+   "source": [
+    "#### Statistics"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0d6e76cf-1553-41a0-965a-e6a8e3e4da74",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "struct Measurements\n",
+    "    xvals::Vector{Float64}\n",
+    "    yvals::Vector{Float64}\n",
+    "end\n",
+    "\n",
+    "function Measurements()\n",
+    "    return Measurements(Vector{Float64}(),Vector{Float64}())\n",
+    "end\n",
+    "\n",
+    "function Base.push!(m::Measurements,x::Number,y::Number)\n",
+    "    push!(m.xvals,x)\n",
+    "    push!(m.yvals,y)\n",
+    "end\n",
+    "\n",
+    "#function Base.push!(m::Measurements,xvals::Vector{Number},yvals::Vector{Number})\n",
+    "#    @show xvals,yvals\n",
+    "#    for (x,y) in zip(xvals,yvals)\n",
+    "#        @show x,y\n",
+    "#        push!(m.xvals,x)\n",
+    "#        push!(m.yvals,y)\n",
+    "#    end\n",
+    "#end\n",
+    "\n",
+    "function Base.push!(m::Measurements, xvals::AbstractVector{<:Number}, yvals::AbstractVector{<:Number})\n",
+    "    if length(xvals) != length(yvals)\n",
+    "        error(\"Input vectors must have the same length\")\n",
+    "    end\n",
+    "    append!(m.xvals, xvals)\n",
+    "    append!(m.yvals, yvals)\n",
+    "end"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1b73c199-8b13-4d3f-afcc-7efabe480ad4",
+   "metadata": {},
+   "source": [
+    "#### Test"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "e0940375-8678-4bbb-8fa1-8dd8130b3231",
+   "metadata": {},
+   "source": [
+    "m = Measurements()"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "535a58ef-262d-4e87-a54a-9bae2ef85a6d",
+   "metadata": {},
+   "source": [
+    "push!(m,1.0,2.0)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c6a79421-1a60-43d0-a13f-ae3eb54426f3",
+   "metadata": {},
+   "source": [
+    "push!(m,[10.0,11.0,12.0],[100.0,200.0,300.0])"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "77ef1850-15cc-4c96-87d7-108ed0a9a115",
+   "metadata": {},
+   "source": [
+    "push!(m,[10,11,12],[101,201,301])"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "26f7b37b-14c8-4d3c-a732-72b0f0aa991e",
+   "metadata": {},
+   "source": [
+    "m"
+   ]
+  },
+  {
+   "cell_type": "markdown",
    "id": "6c08029a-ea36-4846-b20b-82e2fa2e4ebe",
    "metadata": {},
    "source": [
@@ -2836,21 +3158,31 @@
     "    @show k,g\n",
     "    (league,metric) = k\n",
     "\n",
-    "    true_rankings = collect(1:nv(g))    \n",
-    "    true_ratings  = dict_true_ratings_jld2[league]\n",
+    "    true_ratings = dict_true_ratings_jld2[league]\n",
     "    \n",
     "    g_sc,g_f = g_to_sc_f(g)\n",
     "    g_hd = compute_k_th_hodge_decomposition(g_sc,g_f,1)\n",
     "    g_w = ratings(g_hd.w)\n",
     "    g_r = ranking(g_hd.w)\n",
+    "    #g_fname = \"txt/\"*league*\"-\"*metric*\"-g.txt\"\n",
+    "    #save_ratings_and_rankings_as_txt(g_fname,g_w,g_r)    \n",
     "\n",
-    "    list_inferred_sst_ratings = zeros(0)\n",
-    "    list_inferred_sst_rankings = zeros(Int64,0)\n",
+    "    inferred_rating_vs_true_ranking = Measurements()\n",
+    "    inferred_ranking_vs_true_ranking = Measurements()\n",
+    "    sst_rating_vs_true_rating = Measurements()    \n",
+    "    sst_rating_vs_g_rating = Measurements()\n",
+    "    sst_ranking_vs_g_ranking = Measurements()\n",
     "\n",
-    "    list_rs_sst_ratings  = [RunningStat() for i in 1:nv(g)]\n",
-    "    list_rs_sst_rankings = [RunningStat() for i in 1:nv(g)]\n",
+    "    tol = 1e-5\n",
+    "    rs_inferred_rating_vs_true_ranking = ApproxDict(tol)\n",
+    "    rs_inferred_ranking_vs_true_ranking = ApproxDict(tol)\n",
+    "    rs_sst_rating_vs_true_rating = ApproxDict(tol)\n",
+    "    rs_sst_rating_vs_g_rating = ApproxDict(tol)\n",
+    "    rs_sst_ranking_vs_g_ranking = ApproxDict(tol)\n",
     "    \n",
-    "    # Sampling sst's\n",
+    "    true_ranking = collect(1:nv(g))\n",
+    "    #@show true_ranking\n",
+    "    \n",
     "    for sample in 1:num_samples\n",
     "        if sample%10 == 0\n",
     "            @show sample\n",
@@ -2860,30 +3192,37 @@
     "        sst_hd = compute_k_th_hodge_decomposition(sst_sc,sst_f,1)\n",
     "        sst_w = ratings(sst_hd.w)\n",
     "        sst_r = ranking(sst_hd.w)      \n",
+    "        #@show true_ranking,sst_w\n",
     "        \n",
-    "        #push!(list_inferred_sst_ratings,sst_w)\n",
-    "        append!(list_inferred_sst_ratings,sst_w)\n",
-    "        #push!(list_inferred_sst_rankings,sst_r)\n",
-    "        append!(list_inferred_sst_rankings,sst_r)\n",
-    "\n",
-    "        for i in 1:nv(g)\n",
-    "            push!(list_rs_sst_ratings[i],sst_w[i])\n",
-    "            push!(list_rs_sst_rankings[i],sst_r[i])\n",
-    "        end\n",
-    "        \n",
+    "        push!(inferred_rating_vs_true_ranking,true_ranking,sst_w)\n",
+    "        push!(inferred_ranking_vs_true_ranking,true_ranking,sst_r)\n",
+    "        push!(sst_rating_vs_true_rating,true_ratings,sst_w)        \n",
+    "        push!(sst_rating_vs_g_rating,g_w,sst_w)\n",
+    "        push!(sst_ranking_vs_g_ranking,g_r,sst_r)\n",
     "        sst_fname = \"txt/\"*league*\"-\"*metric*\"-sst.txt\"    \n",
     "        save_ratings_and_rankings_as_txt(sst_fname,sst_w,sst_r,true_ratings)        \n",
+    "\n",
+    "        push!(rs_inferred_rating_vs_true_ranking,true_ranking,sst_w)\n",
+    "        push!(rs_inferred_ranking_vs_true_ranking,true_ranking,sst_r)\n",
+    "        push!(rs_sst_rating_vs_true_rating,true_ratings,sst_w)        \n",
+    "        push!(rs_sst_rating_vs_g_rating,g_w,sst_w)\n",
+    "        push!(rs_sst_ranking_vs_g_ranking,g_r,sst_r)\n",
+    "        \n",
     "    end\n",
-    "   \n",
+    "\n",
+    "    #@show inferred_rating_vs_true_ranking\n",
+    "    \n",
     "    p1 = plot(\n",
     "        xlabel=\"true ranking\",\n",
     "        ylabel=\"sst rating [\"*metric*\"]\",\n",
     "    )\n",
-    "    scatter!(p1,repeat(true_rankings;outer=[num_samples]),list_inferred_sst_ratings,c=1,label=\"sst inferred\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
-    "    plot!(p1,true_rankings,g_w,c=1,label=\"\")\n",
-    "    scatter!(p1,true_rankings,g_w,c=1,label=\"g inferred\")\n",
-    "    scatter!(p1,true_rankings,mean.(list_rs_sst_ratings),yerror=std.(list_rs_sst_ratings),c=2,markerstrokecolor=2,label=\"sst mean inferred\")\n",
-    "    #plot!(p1,x->x,c=:black,style=:dash,label=\"ideal\")        \n",
+    "    #plot!(p1,sst_w,c=1,label=\"\",style=:dash)\n",
+    "    #scatter!(p1,sst_w,c=1,label=\"\",markerstyle=:star)\n",
+    "    #plot!(p1,inferred_rating_vs_true_ranking.xvals,inferred_rating_vs_true_ranking.yvals,c=1,label=\"\",style=:dash)\n",
+    "    #scatter!(p1,inferred_rating_vs_true_ranking.xvals,inferred_rating_vs_true_ranking.yvals,c=1,label=\"sst inferred\",m=:star)\n",
+    "    scatter!(p1,inferred_rating_vs_true_ranking.xvals,inferred_rating_vs_true_ranking.yvals,c=1,label=\"sst inferred\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
+    "    plot!(p1,g_w,c=1,label=\"\")\n",
+    "    scatter!(p1,g_w,c=1,label=\"g inferred\")   \n",
     "    fname = \"plots/\"*league*\"-\"*metric*\"-rating-samples.pdf\"\n",
     "    savefig(p1,fname)\n",
     "    \n",
@@ -2891,10 +3230,13 @@
     "        xlabel=\"true ranking\",\n",
     "        ylabel=\"sst ranking [\"*metric*\"]\",\n",
     "    )   \n",
-    "    scatter!(p2,repeat(true_rankings;outer=[num_samples]),list_inferred_sst_rankings,c=2,label=\"sst inferred\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
-    "    plot!(p2,true_rankings,g_r,c=2,label=\"\")\n",
-    "    scatter!(p2,true_rankings,g_r,c=2,label=\"g inferred\")\n",
-    "    scatter!(p2,true_rankings,mean.(list_rs_sst_rankings),yerror=std.(list_rs_sst_rankings),c=1,markerstrokecolor=1,label=\"sst mean inferred\")\n",
+    "    #plot!(p2,sst_r,c=2,label=\"\",style=:dash)\n",
+    "    #scatter!(p2,sst_r,c=2,label=\"mst\",markerstyle=:star)    \n",
+    "    #plot!(p2,inferred_ranking_vs_true_ranking.xvals,inferred_ranking_vs_true_ranking.yvals,c=2,label=\"\",style=:dash)\n",
+    "    #scatter!(p2,inferred_ranking_vs_true_ranking.xvals,inferred_ranking_vs_true_ranking.yvals,c=2,label=\"sst inferred\",m=:star)\n",
+    "    scatter!(p2,inferred_ranking_vs_true_ranking.xvals,inferred_ranking_vs_true_ranking.yvals,c=2,label=\"sst inferred\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
+    "    plot!(p2,g_r,c=2,label=\"\")\n",
+    "    scatter!(p2,g_r,c=2,label=\"g inferred\")\n",
     "    plot!(p2,x->x,c=:black,style=:dash,label=\"ideal\")        \n",
     "    fname = \"plots/\"*league*\"-\"*metric*\"-ranking-samples.pdf\"\n",
     "    savefig(p2,fname)\n",
@@ -2904,10 +3246,11 @@
     "        ylabel=\"sst rating\",\n",
     "        title=league*\" \"*metric,\n",
     "    )\n",
-    "    scatter!(p3,repeat(true_ratings;outer=[num_samples]),list_inferred_sst_ratings,c=1,label=\"sst inferred\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
+    "    #scatter!(p3,true_ratings,sst_w,c=1,label=\"\")\n",
+    "    #scatter!(p3,sst_rating_vs_true_rating.xvals,sst_rating_vs_true_rating.yvals,c=1,label=\"\")\n",
+    "    scatter!(p3,sst_rating_vs_true_rating.xvals,sst_rating_vs_true_rating.yvals,c=1,label=\"sst inferred\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
+    "    #plot!(p3,true_ratings,g_w,c=1,label=\"\")\n",
     "    scatter!(p3,true_ratings,g_w,c=1,label=\"g inferred\")     \n",
-    "    scatter!(p3,true_ratings,mean.(list_rs_sst_ratings),yerror=std.(list_rs_sst_ratings),c=2,markerstrokecolor=2,label=\"sst mean inferred\")\n",
-    "    plot!(p3,x->x,c=:black,style=:dash,label=\"ideal\")        \n",
     "    fname = \"plots/\"*league*\"-\"*metric*\"-true-rating-vs-sst-rating-samples.pdf\"\n",
     "    savefig(p3,fname)\n",
     "    \n",
@@ -2916,9 +3259,9 @@
     "        ylabel=\"sst rating\",\n",
     "        title=league*\" \"*metric,\n",
     "    )\n",
-    "    scatter!(p4,repeat(g_w;outer=[num_samples]),list_inferred_sst_ratings,c=1,label=\"\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
-    "    scatter!(p4,g_w,mean.(list_rs_sst_ratings),yerror=std.(list_rs_sst_ratings),c=2,markerstrokecolor=2,label=\"sst mean inferred\")\n",
-    "    plot!(p4,x->x,c=:black,style=:dash,label=\"ideal\")\n",
+    "    #scatter!(p4,g_w,sst_w,c=1,label=\"\")\n",
+    "    #scatter!(p4,sst_rating_vs_g_rating.xvals,sst_rating_vs_g_rating.yvals,c=1,label=\"\")\n",
+    "    scatter!(p4,sst_rating_vs_g_rating.xvals,sst_rating_vs_g_rating.yvals,c=1,label=\"\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
     "    fname = \"plots/\"*league*\"-\"*metric*\"-g-rating-vs-sst-rating-samples.pdf\"\n",
     "    savefig(p4,fname)\n",
     "    \n",
@@ -2927,8 +3270,9 @@
     "        ylabel=\"sst ranking\",\n",
     "        title=league*\" \"*metric,\n",
     "    )\n",
-    "    scatter!(p5,repeat(g_r;outer=[num_samples]),list_inferred_sst_rankings,c=2,label=\"\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
-    "    scatter!(p5,g_r,mean.(list_rs_sst_rankings),yerror=std.(list_rs_sst_rankings),c=1,markerstrokecolor=1,label=\"sst mean inferred\")\n",
+    "    #scatter!(p5,g_r,sst_r,c=2,label=\"\")\n",
+    "    #scatter!(p5,sst_ranking_vs_g_ranking.xvals,sst_ranking_vs_g_ranking.yvals,c=2,label=\"\")\n",
+    "    scatter!(p5,sst_ranking_vs_g_ranking.xvals,sst_ranking_vs_g_ranking.yvals,c=2,label=\"\",marker = (:circle, 3),alpha = 0.1,markerstrokewidth = 0)\n",
     "    plot!(p5,x->x,c=:black,style=:dash,label=\"ideal\")        \n",
     "    fname = \"plots/\"*league*\"-\"*metric*\"-g-ranking-vs-sst-ranking-samples.pdf\"\n",
     "    savefig(p5,fname)   \n",
@@ -2941,7 +3285,7 @@
     "        title=league*\" \"*metric,\n",
     "    )\n",
     "    #@show sst_rating_vs_g_rating.yvals\n",
-    "    hist = StatsBase.fit(Histogram,list_inferred_sst_ratings,nbins=50)\n",
+    "    hist = StatsBase.fit(Histogram,sst_rating_vs_g_rating.yvals,nbins=50)\n",
     "    probs = hist.weights ./ sum(hist.weights)\n",
     "    plot!(p6,hist,label=\"\")\n",
     "    #plot!(p6,probs,label=\"\")    \n",
@@ -2958,17 +3302,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "54393daa-85b5-483b-952b-d509a70137d0",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "zeros(Int64,0)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "3cd5ae36-d08b-459a-b0b9-edbfb0d30ba8",
+   "id": "de94fd3e-e2da-4998-855d-b3317f661458",
    "metadata": {},
    "outputs": [],
    "source": []
