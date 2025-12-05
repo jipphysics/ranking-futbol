@@ -18,3 +18,8 @@ TODO
   2025-11-28
     - Terminar lo de la fecha anterior, 2025-11-14.
     - Comparar distribuciones de ratings inferidos con metricas originales.
+    
+  2025-12-05
+  - Calcular distribuciones ratigns SST sin shiftear a cero.
+  - Comparar distribuciones de diferencias de ratings inferidos con "flow rate"'s de metricas originales.
+  - Inferir ratings y rankings usando las redes generadas con el fixture hasta la 3er fecha.    
