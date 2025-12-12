@@ -22,4 +22,7 @@ TODO
   2025-12-05
   - Calcular distribuciones ratigns SST sin shiftear a cero.
   - Comparar distribuciones de diferencias de ratings inferidos con "flow rate"'s de metricas originales.
-  - Inferir ratings y rankings usando las redes generadas con el fixture hasta la 3er fecha.    
+  - Inferir ratings y rankings usando las redes generadas con el fixture hasta la 3er fecha.   
+  
+  2025-12-12
+  - Calcular curl, etc. de la inferencia de ratings.
