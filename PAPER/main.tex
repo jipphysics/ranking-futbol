@@ -126,6 +126,85 @@ En este marco, construimos 50 grafos en total, diez grafos por liga. Cada uno as
 \subsection{Utilizacion de HodgeRank para la obtencion de los ratings asociados a las metricas}
 
 
+\subsection{Estadística del rating real}
+
+La idea de esta sección es definir un modelo estadistico para el rating real, $R_T$, el cual definimos como la cantidad de puntos totales obtenidos durante la liga.
+%
+Note que esta es una variable estocastica que depende de la cantidad de partidos ganados, empatados y perdidos.
+%
+Ademas, es sabido que en las ligas de futbol, un equipo obtiene 3 puntos cuando gana, 1 cuando empata y 0 cuanto pierde. 
+%
+En este marco, definimos las variables estocasticas $G_i$, $E_i$ y $P_i$, como la cantidad de partidos ganados, empatados y perdidos por el equipo $i$. Luego, el rating real de este puede escribirse como,
+
+$$
+{R_T}_i = 3G_i + 1E_i.
+$$
+
+Definiendo ${\bf p}_i = ({p_g}_i, {p_e}_i, {p_p}_i)$ como el vector que contiene las probabilidades de ganar, empatar o perder un partido, para el equipo $i$, podemos modelar la cantidad de partidos ganados, empatados y perdidos por ese equipo con una distribucion multinomial,
+
+$$
+(G_i,E_i,P_i) \sim Multinomial( n, {\bf p}_i ),
+$$
+%
+Donde $n$ es la cantidad total de partidos jugados, lo cual en una liga es igual para todos los equipos. 
+Note que cada equipo tendrá asociado un vector ${\bf p}$ diferente, dependiendo de su nivel competitivo. 
+%
+Podemos modelar este vector a partir de una distribución de Dirichlet,
+
+\begin{align*}
+{\bf p}_i &\sim Dirichlet( \boldsymbol{\alpha} ), \\
+\boldsymbol{\alpha} &= ( \alpha_g, \alpha_e, \alpha_p ).
+\end{align*}
+%
+Esta distribución, en función del conjunto de parámetros $\boldsymbol{\alpha}$, genera vectores de tres componentes, ${\bf p}_i$, que cumplen con las propiedades requeridas para una terna de probabilidades:  
+
+
+\begin{align} \label{simplex}
+{p_g}_i>0,\; {p_e}_i>0,\; {p_p}_i>0, \\ 
+{p_g}_i+{p_e}_i+{p_p}_i=1. \nonumber
+\end{align}
+ 
+
+
+
+En este marco, la probabilidad de que un equipo durante la liga gane $G=g$ partidos y empate $E=e$, viene dada por,
+
+\begin{equation} \label{integ}
+P( G=g, E=e ) = 
+\int_S f_M( g,e ; n | {\bf p} ) f_D({\bf p},\boldsymbol{\alpha} ) d{\bf p}.
+\end{equation}
+%
+En esta expresion, las densidades de probabilidad son,
+%
+\begin{align*} 
+f_M( g,e ; n | {\bf p} ) &= 
+\frac{n!}{g!\; e!\; (n-g-e)!} p_g^g\; p_e^e\; p_p^{(n-g-e)}, \\
+%
+f_D({\bf p},\boldsymbol{\alpha} ) &= 
+\frac{1}{B(\boldsymbol{\alpha})}\;  
+p_g^{(\alpha_g -1)}\; p_e^{(\alpha_e -1)}\; p_p^{(\alpha_p -1)},
+%
+\end{align*}
+%
+la densidad multinomial condidicionada y la densidad de Dirichlet, respectivamente. Ademas, el espacio de integración, $S$, es el simplex generado por las eqs. \ref{simplex}.
+%
+La integral \ref{integ} admite solucion analitica. Resolviendo, obtenemos la probabilidad de ganar $G=g$ partidos y empatar $E=e$, en funcion de los parametros $\alpha_g$, $\alpha_e$ y $\alpha_p$,
+%
+\begin{equation} \label{proba}
+P( G=g, E=e ) = \frac{n!}{ g!\; e!\; (n-g-e)!} \; 
+\frac{ B(\alpha_g+g, \alpha_e+e, \alpha_p+n-g-e) }
+{ B(\alpha_g, \alpha_e, \alpha_p) }.
+\end{equation}
+
+A partir de la eq. \ref{proba}, se puede obtener la distribucion de probabilidad teorica $R_T$. Los grados de libertad que otorgan los parametros $\boldsymbol{\alpha}$, permiten ajustando la curva teorica a los datos. 
+En la Fig. \ref{fi:stats}
+
+
+
+
+
+
+
 
 \subsection{Comparacion entre el rating real y el rating obtenido de las metricas}
 
@@ -186,11 +265,22 @@ En este marco utilizamos la eq. \ref{eq:D} para calcular el valor de $D$ para la
 
 \subsection{Propuesta de un raiting multivariado}
 
-La idea de esta seccion es 
+
+Para cada liga, definimos la matriz de rating multivariado, $\bm{R_{MV}}$. En este objeto, las fila representan los equipos, y las columnas los metric ratings calculados con el metodo de HodgeRank. La dimension de esta matriz, en el caso de Espana por ejemplo, esta matriz sera $10 $
 
 
 
 \section{Discusion y conclusion}
+
+
+
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=1.\textwidth]{stats_rating.pdf}
+\caption{Estadística del rating real. (a) Comparación de la Cumuative distribution function (CDF) de los valores de rating real con lo obtenido a partir del M-D model y el modelo gaussiano. (b) Relacion entre los Quantile asociado a los datos y los obtenidos a partir del M-D model y el modelo gaussiano.}
+\label{fi:stats}
+\end{figure}
 
 
 
