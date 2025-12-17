@@ -128,53 +128,49 @@ En este marco, construimos 50 grafos en total, diez grafos por liga. Cada uno as
 
 \subsection{Estadística del rating real}
 
-La idea de esta sección es definir un modelo estadistico para el rating real, $R_T$, el cual definimos como la cantidad de puntos totales obtenidos durante la liga.
+La idea de esta sección es definir un modelo estadistico para la distribucion de probabilidad del rating real, $R_T$, definido como la cantidad de puntos totales obtenidos por un equipo durante la liga.
 %
-Note que esta es una variable estocastica que depende de la cantidad de partidos ganados, empatados y perdidos.
+$R_T$ es una variable estocastica que depende de la cantidad de partidos ganados, empatados y perdidos, por los equipos de la liga.
 %
-Ademas, es sabido que en las ligas de futbol, un equipo obtiene 3 puntos cuando gana, 1 cuando empata y 0 cuanto pierde. 
+En las ligas de futbol, un equipo obtiene 3 puntos cuando gana, 1 cuando empata y 0 cuanto pierde. 
 %
-En este marco, definimos las variables estocasticas $G_i$, $E_i$ y $P_i$, como la cantidad de partidos ganados, empatados y perdidos por el equipo $i$. Luego, el rating real de este puede escribirse como,
+En este marco, $R_T$ puede expresarse en terminos de las variables estocasticas $G$, $E$ y $P$, que representan la cantidad de partidos ganados, empatados y perdidos por un equipo,
+%
+$$
+R_T = 3G + 1E.
+$$
+%
+Definiendo ${\bf p} = (p_g, p_e, p_p)$ como el vector que contiene las probabilidades de ganar, empatar o perder un partido, para el equipo dado, podemos modelar la cantidad de partidos ganados, empatados y perdidos por ese equipo con una distribucion multinomial,
 
 $$
-{R_T}_i = 3G_i + 1E_i.
-$$
-
-Definiendo ${\bf p}_i = ({p_g}_i, {p_e}_i, {p_p}_i)$ como el vector que contiene las probabilidades de ganar, empatar o perder un partido, para el equipo $i$, podemos modelar la cantidad de partidos ganados, empatados y perdidos por ese equipo con una distribucion multinomial,
-
-$$
-(G_i,E_i,P_i) \sim Multinomial( n, {\bf p}_i ),
+(G,E,P) \sim Multinomial( n, {\bf p} ),
 $$
 %
 Donde $n$ es la cantidad total de partidos jugados, lo cual en una liga es igual para todos los equipos. 
-Note que cada equipo tendrá asociado un vector ${\bf p}$ diferente, dependiendo de su nivel competitivo. 
+Proponemos que cada equipo tiene asociado un vector ${\bf p}$ diferente, dependiendo de su nivel competitivo. Por lo tanto ${\bf p}$ tambien puede ser considerada una variable estocastica.
 %
-Podemos modelar este vector a partir de una distribución de Dirichlet,
-
+Podemos modelarla a partir de una distribución de Dirichlet,
+%
 \begin{align*}
 {\bf p}_i &\sim Dirichlet( \boldsymbol{\alpha} ), \\
 \boldsymbol{\alpha} &= ( \alpha_g, \alpha_e, \alpha_p ).
 \end{align*}
 %
-Esta distribución, en función del conjunto de parámetros $\boldsymbol{\alpha}$, genera vectores de tres componentes, ${\bf p}_i$, que cumplen con las propiedades requeridas para una terna de probabilidades:  
-
-
+Esta distribución, en función del conjunto de parámetros $\boldsymbol{\alpha}$, genera vectores de tres componentes, ${\bf p}$, que cumplen con las propiedades requeridas para una terna de probabilidades:  
+%
 \begin{align} \label{simplex}
 {p_g}_i>0,\; {p_e}_i>0,\; {p_p}_i>0, \\ 
 {p_g}_i+{p_e}_i+{p_p}_i=1. \nonumber
 \end{align}
  
-
-
-
-En este marco, la probabilidad de que un equipo durante la liga gane $G=g$ partidos y empate $E=e$, viene dada por,
-
+Con estos elementos, podemos escribir la probabilidad de que un equipo gane $G=g$ partidos y empate $E=e$, durante la liga,
+%
 \begin{equation} \label{integ}
 P( G=g, E=e ) = 
 \int_S f_M( g,e ; n | {\bf p} ) f_D({\bf p},\boldsymbol{\alpha} ) d{\bf p}.
 \end{equation}
 %
-En esta expresion, las densidades de probabilidad son,
+Las densidades de probabilidad dentro de la integral son la densidad multinomial condidicionada y la densidad de Dirichlet. Estas pueden escribirse como,
 %
 \begin{align*} 
 f_M( g,e ; n | {\bf p} ) &= 
@@ -182,11 +178,11 @@ f_M( g,e ; n | {\bf p} ) &=
 %
 f_D({\bf p},\boldsymbol{\alpha} ) &= 
 \frac{1}{B(\boldsymbol{\alpha})}\;  
-p_g^{(\alpha_g -1)}\; p_e^{(\alpha_e -1)}\; p_p^{(\alpha_p -1)},
+p_g^{(\alpha_g -1)}\; p_e^{(\alpha_e -1)}\; p_p^{(\alpha_p -1)}.
 %
 \end{align*}
 %
-la densidad multinomial condidicionada y la densidad de Dirichlet, respectivamente. Ademas, el espacio de integración, $S$, es el simplex generado por las eqs. \ref{simplex}.
+Ademas, el espacio de integración, $S$, es el simplex generado por las eqs. \ref{simplex}.
 %
 La integral \ref{integ} admite solucion analitica. Resolviendo, obtenemos la probabilidad de ganar $G=g$ partidos y empatar $E=e$, en funcion de los parametros $\alpha_g$, $\alpha_e$ y $\alpha_p$,
 %
@@ -195,9 +191,16 @@ P( G=g, E=e ) = \frac{n!}{ g!\; e!\; (n-g-e)!} \;
 \frac{ B(\alpha_g+g, \alpha_e+e, \alpha_p+n-g-e) }
 { B(\alpha_g, \alpha_e, \alpha_p) }.
 \end{equation}
-
-A partir de la eq. \ref{proba}, se puede obtener la distribucion de probabilidad teorica $R_T$. Los grados de libertad que otorgan los parametros $\boldsymbol{\alpha}$, permiten ajustando la curva teorica a los datos. 
-En la Fig. \ref{fi:stats}
+%
+A partir de la eq. \ref{proba}, escribimos la distribucion de probabilidad teorica para el true rating,
+%
+\begin{align*} 
+&P(R_T = r_T) = \sum_X P( G=g, E=e ) \\
+&X = \{ g,e>0, \; 3g+1e=r_T, \; g+e\ge n \}
+\end{align*}
+ 
+Los grados de libertad que otorgan los parametros $\boldsymbol{\alpha}$, permiten ajustar la curva teorica a los datos. 
+En la Fig. \ref{fi:stats} (a), mostramos la cumulative distribution function (CDF) del true rating, el ajuste realizado a partir del multinomial direchlet model (M-D model) desarrollado arriba, y de una densidad gaussiana de valor medio y desviacion estandar igual al valor medio muestral y la desviacion estandar muestral observados en los datos de true rating.
 
 
 
