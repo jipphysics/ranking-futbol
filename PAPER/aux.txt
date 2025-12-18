@@ -1,0 +1,18 @@
+La distribución de Dirichlet, nos permite relacionar estas cantidades con los valores esperados de las probabilidades de ganar y empatar un partido, $p_g$ y $p_e$, de la siguiente manera,
+%
+\begin{align*}
+E[p_g]&= \frac{\alpha_g}{\alpha_0},\\
+E[p_e]&= \frac{\alpha_e}{\alpha_0},\\
+\alpha_0 &= \alpha_g+ \alpha_e+ \alpha_p.
+\end{align*}
+%
+Obtuvimos $E[p_g]= (0.22 \pm 0.01) $ y $E[p_e]= (0.68 \pm 0.01)$.
+Estos valores pueden ser contrastados con los valores medios muestrales de las probabilidad $p_g$ y $p_e$ calculados de manera frecuencista como,
+%
+\begin{align*}
+\bar{p}_g&= \frac{1}{n} \sum_{teams} g,\\
+\bar{p}_e&= \frac{1}{n} \sum_{teams} e.
+\end{align*}
+%
+Haciendo este calculo, obtuvimos $\bar{p}_g=0.38\;(s_{p_g}=0.17)$ y $\bar{p}_e=0.24\;(s_{p_e}=0.08)$. Podemos ver que en el caso de la probabilidad de ganar los valores coindicen dentro del 
+
