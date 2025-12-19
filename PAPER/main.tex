@@ -212,48 +212,39 @@ Respecto a los resultados obtenidos, en primer lugar, podemos observar que el Mu
 
 \subsection{Comparacion entre el rating real y el rating obtenido de las metricas}
 
-Definimos como true ranking, $r$, de un equipo, al puesto final alcanzado en la tabla de posiciones de su liga. Por ejemplo, el true ranking del equipo FC Barcelona en la liga Espanola es 1, por que salio campeon esa temporada.
-Definimos tambien, true rating, $R_T$, de un equipo a la cantidad de puntos obtenidos por ese equipo en su correspondiente liga. Por ejemplo, el true rating del FC Barcelona en esa temporada fue 93 puntos.
+Definimos como true ranking de un equipo, al puesto final alcanzado en la tabla de posiciones de su liga. Por ejemplo, el true ranking del equipo FC Barcelona en la liga Española es 1, por que salio campeon esa temporada.
 %
 Asimismo, definimos como metric rating, $R_M$, de un equipo de una liga, en una metrica dada, al valor de rating calculado a partir del metodo HodgeRank para la red asociada a esa metrica.
 
-Por otro lado, como nuestra idea es comparar el true rating con el rating obtenido a partir del metodo de HodgeRank, es necesario llevar los valores de ambas variables a la misma escala. Por tal motivo, decidimos estandarizar las variables utilizando la media y la desviacion estandar, de la siguiente manera,
+Nuestra idea es comparar el true rating con el rating obtenido a partir del metodo de HodgeRank. Naturalemente, estas cantidades estan en escalas distintas, por lo tanto para hacer la comparación es necesario llevar los valores de ambas variables a la misma escala. Por tal motivo, decidimos estandarizar las variables y hacer la comparacion sobre el {\it z-score} de cada una de estas.
 %
-\begin{align*}
-R_T &\to \frac{R_T - \langle R_T\rangle} { \sigma(R_T)}, \\
-R_M &\to \frac{R_M - \langle R_M\rangle} { \sigma(R_M)},
-\end{align*}
+En lo siguiente discutimos algunas comparaciones intersantes entre true raiting y el metric rating obtenido a partir de alguna de las metricas. 
 %
-donde $\langle * \rangle$ indica el valor medio y $\sigma(*)$ la desviacion estandar.
+En la Fig. \ref{fi:rating} (a) comparamos las CDF del true rating asociado a los datos de todos los equipos y todas las ligas, con la del metric rating asociado a los datos de todos los equipos de todas las ligas y de las diez metricas estudiadas. A ambas curvas se les estrajeron los valores outliers considerados como aquellos casos que se encuentran por encima del quantile $Q_{99.7}$
 %
-Por ultimo, definimos como $\Delta_{i,m}$ a la diferencia cuadratica de rating de una metrica $m$, de un equipo $i$, como,
+Podemos observar una coincidencia notable en casi todo el rango, observando algunas diferencias en las colas: el metric rating muestra mas valores positivos mas alejados de la media, y el true rating muestra mas valores negativos levemente mas alejados de la media.
 %
-\begin{equation} \label{eq:delta}
-\Delta_{i,m} = \big(  R_T(i)- R_M(i,m) \big)^2.
-\end{equation}
+En la Fig. \ref{fi:rating} (b) comparamos las curva $R_T$ y $R_M$ en función del true rnking, para el caso de la metrica {\it Presure Point} en la liga Inglesa. 
+En primer lugar podemos notar que $R_T$ decrece a medida que crece el ranking, esto es trivial por defincion: el primer equipo tiene un true raiting mayor o igual que el segundo, el segundo tiene un true raiting mayor o igual que el tercero, y asi hasta el ultimo puesto. 
+En la curva de $R_M$ observamos una tendencia tambien decreciente, pero no monotona. En este caso, podemos decir que en terminos generales el metric rating aproxima relativamente bien la tendencia del true rating.
 %
-Esta cantidad cuantifica que tan distinto es el true rating de un equipo respecto al metric rating calculado a partir de HodgeRank para ese mismo equipo en una metrica dada.
+En la Fig. \ref{fi:rating} (c) mostramos una comparacion analoga a la anterior  para el caso de la metrica {\it Maintenance} en la liga Italiana. En este caso vemos que la curva $R_M$ no sigue una tendencia decreciente y se obverva una total descorrelacion con el true rating.
+%
+Vemos entonces que el true rating de una dada liga puede diferir poco o mucho del metric rating dependiendo de la metrica que utilizamos para inferir el rating.
+Una pregunta que surge naturalmente es cual es la estadistica asociada a esas diferencias. 
+Para estudiar esto, definimos la cantidad $\Delta R$ como la diferencia entre el true rating de un equipo $i$ de una liga $l$ y el metric rating asociado a una metrica $m$,
+%
+$$
+\Delta R = R_T(i,l) - R_M(i,l,m) 
+$$
+%
+%
+En la Fig. \ref{fi:rating} (d) mostramos la CDF de las diferencias $\Delta R$ observadas en cada liga. En cada una de estas hemos agrupado los datos provenientes de las 10 metricas. A modo de referencia, el grafico incluye tambien la CDF de una densidad gaussiana de valor medio y desvio estandar igual al del conjunto formado por el total de los datos.
+Note que dependiendo de cada liga la CDF se aparta de manera distinto de la referencia gaussiana, mostrando diferentes tipo de comportamiento. Podemos ver que las ligas Inglesa e Italiana presentan colas mas livianas que la gaussiana, indicando una densidad de probabilidad aguda alrededor de la media. Por el conrario, los datos asociado a liga española muestran colas levemente pesadas, mostrando la presencia de casos mas extremos. Por otro lado, los datos asociados a las ligas Francesa y alemana parecen comportarse de manera normal.
+Estas observaciones parecen indicar que hay ligas donde el metric rating tiende a diferenciarse mas del true rating. En lo que sigue cuantificamos estas diferencias en funcion de las distintas metricas.
 
-En lo siguiente dsicutimos en orma cualitativa algunas comparaciones intersantes entre true raiting y metric rating. 
-En la Fig. \ref{fi:puntos} (a) mostramos la curva $R_T$ vs. $r$ y $R_M$ vs. $r$ para el caso de la metrica {\it Presure Point} en la liga Inglesa. 
-En primer lugar podemos notar que $R_T$ decrece a medida que crece $r$, esto es trivial por defincion. Observamos tambien que $R_M$ tiene tambien una tendencia decreciente, pero no monotona. En terminos generales podemos decir que, en este caso, el metric rating se aproxima bastante bien al true rating.
-En la Fig. \ref{fi:puntos} (b) mostramos una comparacion analoga a la anterior para el caso de la metrica {\it Direct play} en la liga Espanola. En este caso podemos ver que $R_M$ parece seguir una tendencia levemente decreciente, pero difiere bastante de la curva $R_T$. 
-En la Fig. \ref{fi:puntos} (c) mostramos lo mismo que antes pero para el caso de la metrica {\it Maintenance} en la liga Italiana. En este caso vemos que la curva $R_M$ no sigue una tendencia decreciente y se obverva una total descorrelacion con el true rating.
-Note, que la diferencia punto a punto entre la curvas $R_T$ y $R_M$, en cualquiera de estos casos, representa la diferencia entre el true rating y el metric rating para cada equipo de la liga. 
-En estos ejemplos, podemos ver que esta diferencia puede ser muy variada dependiendo del caso. Para estudiar en mas detalle estas variaciones, utilizamos la eq. 1 para calcular la diferencia cuadratica $\Delta_{i,m}$ en todos los equipos de todas las ligas y en todas las metricas. La distribucion de esos valores se muestra en la Fig. \ref{fi:puntos} (d). Se observa una distribucion tipo power law con un cut off alrdedor de $\Delta_{i,m}\approx 1$, esto indica que rara vez las diferencias superan 1 desviacion estandar. En el rango $10^{-6} <\Delta_{i,m}<1$ ajustamos el modelo $P(\Delta_{i,m}) \propto \Delta_{i,m}^{-\alpha}$ para obtener el valor del exponente. Obtuvimos $\alpha= 0.61 \pm 0.02$, lo que indica una distribucion de valores extremadamente heterogeneos. En este caso el valor medio no es un estadisitico informativo, no obstante si lo es la mediana, la cual arrojo un valor de $0.26$.
-Podemos concluir entonces, que si bien la distribucion de diferencias cuadraticas exhibe un alto grado de complejidad los valores observados son en terminos generales relativamente pequenos. 
+Nuestro objetivo es cuantificar la diferencia entre la curva de true rating, $R_T$, y las curvas de metric rating, $R_M$, asociada a una metrica $m$ en una liga $l$. Para esto, definimos la distancia $D$, como  el Root Mean Square Error (RMSE), el valor medio de las diferencias cuadraticas entre dos curvas. Ademas, calculamos el coeficiente de Person entre ambas curvas, para estudiar el comportamiento de la tendencia.
 
-La idea a continuacion es cuantificar la diferencia entre la curva de true rating, $R_T$, y la curva metric rating, $R_M$, asociada a una metrica $m$ en una liga $l$. 
-Para eso, en primer lugar definimos $\{\Delta_{i,m,l} \}$ como al conjunto de las diferencias cuadraticas que se observan punto a punto entre las curvas $R_T$ y $R_M$ asociadas a una metrica $m$ en una liga $l$. 
-A partir de esto, definimos la distancia $D(m,l)$ como la raiz cuadrada de la mediana de ese conjunto,
-%
-\begin{equation} \label{eq:D}
-D(m,l) = \sqrt {M_d ( \{\Delta_{i,m,l} \})}.
-\end{equation}
-%
-Notar, que $D(m,l)$ esta definida de manera analoga a la cantidad Root Mean Square Error (RMSE), la cual se define como el mean de las diferencias cuadraticas entre dos curvas. En nuestro caso decidimos tomar la mediana, debido a que la heterogeneidad de la distribucion $P(\Delta_{i,m})$ indica que el estadisitico mean podria ser poco informativo en este caso.
-
-En este marco utilizamos la eq. \ref{eq:D} para calcular el valor de $D$ para las 10 metricas en las 5 ligas. En resultado se muestra en la Fig. \ref{fi:ratings}, la cual esta separada en 10 paneles uno por cada metrica, indicada en el parte superior del grafico. En cada panel se encuentran 5 barras que indican el valor de $D$ para cada liga. Cada panel fue ordenado en orden ascendente, mostrando primero las ligas que muestran una menor distancia. En la parte inferior de cada panel mostramos el coeficiente de correlacion de pearson, $\rho$, el cual mide la correlacion entre las curvas $R_T$ y $R_M$ en cada caso. Los colores de las barras estan asociados a las ligas para una mejor visualizacion. Asimismo, las barras negras indican que en ese caso la correlacion de Person es debil, $|\rho|<0.4$.
 
 
 
@@ -290,9 +281,13 @@ Para cada liga, definimos la matriz de rating multivariado, $\bm{R_{MV}}$. En es
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=1.\textwidth]{puntos.pdf}
-\caption{Comparacion entre el rating verdadero y el rating obtenido de las metricas (algunos casos ejemplares). (a) Caso Presure point en la liga inglesa. (b) Caso Direct play en la liga espanola. (c) Caso Maintenance en la liga italiana. (d) Distribucion de diferencias cuadraticas calculada sobre el conjunto de todas las metricas de todas las ligas.}
-\label{fi:puntos}
+\includegraphics[width=1.\textwidth]{rating.pdf}
+\caption{Comparacion entre true rating y metric rating. Debido a que estas cantidades estan en unidades distintas, para comparar se usan los datos estandarizados. 
+(a) Comparacion de las cumulative distribution functions asociadas al true ranking y al metric rating.
+(b) Comparación en el caso Presure point en la liga inglesa. 
+(c) Comparación en el caso Maintenance en la liga italiana.. 
+(d) Cumulative distribution function asociadas a las diferencias punto a punto entre el true rating y el metric raiting. A modeo de referencia, en lineas punteadas, se muestra la CDF de una densidad gaussiana de media y desvio igual al conjunto de todos los datos.}
+\label{fi:rating}
 \end{figure}
 
 
@@ -300,7 +295,7 @@ Para cada liga, definimos la matriz de rating multivariado, $\bm{R_{MV}}$. En es
 \centering
 \includegraphics[width=1.\textwidth]{rmse.pdf}
 \caption{Distancia $D$ y coeficiente de person $\rho$, entre el rating verdadero y el rating dado por las metricas. Cada panel contiene la informacion de una metrica y las barras muestran el valor de $D$ obtenido en cada liga. 
-Las barras en cada panel estan ordenadas en orden creciente respecto del valor de $D$. Asimismo, los paneles estan ordenado en orden creciente respecto del valor promedio en cada metrica, $\overline{D}$. Las barras negras muestran los casos donde el coeficiente de Pearson indica una correlacion debil, $|\rho|<0.4$.   }
+Las barras en cada panel estan ordenadas en orden creciente respecto del valor de $D$. Asimismo, los paneles estan ordenado en orden creciente respecto del valor promedio en cada metrica, $\overline{D}$. Las barras con hatch muestran los casos donde el coeficiente de Pearson indica una correlacion debil, $|\rho|<0.4$.   }
 \label{fi:ratings}
 \end{figure}
 
@@ -310,7 +305,7 @@ Las barras en cada panel estan ordenadas en orden creciente respecto del valor d
 \includegraphics[width=1.\textwidth]{kendalls.pdf}
 \caption{Coeficiente de Kendall, $\tau$, entre los rankings verdaderos y los rankings dados por las metricas. 
 Cada panel contiene la informacion de una metrica y las barras muestran el valor de $\tau$ obtenido en cada liga. 
-Las barras en cada panel estan ordenadas en orden decreciente respecto del valor de $\tau$. Asimismo, los paneles estan ordenado en orden decreciente respecto del valor promedio en cada metrica, $\overline{\tau}$. Las barras negras muestran los casos donde el p-valor indica que no hay evidencia suficiente para afirmar que existe correlacion significativa.}
+Las barras en cada panel estan ordenadas en orden decreciente respecto del valor de $\tau$. Asimismo, los paneles estan ordenado en orden decreciente respecto del valor promedio en cada metrica, $\overline{\tau}$. Las barras con hatch indica los casos donde el $p-value<0.05$. En esos casos no hay evidencia suficiente para afirmar que existe correlacion significativa.}
 \label{fi:rankings}
 \end{figure}
 
