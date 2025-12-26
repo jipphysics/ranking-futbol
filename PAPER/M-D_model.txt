@@ -1,0 +1,85 @@
+
+
+\subsection{Estadística del rating real}
+
+La idea de esta sección es definir un modelo estadistico para la distribucion de probabilidad del rating real, $R_T$, definido como la cantidad de puntos totales obtenidos por un equipo durante la liga.
+%
+$R_T$ es una variable estocastica que depende de la cantidad de partidos ganados, empatados y perdidos, por los equipos de la liga.
+%
+En las ligas de futbol, un equipo obtiene 3 puntos cuando gana, 1 cuando empata y 0 cuanto pierde. 
+%
+En este marco, $R_T$ puede expresarse en terminos de las variables estocasticas $G$, $E$ y $P$, que representan la cantidad de partidos ganados, empatados y perdidos por un equipo,
+%
+$$
+R_T = 3G + 1E.
+$$
+%
+Definiendo ${\bf p} = (p_g, p_e, p_p)$ como el vector que contiene las probabilidades de ganar, empatar o perder un partido, para el equipo dado, podemos modelar la cantidad de partidos ganados, empatados y perdidos por ese equipo con una distribucion multinomial,
+
+$$
+(G,E,P) \sim Multinomial( n, {\bf p} ),
+$$
+%
+Donde $n$ es la cantidad total de partidos jugados, lo cual en una liga es igual para todos los equipos. 
+Proponemos que cada equipo tiene asociado un vector ${\bf p}$ diferente, dependiendo de su nivel competitivo. Por lo tanto ${\bf p}$ tambien puede ser considerada una variable estocastica.
+%
+Podemos modelar este parametro a partir de una distribución de Dirichlet,
+%
+\begin{align*}
+{\bf p}_i &\sim Dirichlet( \boldsymbol{\alpha} ), \\
+\boldsymbol{\alpha} &= ( \alpha_g, \alpha_e, \alpha_p ).
+\end{align*}
+%
+Esta distribución, en función del conjunto de parámetros $\boldsymbol{\alpha}$, genera vectores de tres componentes, ${\bf p}$, que cumplen con las propiedades requeridas para una terna de probabilidades:  
+%
+\begin{align} \label{simplex}
+{p_g}_i>0, {p_e}_i>0, {p_p}_i>0, \\ 
+{p_g}_i+{p_e}_i+{p_p}_i=1. \nonumber
+\end{align}
+ 
+Con estos elementos, podemos escribir la probabilidad de que un equipo gane $G=g$ partidos y empate $E=e$, durante la liga,
+%
+\begin{equation} \label{integ}
+P( G=g, E=e ) = 
+\int_S f_M( g,e ; n | {\bf p} ) f_D({\bf p},\boldsymbol{\alpha} ) d{\bf p}.
+\end{equation}
+%
+Las densidades de probabilidad dentro de la integral son la densidad multinomial condidicionada y la densidad de Dirichlet. Estas pueden escribirse como,
+%
+\begin{align*} 
+f_M( g,e ; n | {\bf p} ) &= 
+\frac{n!}{g! e! (n-g-e)!}\; p_g^g \; p_e^e \; p_p^{(n-g-e)}, \\
+%
+f_D({\bf p},\boldsymbol{\alpha} ) &= 
+\frac{1}{B(\boldsymbol{\alpha})}  
+p_g^{(\alpha_g -1)}\; p_e^{(\alpha_e -1)} \; p_p^{(\alpha_p -1)}.
+%
+\end{align*}
+%
+Ademas, el espacio de integración, $S$, es el simplex generado por las eqs. \ref{simplex}.
+%
+La integral \ref{integ} admite solucion analitica. Resolviendo, obtenemos la probabilidad de ganar $G=g$ partidos y empatar $E=e$, en funcion de los parametros $\alpha_g$, $\alpha_e$ y $\alpha_p$,
+%
+\begin{equation} \label{proba}
+P( G=g, E=e ) = \frac{n!}{ g! e! (n-g-e)!}  
+\frac{ B(\alpha_g+g, \alpha_e+e, \alpha_p+n-g-e) }
+{ B(\alpha_g, \alpha_e, \alpha_p) }.
+\end{equation}
+%
+A partir de la eq. \ref{proba}, escribimos la distribucion de probabilidad teorica para el true rating,
+%
+\begin{align*} 
+&P(R_T = r_T) = \sum_X P( G=g, E=e ) \\
+&X = \{ g,e>0,  3g+1e=r_T,  g+e\ge n \}
+\end{align*}
+ 
+Los grados de libertad que otorgan los parametros $\boldsymbol{\alpha}$, permiten ajustar la curva teorica a los datos. 
+Lo hicimos a partir de un procedimiento tipo boostraping para $1000$ muestreos con remplazo, utilizando los datos de la liga Inglesa, Francesa, Italiana y Epañola.
+En la Fig. \ref{fi:stats} (a), mostramos la cumulative distribution function (CDF) del true rating junto con el ajuste. El grafico incluye también una densidad gaussiana de valor medio y desviacion estandar igual a los valores muestrales $\bar{R}_T=52.45$ $(s_{R_T}=18.56)$, a modo de referencia.
+Los valores obtenidos del ajuste para los parametros son 
+$\alpha_g= 0.85\pm0.03$, $\alpha_e=2.60\pm0.07$, y $\alpha_p=0.46\pm0.05$.
+Respecto a los resultados obtenidos, en primer lugar, podemos observar que el Multinomial-Dirichlet (M-D) model ajusta bien los datos empiricos en toda la curva, notandose un destacable rendimiento en la zona de raiting bajos. Comaprando estos resultados con la curva gaussiana, vemos que los true rating muestran colas mas livianas y un exceso de concentración en la zona de la mediana. En la Fig. \ref{fi:stats} (b), la realción entre los quantiles resalta el buen renidmiento del modelo y las diferencias claras repecto del modelo gaussiano en la zona de las colas y de la mediana.  
+
+
+
+

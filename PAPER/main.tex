@@ -17,7 +17,7 @@
 \author{Andres Chacoma}
 \email{achacoma@df.uba.ar}
 \affiliation{Universidad de Buenos Aires, Facultad de Ciencias Exactas y Naturales, Departamento de Física. Buenos Aires, Argentina}
-\affiliation{CONICET - Universidad de Buenos Aires, Instituto de Física Interdisciplinaria y Aplicada (INFINA). Buenos Aires, Argentina.}
+\affiliation{CONICET - Universidad de Buenos Aires, Instituto de Física Interdisciplinaria y Aplicada. Buenos Aires, Argentina.}
 
 \author{Juan I. Perotti}
 \affiliation{Universidad Nacional de Córdoba, Facultad de Matemática, Astronomía, Física y Computación. Córdoba, Argentina }
@@ -25,7 +25,7 @@
 
 \author{Orlando V. Billoni}
 \affiliation{Universidad Nacional de Córdoba, Facultad de Matemática, Astronomía, Física y Computación. Córdoba, Argentina }
-\affiliation{CONICET- Universidad Nacional de Córdoba, Instituto de Física Enrique Gaviola (IFEG). Córdoba, Argentina.}
+\affiliation{CONICET- Universidad Nacional de Córdoba, Instituto de Física Enrique Gaviola. Córdoba, Argentina.}
 
 
 \begin{abstract}
@@ -117,16 +117,11 @@ En este marco, construimos 50 grafos en total, diez grafos por liga. Cada uno as
 
 
 
-
-
-
-
+\section{Theory}
 
 
 
 \section{Resultados}
-
-
 
 \subsection{Estadística del rating real}
 
@@ -136,78 +131,104 @@ $R_T$ es una variable estocastica que depende de la cantidad de partidos ganados
 %
 En las ligas de futbol, un equipo obtiene 3 puntos cuando gana, 1 cuando empata y 0 cuanto pierde. 
 %
-En este marco, $R_T$ puede expresarse en terminos de las variables estocasticas $G$, $E$ y $P$, que representan la cantidad de partidos ganados, empatados y perdidos por un equipo,
+En este marco, $R_T$ puede expresarse en terminos de las variables estocasticas $W$ y $D$ , que representan el numero de partidos ganados y empatados, respectivamente,
 %
 $$
-R_T = 3G + 1E.
+R_T = 3W + D.
 $$
 %
-Definiendo ${\bf p} = (p_g, p_e, p_p)$ como el vector que contiene las probabilidades de ganar, empatar o perder un partido, para el equipo dado, podemos modelar la cantidad de partidos ganados, empatados y perdidos por ese equipo con una distribucion multinomial,
+Sea $n$ el número total de partidos en la temporada. Modelamos $W$ con una distribución binomial,
+%
+$$
+W \sim Bin( n |p_w )
+$$
+%
+donde $p_w$ es la probabilidad de ganar un partido. Condicional al número de victorias $W=w$, los empates siguen,
+%
+$$
+D|W=w \sim Bin( n-w | \frac{p_d}{1-p_w}  ),
+$$
+%
+con $p_d$ probabilidad de empatar.
+%
+Dado que los equipos tienen distinto nivel competitivo, cada equipo posee probabilidades intrínsecas $p_w$ y $p_d$ de ganar y empatar, respectivamente. 
+%
+Modelamos estas probabilidades mediante un enfoque jerárquico: cada equipo tiene un par de habilidades latentes $\boldsymbol{\eta} = (\eta_w, \eta_d)^T$, de ganar o empatar, que siguen una distribución normal bivariada,
 
 $$
-(G,E,P) \sim Multinomial( n, {\bf p} ),
+\boldsymbol{\eta} \sim \mathcal{N}\left(\boldsymbol{\mu},\boldsymbol{\Sigma} \right),
 $$
 %
-Donde $n$ es la cantidad total de partidos jugados, lo cual en una liga es igual para todos los equipos. 
-Proponemos que cada equipo tiene asociado un vector ${\bf p}$ diferente, dependiendo de su nivel competitivo. Por lo tanto ${\bf p}$ tambien puede ser considerada una variable estocastica.
+$$
+\boldsymbol{\mu} = ( \mu_w, \mu_d)^T,
+\quad
+\boldsymbol{\Sigma} = \begin{pmatrix} \sigma_w^2 & \rho\sigma_w\sigma_d \\ \rho\sigma_w\sigma_d & \sigma_d^2 \end{pmatrix},
+$$
 %
-Podemos modelar este parametro a partir de una distribución de Dirichlet,
+donde $\boldsymbol{\mu}$ es el centro de la distribucion, $\boldsymbol{\Sigma}$ la matriz de covarianza. En este marco, $\rho$ representa la correlación entre las habilidades para victoria y empate. 
+Las probabilidades se obtienen mediante la transformación softmax,
 %
-\begin{align*}
-{\bf p}_i &\sim Dirichlet( \boldsymbol{\alpha} ), \\
-\boldsymbol{\alpha} &= ( \alpha_g, \alpha_e, \alpha_p ).
-\end{align*}
+$$
+p_w = \frac{e^{\eta_w}}{1 + e^{\eta_w} + e^{\eta_d}}, \quad
+p_d = \frac{e^{\eta_d}}{1 + e^{\eta_w} + e^{\eta_d}}.
+$$
 %
-Esta distribución, en función del conjunto de parámetros $\boldsymbol{\alpha}$, genera vectores de tres componentes, ${\bf p}$, que cumplen con las propiedades requeridas para una terna de probabilidades:  
+Esta transformación garantiza que $p_w + p_d \leq 1$ y que el modelo sea identificable al fijar implícitamente $\eta_l = 0$ para las derrotas.
 %
-\begin{align} \label{simplex}
-{p_g}_i>0, {p_e}_i>0, {p_p}_i>0, \\ 
-{p_g}_i+{p_e}_i+{p_p}_i=1. \nonumber
-\end{align}
- 
-Con estos elementos, podemos escribir la probabilidad de que un equipo gane $G=g$ partidos y empate $E=e$, durante la liga,
+Con estos elementos, podemos escribir la distribucion conjunta de victorias y empates marginalizando sobre los efectos aleatorios $\boldsymbol{\eta}$,
 %
 \begin{equation} \label{integ}
-P( G=g, E=e ) = 
-\int_S f_M( g,e ; n | {\bf p} ) f_D({\bf p},\boldsymbol{\alpha} ) d{\bf p}.
+P( W=w, D=d ) = 
+\int_{\mathbb{R}^2}  
+Bin( n |p_w(\boldsymbol{\eta}) )\;
+Bin( n-w | \frac{p_d(\boldsymbol{\eta})}{1-p_w(\boldsymbol{\eta})})\;
+\phi( \boldsymbol{\eta}| \boldsymbol{\mu}, \boldsymbol{\Sigma} )
+d \boldsymbol{\eta},
 \end{equation}
 %
-Las densidades de probabilidad dentro de la integral son la densidad multinomial condidicionada y la densidad de Dirichlet. Estas pueden escribirse como,
+Notar que la integral en \ref{integ} no tiene forma cerrada, para resolverla utilizamos el metodo de monte carlo.
 %
-\begin{align*} 
-f_M( g,e ; n | {\bf p} ) &= 
-\frac{n!}{g! e! (n-g-e)!}\; p_g^g \; p_e^e \; p_p^{(n-g-e)}, \\
+Con estos elementos, podemos finalmente escribir la distribucion de probabilidad teorica para el true rating como,
 %
-f_D({\bf p},\boldsymbol{\alpha} ) &= 
-\frac{1}{B(\boldsymbol{\alpha})}  
-p_g^{(\alpha_g -1)}\; p_e^{(\alpha_e -1)} \; p_p^{(\alpha_p -1)}.
-%
-\end{align*}
-%
-Ademas, el espacio de integración, $S$, es el simplex generado por las eqs. \ref{simplex}.
-%
-La integral \ref{integ} admite solucion analitica. Resolviendo, obtenemos la probabilidad de ganar $G=g$ partidos y empatar $E=e$, en funcion de los parametros $\alpha_g$, $\alpha_e$ y $\alpha_p$,
-%
-\begin{equation} \label{proba}
-P( G=g, E=e ) = \frac{n!}{ g! e! (n-g-e)!}  
-\frac{ B(\alpha_g+g, \alpha_e+e, \alpha_p+n-g-e) }
-{ B(\alpha_g, \alpha_e, \alpha_p) }.
+\begin{equation} \label{theo}
+P(R_T = r_T) = \sum_X P( W=w, D=d ), \\
 \end{equation}
 %
-A partir de la eq. \ref{proba}, escribimos la distribucion de probabilidad teorica para el true rating,
+$$
+X = \{ w,d>0,  3w+d=r_T,  w+d \le n \}.
+$$
+%
+Los grados de libertad que otorgan los parametros $\mu_w$, $\mu_d$, $\sigma_w$, $\sigma_d$ y $\rho$, permiten ajustar la curva teorica \ref{theo} a la curva empirica. 
+%
+El ajuste fue realizado sobre el conjunto de datos asociado a las ligas Inglesa, Francesa,  Italiana y Española. Para este analisis, decidimos no utilizar los datos de la liga Alemana, ya que su torneo se disputa entre un numero menor de equipos (18), y por lo tanto se genera una distribucion de valores de true rating menor respecto de las otras ligas, en las cuales participa un total de 20 equipos por liga.
+%
+Para hacer el ajuste, utilizamos el algoritmo Nelder-Mead minimizando el RMSE entre las CDF empírica y teórica.
+%
+Con los parámetros óptimos, realizamos bootstrap paramétrico (1000 réplicas) para estimar la incertidumbre.
+%
+Para la probabilidad de victoria obtuvimos $\bar{p}_w=0.366$ ($SD=0.010$) con un intervalo de confianza del $95\%$ de $[0.3527, 0.3798]$.
+Asimismo, para la probabilidad de empate obtuvimos $\bar{p}_d=0.280$ ($SD=0.020$) con un intervalo de confianza del $95\%$ de $[0.2548, 0.3074]$.
+%
+Para contrastar estos resultados con los datos empiricos, utilizando la informacion de los resultados de los partidos, calculamos para cada equipo $i$ las probabilidades de victoria y empate empiricas, $q_w$ y $q_d$, 
 %
 \begin{align*} 
-&P(R_T = r_T) = \sum_X P( G=g, E=e ) \\
-&X = \{ g,e>0,  3g+1e=r_T,  g+e\ge n \}
-\end{align*}
- 
-Los grados de libertad que otorgan los parametros $\boldsymbol{\alpha}$, permiten ajustar la curva teorica a los datos. 
-Lo hicimos a partir de un procedimiento tipo boostraping para $1000$ muestreos con remplazo, utilizando los datos de la liga Inglesa, Francesa, Italiana y Epañola.
-En la Fig. \ref{fi:stats} (a), mostramos la cumulative distribution function (CDF) del true rating junto con el ajuste. El grafico incluye también una densidad gaussiana de valor medio y desviacion estandar igual a los valores muestrales $\bar{R}_T=52.45$ $(s_{R_T}=18.56)$, a modo de referencia.
-Los valores obtenidos del ajuste para los parametros son 
-$\alpha_g= 0.85\pm0.03$, $\alpha_e=2.60\pm0.07$, y $\alpha_p=0.46\pm0.05$.
-Respecto a los resultados obtenidos, en primer lugar, podemos observar que el Multinomial-Dirichlet (M-D) model ajusta bien los datos empiricos en toda la curva, notandose un destacable rendimiento en la zona de raiting bajos. Comaprando estos resultados con la curva gaussiana, vemos que los true rating muestran colas mas livianas y un exceso de concentración en la zona de la mediana. En la Fig. \ref{fi:stats} (b), la realción entre los quantiles resalta el buen renidmiento del modelo y las diferencias claras repecto del modelo gaussiano en la zona de las colas y de la mediana.  
+q_w^{(i)} = \frac{\# wins^{(i)}}{\#matchs^{(i)}},\quad
+q_d^{(i)} = \frac{\# draws^{(i)}}{\#matchs^{(i)}}.
+\end{align*} 
+%
+Calculando el valor medio y el desvio estandar sobre el conjunto de todos los equipos, obtuvimos para la probabilidad de victoria $\bar{q}_w=0.379$ ($SD=0.168$) con un intervalo de confianza del $95\%$ de $[0.1572, 0.7638]$, y para la probabilidad de empate $\bar{q}_d=0.243$ ($SD=0.081$) con un intervalo de confianza del $95\%$ de $[0.1046, 0.3954]$. 
+%
+Podemos observar, (1) Las medias son similares ($0.366$ vs $0.379$ para victorias, $0.280$ vs $0.243$ para empates), lo que valida el centro de la distribución. (2) las desviaciones estándar empíricas $(0.168, 0.081)$ son mucho mayores que las implícitas en el modelo $(0.01, 0.02)$, indicando que el modelo subestima la heterogeneidad entre equipos.
 
+Con respecto al parametro de correlacion, obtuvimos $\bar{\rho}=-0.130$ ($SD=0.07$) con un intervalo de confianza del $95\%$ de $[-0.3040, -0.0371]$. Esto indica la presencia de una correlacion estructural negativa debil entre las habilidades de victoria, $\eta_w$, y empate, $\eta_d$, de los equipos.  Esto sugiere que equipos con mayor habilidad para ganar tienden ligeramente a tener menor habilidad para empatar.
+
+En la Fig. \ref{fi:stats} (a), mostramos la CDF del true rating junto con el ajuste. Podemos ver que el modelo propuesto captura muy bien el comportamiento de la curva en todo el soporte. En Fig. \ref{fi:stats} (b) mostramos un grafico con la relacion entre los quantiles teoricos y de los datos. A modo de referencia, mostramos tambien la relacion entre los quantiles de los datos y los asociados a una distribucion gausiana con media y desvio estandar igual a los valores muestrales obtenidos de los datos, $\bar{R}_T = 52.45$ ($SD=18.56$). 
+En primer lugar, podemos ver que el modelo propuesto captura bien el comportamiento en la zona central izquierda y de manera aceptable el comportamiento de la cola de la derecha. 
+La comparación con el modelo gaussiano nos permite ver que la distribucion real presenta colas mas livianas a la izquierda y mas pesadas a la derecha, respecto del comportamiento gaussiano, develando así la presencia de una asimetria en la distribuicion. La concabidad hacia abajo en el centro del grafico, indica tambien que la mediana de los datos esta corrida hacia la izquierda.
+
+
+%
+%
 
 
 \subsection{Comparacion entre el rating real y el rating obtenido de las metricas}
@@ -216,7 +237,7 @@ Definimos como true ranking de un equipo, al puesto final alcanzado en la tabla 
 %
 Asimismo, definimos como metric rating, $R_M$, de un equipo de una liga, en una metrica dada, al valor de rating calculado a partir del metodo HodgeRank para la red asociada a esa metrica.
 
-Nuestra idea es comparar el true rating con el rating obtenido a partir del metodo de HodgeRank. Naturalemente, estas cantidades estan en escalas distintas, por lo tanto para hacer la comparación es necesario llevar los valores de ambas variables a la misma escala. Por tal motivo, decidimos estandarizar las variables y hacer la comparacion sobre el {\it z-score} de cada una de estas.
+Nuestra idea es comparar el true rating con el rating obtenido a partir del metodo de HodgeRank. Naturalmente, estas cantidades estan en escalas distintas, por lo tanto para hacer la comparación es necesario llevar los valores de ambas variables a la misma escala. Por tal motivo, decidimos estandarizar las variables y hacer la comparacion sobre el {\it z-score} de cada una de estas.
 %
 En lo siguiente discutimos algunas comparaciones intersantes entre true raiting y el metric rating obtenido a partir de alguna de las metricas. 
 %
@@ -238,12 +259,14 @@ $$
 \Delta R = R_T(i,l) - R_M(i,l,m) 
 $$
 %
+Note que en las ligas Inglesa, Francesa, Italiana y Española, liga obtuvimos $20 \times 10$ muestras de $\Delta R$, ya que tenemos $20$ equipos y $10$ metricas distintas. No obstante, en la liga Alemana obtuvimos $18 \times 10$ muestras.
 %
-En la Fig. \ref{fi:rating} (d) mostramos la CDF de las diferencias $\Delta R$ observadas en cada liga. En cada una de estas hemos agrupado los datos provenientes de las 10 metricas. A modo de referencia, el grafico incluye tambien la CDF de una densidad gaussiana de valor medio y desvio estandar igual al del conjunto formado por el total de los datos.
-Note que dependiendo de cada liga la CDF se aparta de manera distinto de la referencia gaussiana, mostrando diferentes tipo de comportamiento. Podemos ver que las ligas Inglesa e Italiana presentan colas mas livianas que la gaussiana, indicando una densidad de probabilidad aguda alrededor de la media. Por el conrario, los datos asociado a liga española muestran colas levemente pesadas, mostrando la presencia de casos mas extremos. Por otro lado, los datos asociados a las ligas Francesa y alemana parecen comportarse de manera normal.
-Estas observaciones parecen indicar que hay ligas donde el metric rating tiende a diferenciarse mas del true rating. En lo que sigue cuantificamos estas diferencias en funcion de las distintas metricas.
+Nos interesa veriricar si las distribuciones de esas diferencias tienen comportamiento normal y si difieren entre una liga y otra. Para esto, utilizamos el grafico quantil quantile que mostramos en la Fig. \ref{fi:rating} (d). Para este grafico, tomamos los valores de $\Delta R$ de cada liga y los estandarizados al valor medio y la desviacion estandar. Luego calculamos los quantiles y los comparamos contra los quantiles de una distribucion normal. En general se observa un comportamiento bastante cercano al normal. La liga inglesa, podemos ver que presenta colas ligeramente pesadas tanto a izquierda como a derecha. Por el contrario, en la liga alemana podemos ver una asimetria, mostrando colas levente livianas a la iquierda y levemente pesadas a la derecha.
 
-Nuestro objetivo es cuantificar la diferencia entre la curva de true rating, $R_T$, y las curvas de metric rating, $R_M$, asociada a una metrica $m$ en una liga $l$. Para esto, definimos la distancia $D$, como  el Root Mean Square Error (RMSE), el valor medio de las diferencias cuadraticas entre dos curvas. Ademas, calculamos el coeficiente de Person entre ambas curvas, para estudiar el comportamiento de la tendencia.
+Nuestro objetivo ahora es cuantificar la diferencia entre la curva de true rating, $R_T$, y las curvas de metric rating, $R_M$, asociadas a cada metrica de cada liga. Nuestra idea es verificar de metrica se obtiene el rating mas similar al real, y si eso depende de la liga.
+%
+Para esto, definimos la distancia $D$, como el valor medio de las diferencias cuadraticas entre dos curvas (RMSE), esto cuantifica que tan diference es $R_T$ de $R_M$ en cada caso. 
+Ademas, calculamos el coeficiente de Person entre ambas curvas, para estudiar el comportamiento de la tendencia.
 
 
 
@@ -273,7 +296,7 @@ Para cada liga, definimos la matriz de rating multivariado, $\bm{R_{MV}}$. En es
 \begin{figure}[t!]
 \centering
 \includegraphics[width=1.\textwidth]{true_rating_stats.pdf}
-\caption{Estadística del rating real. (a) Comparación de la Cumuative distribution function (CDF) de los valores de rating real con lo obtenido a partir del M-D model y el modelo gaussiano. (b) Relacion entre los Quantile asociado a los datos y los obtenidos a partir del M-D model y el modelo gaussiano.}
+\caption{Estadística del rating real. (a) Comparación de la Cumuative distribution function (CDF) de los valores de rating real con lo obtenido a partir del modelo. (b) Relacion entre los Quantile asociado a los datos y los obtenidos a partir del modelo. A modo de referencia, se agrega tambien una comparación con una distribucion gaussiana de media y desvio estandar igual al de los datos.}
 \label{fi:stats}
 \end{figure}
 
