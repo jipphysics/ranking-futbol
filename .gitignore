@@ -3,4 +3,5 @@
 *.log
 *.blg
 .out
+aux_/
 

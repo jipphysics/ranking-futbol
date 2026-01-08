@@ -1,6 +1,7 @@
 \documentclass[preprint, amsmath,amssymb, pre]{revtex4-2}
 \usepackage{graphicx,dcolumn,bm,xcolor,lineno,ulem}
-\newcommand{\avg}[1]{\left\langle #1  \right\rangle}
+\usepackage{booktabs} % Para líneas horizontales de calidad académica
+
 \newcommand{\agregar}[1]{{\color{blue}{#1}}}
 \newcommand{\sacar}[1]{{\color{red}\sout{#1}}} 
 %\linenumbers
@@ -40,6 +41,7 @@ We ...
 \section{Data}
 
 \subsection{Recopilación de métricas}
+\label{se:metricas}
 
 En este trabajo utilizamos la base de datos de evento provista por L. Pappalardo et al en \cite{pappalardo2019public}. 
 En ese articulo, los autores visualizan todos los partidos de la temporada 2017-2018 de las principales ligas de fútbol europeas: La Liga (España), Premier league (Inglaterra), Seria A (Italia), Bundesliga (Alemania), Ligue 1 (Francia). Por cada partido detectan, clasifican, y localizan en tiempo y espacio todos los eventos: goles, tiros al arco, pases, saques de esquina, faltas, etc. 
@@ -204,7 +206,7 @@ El ajuste fue realizado sobre el conjunto de datos asociado a las ligas Inglesa,
 %
 Para hacer el ajuste, utilizamos el algoritmo Nelder-Mead minimizando el RMSE entre las CDF empírica y teórica.
 %
-Con los parámetros óptimos, realizamos bootstrap paramétrico (1000 réplicas) para estimar la incertidumbre.
+Posteriormente, con los parámetros óptimos, realizamos bootstrap paramétrico (1000 réplicas) para estimar el valor medio y la incertidumbre de las probabilidades $p_w$ y $p_d$.
 %
 Para la probabilidad de victoria obtuvimos $\bar{p}_w=0.366$ ($SD=0.010$) con un intervalo de confianza del $95\%$ de $[0.3527, 0.3798]$.
 Asimismo, para la probabilidad de empate obtuvimos $\bar{p}_d=0.280$ ($SD=0.020$) con un intervalo de confianza del $95\%$ de $[0.2548, 0.3074]$.
@@ -220,7 +222,7 @@ Calculando el valor medio y el desvio estandar sobre el conjunto de todos los eq
 %
 Podemos observar, (1) Las medias son similares ($0.366$ vs $0.379$ para victorias, $0.280$ vs $0.243$ para empates), lo que valida el centro de la distribución. (2) las desviaciones estándar empíricas $(0.168, 0.081)$ son mucho mayores que las implícitas en el modelo $(0.01, 0.02)$, indicando que el modelo subestima la heterogeneidad entre equipos.
 
-Con respecto al parametro de correlacion, obtuvimos $\bar{\rho}=-0.130$ ($SD=0.07$) con un intervalo de confianza del $95\%$ de $[-0.3040, -0.0371]$. Esto indica la presencia de una correlacion estructural negativa debil entre las habilidades de victoria, $\eta_w$, y empate, $\eta_d$, de los equipos.  Esto sugiere que equipos con mayor habilidad para ganar tienden ligeramente a tener menor habilidad para empatar.
+Con respecto al parametro de correlacion, del boostraping parametrio obtuvimos $\bar{\rho}=-0.130$ ($SD=0.07$) con un intervalo de confianza del $95\%$ de $[-0.3040, -0.0371]$. Esto indica la presencia de una correlacion estructural negativa debil entre las habilidades de victoria, $\eta_w$, y empate, $\eta_d$, de los equipos.  Esto sugiere que equipos con mayor habilidad para ganar tienden ligeramente a tener menor habilidad para empatar.
 
 En la Fig. \ref{fi:stats} (a), mostramos la CDF del true rating junto con el ajuste. Podemos ver que el modelo propuesto captura muy bien el comportamiento de la curva en todo el soporte. En Fig. \ref{fi:stats} (b) mostramos un grafico con la relacion entre los quantiles teoricos y de los datos. A modo de referencia, mostramos tambien la relacion entre los quantiles de los datos y los asociados a una distribucion gausiana con media y desvio estandar igual a los valores muestrales obtenidos de los datos, $\bar{R}_T = 52.45$ ($SD=18.56$). 
 En primer lugar, podemos ver que el modelo propuesto captura bien el comportamiento en la zona central izquierda y de manera aceptable el comportamiento de la cola de la derecha. 
@@ -233,58 +235,115 @@ La comparación con el modelo gaussiano nos permite ver que la distribucion real
 
 \subsection{Comparacion entre el rating real y el rating obtenido de las metricas}
 
-Definimos como true ranking de un equipo, al puesto final alcanzado en la tabla de posiciones de su liga. Por ejemplo, el true ranking del equipo FC Barcelona en la liga Española es 1, por que salio campeon esa temporada.
+En esta sección, la idea es caracteriar las diferencias entre el true rating, dado por el sistema de puntos de las ligas, y el rating obtenido a partir del metodo de HodgeRank. 
 %
-Asimismo, definimos como metric rating, $R_M$, de un equipo de una liga, en una metrica dada, al valor de rating calculado a partir del metodo HodgeRank para la red asociada a esa metrica.
+En este marco, definimos como el metric rating como el valor de rating calculado, para un equipo de una liga, con metodo HodgeRank utilizando la red asociada a una metrica en particular.
+%
+Dado que son ocho las metricas utilizadas (ver seccion \ref{se:metricas}), por cada equipo calcularemos ocho valores de matric raiting distintos, que compararemos con el true rating.
+%
+En importante remarcar que el true rating y el metric rating estan expresados en escalas de valores distintas. El primero esta expresado en cantidad de puntos obtenidos y el segundo en un numero estandarizado.
+%
+No obstante esto no nos impide compararlos, ya que lo importante de estos valores no es el valor absoluto que obtiene cada equipo, si no mas bien el valor relativo entre ellos.
+%
+Por tal motivo, para comparar el comportamiento del true rating con el metric rating, decidimos estandarizar ambas variables y trabajar con el {\it z-score} de cada una de estas.
+%
+En lo siguiente discutimos algunos resultados interesantes obtenidos al comparar true raiting con metric rating.
 
-Nuestra idea es comparar el true rating con el rating obtenido a partir del metodo de HodgeRank. Naturalmente, estas cantidades estan en escalas distintas, por lo tanto para hacer la comparación es necesario llevar los valores de ambas variables a la misma escala. Por tal motivo, decidimos estandarizar las variables y hacer la comparacion sobre el {\it z-score} de cada una de estas.
+En la Fig. \ref{fi:rating} (a) mostramos las CDF del true rating asociado a los datos de todos los equipos y todas las ligas, con la del metric rating asociado a los datos de todos los equipos de todas las ligas y de las ocho metricas estudiadas. A ambas curvas se les estrajeron los valores outliers considerados como aquellos casos que se encuentran por encima del quantile $Q_{99.7}$
 %
-En lo siguiente discutimos algunas comparaciones intersantes entre true raiting y el metric rating obtenido a partir de alguna de las metricas. 
+Podemos observar una coincidencia notable en casi todo el rango, observando algunas diferencias en las colas: el metric rating muestra valores positivos mas alejados de la media, y el true rating muestra valores negativos levemente mas alejados de la media.
 %
-En la Fig. \ref{fi:rating} (a) comparamos las CDF del true rating asociado a los datos de todos los equipos y todas las ligas, con la del metric rating asociado a los datos de todos los equipos de todas las ligas y de las diez metricas estudiadas. A ambas curvas se les estrajeron los valores outliers considerados como aquellos casos que se encuentran por encima del quantile $Q_{99.7}$
+A continuacion evaluamos la distribucion de valores de matric rating de cada una de las ligas. Para esto, por liga, agrupamos los valores de metric rating asociado a todas las metricas y estandarizamos los valores utilizando el z-score. En la Fig. \ref{fi:rating} (b) se muestran los resultados. A modo de refrencia se grafica tambien, en linea negra punteada, la CDF de una distribucion normal estandar. 
+Si bien vemos que las curvas asociadas a las diferentes ligas difieren levemente, indicando un comportamiento dependiente de la liga, para todos los casos podemos ver una acumulacion de probabilidad en la zona media. Esto se compensa con colas livianas a izquierda y pesadas a la derecha, siempre utilizando como referencia la distribucion normal estandar. 
 %
-Podemos observar una coincidencia notable en casi todo el rango, observando algunas diferencias en las colas: el metric rating muestra mas valores positivos mas alejados de la media, y el true rating muestra mas valores negativos levemente mas alejados de la media.
+Por otro lado, en la Fig.~\ref{fi:rating} (c) graficamos las curva true rating y metric rating en función del true ranking, para el caso de la metrica {\it Presure Point} en la liga Inglesa. La idea es evaluar cualitativamente las diferencias observadas equipo a equipo.
+En primer lugar podemos notar que el true rating decrece monotonamente a medida que crece el ranking, esto es trivial por defincion: el primer equipo tiene un true raiting mayor o igual que el segundo, el segundo tiene un true raiting mayor o igual que el tercero, y asi hasta el ultimo puesto. 
+En la curva de metric rating observamos una tendencia tambien decreciente, pero no monotona. En este caso, podemos decir que en terminos generales el metric rating sigue la tendencia del true rating, a menos de esas diferencias locales.
 %
-En la Fig. \ref{fi:rating} (b) comparamos las curva $R_T$ y $R_M$ en función del true rnking, para el caso de la metrica {\it Presure Point} en la liga Inglesa. 
-En primer lugar podemos notar que $R_T$ decrece a medida que crece el ranking, esto es trivial por defincion: el primer equipo tiene un true raiting mayor o igual que el segundo, el segundo tiene un true raiting mayor o igual que el tercero, y asi hasta el ultimo puesto. 
-En la curva de $R_M$ observamos una tendencia tambien decreciente, pero no monotona. En este caso, podemos decir que en terminos generales el metric rating aproxima relativamente bien la tendencia del true rating.
-%
-En la Fig. \ref{fi:rating} (c) mostramos una comparacion analoga a la anterior  para el caso de la metrica {\it Maintenance} en la liga Italiana. En este caso vemos que la curva $R_M$ no sigue una tendencia decreciente y se obverva una total descorrelacion con el true rating.
+En la Fig.~\ref{fi:rating} (d) mostramos una comparacion analoga a la anterior  para el caso de la metrica {\it Direct play} en la liga española. En este caso vemos que la curva de metric rating no sigue una clara tendencia decreciente y se observa una fuerte descorrelacion con los valores de true rating.
 %
 Vemos entonces que el true rating de una dada liga puede diferir poco o mucho del metric rating dependiendo de la metrica que utilizamos para inferir el rating.
-Una pregunta que surge naturalmente es cual es la estadistica asociada a esas diferencias. 
-Para estudiar esto, definimos la cantidad $\Delta R$ como la diferencia entre el true rating de un equipo $i$ de una liga $l$ y el metric rating asociado a una metrica $m$,
+
+Nuestro objetivo ahora es cuantificar la correlación entre la curva de true rating de una liga y las curvas de metric rating asociadas a cada metrica. Nuestra idea es cuantificar con que metrica se obtiene el rating mas sigue la tendencia del real, y si eso depende de la liga.
+%
+Para esto, estudiamos el coeficiente de correlacion de Pearson entre las curvas de true rating de cada liga y la de metric rating en cada metrica. 
+%
+En Fig.~\ref{fi:correlacion}, mostramos los resultados. Cada panel contiene la información asociada a una metrica, y dentro de los panes, cada barra contiene la información asociada a una liga. Los paneles se muestran ordenados de mayor a menor por correlacion promedio y las barras, dentro de cada panel, odenadas de mayor a menor por correlacion. Las barras con hatch indican que para esos casos no se puede asegurar significancia estadistica.
+%
+En primer lugar podemos ver que las ligas italiana e inglesa muestran la mayor correlacion en todas las metricas. 
+En segundo lugar, vemos que las ligas frances y alemana se alteran el tercer y cuarto puesto entre los casos con mas correlacion en casi todas las metricas.
+Por ultimo, vemos que la liga española muestra los peores resultados, mostrando el peor valor de correlacion en 7 de las 8 metricas. Aun así, presenta valores que indican correlacion fuerte ($\rho>0.4$) en los casos de las metricas {\it  Flow rate} y {\it  Counterattack}.
+%
+
+
+
+\subsection{Comparacion entre el true ranking y el ranking obtenido de las metricas}
+
+La idea de esta sección es complementar el analisis de la seccion anterior haciendo una comparacion utilizando los rankings.
+%
+La posicion final de un equipo en una liga se obtiene al ordenar los equipos de esa liga de manera descendente por cantidad de puntos obtenidos. 
+Ese ordenamiento define lo que llamaremos el true ranking de esa liga.
+%
+Analogamente, para los equipos de una liga, definimos el metric ranking ordenando los equipos de manera descendente por valor de metric ranking obtenido con el metodo HodgeRank. Note que por cada liga tenemos ocho ranking en total. 
+%
+De manera similar a lo realizado en la seccion anterior, compararemos el true ranking de los equipos con los metric rankings obtenidos a partir del metodo HodgeRank.
+%
+Para esto utilizaremos el coeficiente de correlacion de rango Kendall, $\tau$ [ref].
+
+
+
+
+\subsection{Composite rating}
+
+En esta seccion, desarrollamos para cada liga un Composite Rating (CR), definido como una combinacion lineal de los metric rating obtenidos de las metricas de rendimiento. La idea es proporcionar una evaluacion mas general de la calidad de los equipos. 
+%
+Sea $n$ la cantidad de equipos en la liga y $m$ la cantidad de metricas, definimos $R^{ n\times m }$ como la matriz donde las filas contienen los valores de metric rating obtenidos para cada equipo. 
+Asimismo definimos el $T^{n \times 1}$ como el vector que contiene los true ratings de cada equipo de una liga.
+En este marco, nuestro objetivo es encontrar $\alpha^{m \times 1}$ tal que,
 %
 $$
-\Delta R = R_T(i,l) - R_M(i,l,m) 
-$$
+M \alpha = T.
+$$  
+
+Para resolver este sistema, y con la de idea de garantizar la parsimonia y la capacidad explicativa del Composite Rating (CR), empleamos un algoritmo de Selección Exhaustiva de Características (Exhaustive Feature Selector o EFS). 
 %
-Note que en las ligas Inglesa, Francesa, Italiana y Española, liga obtuvimos $20 \times 10$ muestras de $\Delta R$, ya que tenemos $20$ equipos y $10$ metricas distintas. No obstante, en la liga Alemana obtuvimos $18 \times 10$ muestras.
+Luego de normalizar las metricas mediante un escalado estandar ($Z-score$), este procedimiento evalua todas las combinaciones posibles de las ocho métricas de rendimiento iniciales, desde modelos univariados hasta el modelo completo con ocho variables. 
 %
-Nos interesa veriricar si las distribuciones de esas diferencias tienen comportamiento normal y si difieren entre una liga y otra. Para esto, utilizamos el grafico quantil quantile que mostramos en la Fig. \ref{fi:rating} (d). Para este grafico, tomamos los valores de $\Delta R$ de cada liga y los estandarizados al valor medio y la desviacion estandar. Luego calculamos los quantiles y los comparamos contra los quantiles de una distribucion normal. En general se observa un comportamiento bastante cercano al normal. La liga inglesa, podemos ver que presenta colas ligeramente pesadas tanto a izquierda como a derecha. Por el contrario, en la liga alemana podemos ver una asimetria, mostrando colas levente livianas a la iquierda y levemente pesadas a la derecha.
-
-Nuestro objetivo ahora es cuantificar la diferencia entre la curva de true rating, $R_T$, y las curvas de metric rating, $R_M$, asociadas a cada metrica de cada liga. Nuestra idea es verificar de metrica se obtiene el rating mas similar al real, y si eso depende de la liga.
+Con el fin de evitar el sobreajuste, utilizamos el Criterio de Información Bayesiano (BIC) como función de selección. El BIC permite identificar el modelo que maximiza la verosimilitud de los datos introduciendo una penalización proporcional a la complejidad del modelo (número de variables), favoreciendo así la estructura más eficiente. 
 %
-Para esto, definimos la distancia $D$, como el valor medio de las diferencias cuadraticas entre dos curvas (RMSE), esto cuantifica que tan diference es $R_T$ de $R_M$ en cada caso. 
-Ademas, calculamos el coeficiente de Person entre ambas curvas, para estudiar el comportamiento de la tendencia.
+En este marco, el modelo óptimo seleccionado fue aquel que minimiza el valor del BIC. De esta manera aseguramos que el rating final sea estadísticamente robusto y representativo del rendimiento real de los equipos.
 
+Para determinar la composición del Composite rating en cada liga, se ajustó un modelo de regresión por mínimos cuadrados ordinarios (OLS) utilizando las métricas seleccionadas por el algoritmo EFS. Dado que las variables fueron estandarizadas previamente, los coeficientes obtenidos representan la importancia relativa de cada dimensión en la predicción de los puntos obtenidos en la liga. 
+%
+En la tabla~\ref{tab:CR}, se muestran los resultados de la regresion. 
+El análisis de los coeficientes revela áreas críticas para la mejora del rendimiento.
+%
+Para la liga inglesa, podemos ver que las metricas mas relevantes, en orden de importancia relativa, son {\it Build up}, {\it Flow rate} y {\it Presure point}, las cuales explican casi el $90\%$ de la varianza de los datos. 
+El coeficiente negativo en la métrica {\it Build up}($-24.56$) sugiere que los equipos que reducen sus tiempos de elaboración en el ultimo cuarto del campo de juego, incrementan significativamente su probabilidad de obtener puntos. 
+Por el contrario, un aumento en esta métrica penaliza el Composite Rating, lo que indica una ineficiencia en estilos de juego que utilicen esta tactica en esa liga en particular.
+Tambien podemos decir que el coeficiente positivo en {\it Flow rate} ($22.69$) sugiere que los equipos que incrementan la velocidad con la que mueven la pelota en el campo de juego, incrementa sus chances de obtener más puntos en esta liga.
+Asimistmo, el coeficiente positivo en la metrica {\it Presure point} sugiere que los equipos que presionan mas alto en el campo de juego incrementa su probabilidad de obtener puntos.
+%
+Con respecto a la liga francesa, haciendo un analisis similar basado en el analisis de los coeficientes de la regresion, podemos ver que los equipos que presionan alto en el campo de juego y disminuyen su juego directo, aumentan sus chances de obtener puntos. 
+%
+El caso de la liga alemana es probablemente el más curioso, note que con una sola variable, {\it Direct play}, es posible explicar el 46\% de la varianza. 
+Es decir, entender esta variable, nos permite intuir por qué un equipo gana o pierde puntos en esa liga. En este caso encontramos un modelo extremadamente parsimonioso.
+%
+Lo obtenido para la liga italiana sugiere que el exito estaria asociado a un incremento en las variables {\it Flow rate} y {\it Direct play} y un decremento en {\it Midfield play}. Es decir, los equipos más exitosos de esta liga parecen estar relacionados con un estilo de juego que fomenta el movimiento rapido de la pelota y relega el tiempo de control en la mitad del campo.
+%
+Por ultimo, en el caso de la liga española podemos ver que un estilo de juego asociado a la obtencion de puntos parece estar relacionado con una disminucion los niveles de presion alta, y un aumento de la velocidad con la que se mueve la pelota y de los contrataques.
 
+El composite rating obtenido para cada liga puede ser comparado con el true rating como se hizo en la secciones anteriores con los ratings asociados a las metricas individuales.
+%
+En Fig.~\ref{fi:mv} paneles (a), (b), (c), (e) y (e) mostramos la comparacion liga a liga, equipo a equipo, en un grafico rating contra true ranking.
+%
+En el caso de la liga inglesa, en Fig.~\ref{fi:mv} (a), podemos ver que para los primeros dos equipos el true rating es mayor al composite rating. Estos equipos muestran entonces un supra-rendimiento estadistico, parecen estar rindiendo mas de lo que deberian. Esto puede deberse a diversos factores externos atribuibles al azar. Contrariamente el equipo que quedo tercero en la tabla, muestra un true rating menor al composite rating, lo cual indica un comportamiento infra-estadistico, es decir, parece ser que hicieron lo estadisticamente correcto pero fallaron en la ejecución o simplemente tuvieron "mala suerte". 
+Ejemplos similares se observan en todas las ligas, en todas las posisiones de la tabla.
+%
+En terminos generales podemos decir que las curvas de composite rating siguen una tendencia similar a las curvas de true rating, destacandose a ojo denudo los casos de la liga inglesa e italiana.
+En Fig.~\ref{fi:mv} (f) mostramos un grafico de barras con los valores de los coefientes de correlacion de Pearson, $\rho$, y del coeficiente de Kendall, $\tau$. 
+En todos los casos, podemos ver que los valores obtenidos son superiores a los obtenidos a partr de las metricas individuales (ver Fig. \ref{fi:correlacion} y Fig. \ref{fi:rankings}). Destacamos principalmente los valores obtenidos en la liga Italiana y las mejoras significativas en las ligas española y alemana.
 
-
-
-
-
-
-
-
-\subsection{Comparacion entre el ranking real y el ranking obtenido de las metricas}
-
-
-
-\subsection{Propuesta de un raiting multivariado}
-
-
-Para cada liga, definimos la matriz de rating multivariado, $\bm{R_{MV}}$. En este objeto, las fila representan los equipos, y las columnas los metric ratings calculados con el metodo de HodgeRank. La dimension de esta matriz, en el caso de Espana por ejemplo, esta matriz sera $10 $
 
 
 
@@ -304,56 +363,79 @@ Para cada liga, definimos la matriz de rating multivariado, $\bm{R_{MV}}$. En es
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=1.\textwidth]{rating.pdf}
+\includegraphics[width=1.\textwidth]{rating_2.pdf}
 \caption{Comparacion entre true rating y metric rating. Debido a que estas cantidades estan en unidades distintas, para comparar se usan los datos estandarizados. 
-(a) Comparacion de las cumulative distribution functions asociadas al true ranking y al metric rating.
-(b) Comparación en el caso Presure point en la liga inglesa. 
-(c) Comparación en el caso Maintenance en la liga italiana.. 
-(d) Cumulative distribution function asociadas a las diferencias punto a punto entre el true rating y el metric raiting. A modeo de referencia, en lineas punteadas, se muestra la CDF de una densidad gaussiana de media y desvio igual al conjunto de todos los datos.}
+(a) Comparacion de las cumulative distribution function asociadas al true rating y al metric rating.
+(b) Cumulative distribution function del metric rating por liga. En lineas negras punteadas se grafica a modo de referencia la curva de una distribucion normal estandar. 
+(c) Comparación en el caso Presure point en la liga inglesa. 
+(d) Comparación en el caso Direct play en la liga española. 
+}
 \label{fi:rating}
 \end{figure}
 
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=1.\textwidth]{rmse.pdf}
-\caption{Distancia $D$ y coeficiente de person $\rho$, entre el rating verdadero y el rating dado por las metricas. Cada panel contiene la informacion de una metrica y las barras muestran el valor de $D$ obtenido en cada liga. 
-Las barras en cada panel estan ordenadas en orden creciente respecto del valor de $D$. Asimismo, los paneles estan ordenado en orden creciente respecto del valor promedio en cada metrica, $\overline{D}$. Las barras con hatch muestran los casos donde el coeficiente de Pearson indica una correlacion debil, $|\rho|<0.4$.   }
-\label{fi:ratings}
+\includegraphics[width=1.\textwidth]{correlacion.pdf}
+\caption{Coeficiente de correlación de person, $\rho$, entre el rating verdadero y el rating dado por las metricas. Cada panel contiene la informacion de una metrica y las barras muestran el valor de $\rho$ obtenido en cada liga. 
+Las barras en cada panel estan ordenadas en orden creciente respecto del valor de $\rho$. Asimismo, los paneles estan ordenado en orden creciente respecto del valor promedio en cada metrica, $\overline{\rho}$. Las barras con hatch indica los casos donde el $p-value>0.05$. En esos casos no se encontró una correlación estadísticamente significativa entre el true rating y el metric rating.}
+\label{fi:correlacion}
 \end{figure}
 
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=1.\textwidth]{kendalls.pdf}
+\includegraphics[width=1.\textwidth]{kendalls_3.pdf}
 \caption{Coeficiente de Kendall, $\tau$, entre los rankings verdaderos y los rankings dados por las metricas. 
 Cada panel contiene la informacion de una metrica y las barras muestran el valor de $\tau$ obtenido en cada liga. 
-Las barras en cada panel estan ordenadas en orden decreciente respecto del valor de $\tau$. Asimismo, los paneles estan ordenado en orden decreciente respecto del valor promedio en cada metrica, $\overline{\tau}$. Las barras con hatch indica los casos donde el $p-value<0.05$. En esos casos no hay evidencia suficiente para afirmar que existe correlacion significativa.}
+Las barras en cada panel estan ordenadas en orden decreciente respecto del valor de $\tau$. Asimismo, los paneles estan ordenado en orden decreciente respecto del valor promedio en cada metrica, $\overline{\tau}$. Las barras con hatch indica los casos donde el $p-value>0.05$. En esos casos, los resultados no proporcionan evidencia suficiente para afirmar la existencia de una relación lineal entre el ranking real y el inferido.}
 \label{fi:rankings}
 \end{figure}
 
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=1.\textwidth]{relevancia.pdf}
-\caption{Relevancia de las metricas en el rating multivariado. Cada panel muestra los valores de $\gamma_i$ en cada metrica para una liga dada. Las barras negras muestran los casos donde no hay significancia estadistica.}
-\label{fi:relevancia}
+\includegraphics[width=1.\textwidth]{mv.pdf}
+\caption{Comparación entre el true rating y el composite rating.
+En los panes (a), (b), (c), (d) y (e) comparamos el true raiting con el composite rating de cada uno de los equipos en las ligas inglesa, francesa, alemana, italiana y española respectivamente. En el panel (f) mostramos los valores del coeficiente de Pearson, $\rho$, y el coeficiente de Kendall, $\tau$, obtenido para cada liga. Notar que, en cada caso, la barra de la izquierda se corresponde con el valor de $\rho$ y la de la derecha con el valor de $\tau$.}
+\label{fi:mv}
 \end{figure}
 
 
 
-\begin{figure}[t!]
+\begin{table}[htbp]
 \centering
-\includegraphics[width=1.\textwidth]{tr_mvr.pdf}
-\caption{Comparacion el true rating y el multivariate rating. 
-(a) Utilizando todas las variables para calcular el raiting multivariado.
-(b) Utilizando solo las variables relevantes de cada liga (ver Fig. \ref{fi:relevancia} ).
-%
-En ambos paneles, los scatters muestran los valores exactos para cada equipo de cada liga, las rectas fueron calculadas a partir un fit lineal con el objetivo de mostrar la tendencia que siguen las relaciones graficadas. La linea negra punteada muestra la funcion identidad. }
-\label{fi:tr_mvr}
-\end{figure}
-
-
+\caption{Componentes del Composite rating por Liga (basado en selección BIC)}
+\label{tab:CR}
+\normalsize % Ajuste de tamaño 
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Metric} & \textbf{Coef.} & \textbf{P-val} & \textbf{Imp. (\%)} & \textbf{$R^2$} \\
+\midrule
+\multicolumn{5}{l}{\textit{England}} \\
+Build up & -24.56 & 0.0006 & 37.65 & 0.88 \\
+Flow rate & 22.69 & 0.0045 & 34.79 & \\
+Pressure point & 17.98 & 0.0117 & 27.57 & \\
+\midrule
+\multicolumn{5}{l}{\textit{France}} \\
+Pressure point & 33.68 & 0.0145 & 61.71 & 0.61 \\
+Direct play & -20.90 & 0.1096 & 38.29 & \\
+\midrule
+\multicolumn{5}{l}{\textit{Germany}} \\
+Direct play & 9.48 & 0.0012 & 100 & 0.46 \\
+\midrule
+\multicolumn{5}{l}{\textit{Italy}} \\
+Flow rate & 17.84 & 0.0006 & 37.15 & 0.86 \\
+Direct play & 15.46 & 0.0018 & 32.18 & \\
+Midfield play & -14.73 & 0.0119 & 30.67 & \\
+\midrule
+\multicolumn{5}{l}{\textit{Spain}} \\
+Pressure point & -34.93 & 0.0185 & 43.08 & 0.46 \\
+Flow rate & 26.38 & 0.0297 & 32.53 & \\
+Counterattack & 19.78 & 0.0046 & 24.39 & \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 \bibliographystyle{unsrt}
