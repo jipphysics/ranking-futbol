@@ -299,10 +299,10 @@ En esta seccion, desarrollamos para cada liga un Composite Rating (CR), definido
 %
 Sea $n$ la cantidad de equipos en la liga y $m$ la cantidad de metricas, definimos $R^{ n\times m }$ como la matriz donde las filas contienen los valores de metric rating obtenidos para cada equipo. 
 Asimismo definimos el $T^{n \times 1}$ como el vector que contiene los true ratings de cada equipo de una liga.
-En este marco, nuestro objetivo es encontrar $\alpha^{m \times 1}$ tal que,
+En este marco, nuestro objetivo es encontrar el vector de pesos $\alpha^{m \times 1} = (\alpha_1 ....\alpha_m)^T$ tal que,
 %
 $$
-M \alpha = T.
+T = \alpha R .
 $$  
 
 Para resolver este sistema, y con la de idea de garantizar la parsimonia y la capacidad explicativa del Composite Rating (CR), empleamos un algoritmo de Selección Exhaustiva de Características (Exhaustive Feature Selector o EFS). 
@@ -319,7 +319,7 @@ En la tabla~\ref{tab:CR}, se muestran los resultados de la regresion.
 El análisis de los coeficientes revela áreas críticas para la mejora del rendimiento.
 %
 Para la liga inglesa, podemos ver que las metricas mas relevantes, en orden de importancia relativa, son {\it Build up}, {\it Flow rate} y {\it Presure point}, las cuales explican casi el $90\%$ de la varianza de los datos. 
-El coeficiente negativo en la métrica {\it Build up}($-24.56$) sugiere que los equipos que reducen sus tiempos de elaboración en el ultimo cuarto del campo de juego, incrementan significativamente su probabilidad de obtener puntos. 
+El coeficiente negativo en la métrica {\it Build up} ($-24.56$) sugiere que los equipos que reducen sus tiempos de elaboración en el ultimo cuarto del campo de juego, incrementan significativamente su probabilidad de obtener puntos. 
 Por el contrario, un aumento en esta métrica penaliza el Composite Rating, lo que indica una ineficiencia en estilos de juego que utilicen esta tactica en esa liga en particular.
 Tambien podemos decir que el coeficiente positivo en {\it Flow rate} ($22.69$) sugiere que los equipos que incrementan la velocidad con la que mueven la pelota en el campo de juego, incrementa sus chances de obtener más puntos en esta liga.
 Asimistmo, el coeficiente positivo en la metrica {\it Presure point} sugiere que los equipos que presionan mas alto en el campo de juego incrementa su probabilidad de obtener puntos.
