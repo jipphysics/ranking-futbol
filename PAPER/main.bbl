@@ -19,4 +19,14 @@ Andres Chacoma and Orlando~V Billoni.
 \newblock Data-driven approach to defining football styles in major leagues.
 \newblock {\em Chaos, Solitons \& Fractals}, 200:116926, 2025.
 
+\bibitem{kendall1938new}
+Maurice~G Kendall.
+\newblock A new measure of rank correlation.
+\newblock {\em Biometrika}, 30(1-2):81--93, 1938.
+
+\bibitem{elo1978rating}
+Arpad~E. Elo.
+\newblock {\em The Rating of Chess Players, Past and Present}.
+\newblock Arco Publishing, New York, 1978.
+
 \end{thebibliography}
