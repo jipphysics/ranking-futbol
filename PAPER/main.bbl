@@ -1,4 +1,164 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{barthelemy2025fragility}
+Marc Barthelemy.
+\newblock Fragility of chess positions: Measure, universality, and tipping
+  points.
+\newblock {\em Physical Review E}, 111(1):014314, 2025.
+
+\bibitem{Clauset2015safe}
+A~Clauset, M~Kogan, and S~Redner.
+\newblock Safe leads and lead changes in competitive team sports.
+\newblock {\em Physical Review E}, 91(6):062815, 2015.
+
+\bibitem{buldu2019defining}
+Javier~M Buld{\'u}, Javier Busquets, Ignacio Echegoyen, and F~Seirul.~lo.
+\newblock Defining a historic football team: Using network science to analyze
+  guardiola’s fc barcelona.
+\newblock {\em Scientific reports}, 9(1):13602, 2019.
+
+\bibitem{Ribeiro2012anomalous}
+Haroldo~V Ribeiro, Satyam Mukherjee, and Xiao Han~T Zeng.
+\newblock Anomalous diffusion and long-range correlations in the score
+  evolution of the game of cricket.
+\newblock {\em Physical Review E}, 86(2):022102, 2012.
+
+\bibitem{Chacoma2022simple}
+Andr{\'e}s Chacoma and Orlando~V Billoni.
+\newblock Simple mechanism rules the dynamics of volleyball.
+\newblock {\em Journal of Physics: Complexity}, 3(3):035006, 2022.
+
+\bibitem{Chacoma2023probabilistic}
+Andr{\'e}s Chacoma and Orlando~V Billoni.
+\newblock Probabilistic model for padel games dynamics.
+\newblock {\em Chaos, Solitons \& Fractals}, 174:113784, 2023.
+
+\bibitem{chacoma2025emergent}
+Andr{\'e}s Chacoma and Orlando~V Billoni.
+\newblock Emergent complexity in the decision-making process of chess players.
+\newblock {\em Scientific Reports}, 15(1):23234, 2025.
+
+\bibitem{zappala2022role}
+Chiara Zappal{\`a}, Alessandro Pluchino, Andrea Rapisarda, Alessio~Emanuele
+  Biondo, and Pawel Sobkowicz.
+\newblock On the role of chance in fencing tournaments: An agent-based
+  approach.
+\newblock {\em Plos one}, 17(5):e0267541, 2022.
+
+\bibitem{ibanez2018relative}
+Sergio~J Ib{\'a}{\~n}ez, Aitor Mazo, Juarez Nascimento, and Javier
+  Garc{\'\i}a-Rubio.
+\newblock The relative age effect in under-18 basketball: Effects on
+  performance according to playing position.
+\newblock {\em PloS one}, 13(7):e0200408, 2018.
+
+\bibitem{galeano2022using}
+Javier Galeano, Miguel-{\'A}ngel G{\'o}mez, Fernando Rivas, and Javier~M
+  Buld{\'u}.
+\newblock Using markov chains to identify player’s performance in badminton.
+\newblock {\em Chaos, Solitons \& Fractals}, 165:112828, 2022.
+
+\bibitem{silva2016sports}
+Pedro Silva, Lu{\'\i}s Vilar, Keith Davids, Duarte Ara{\'u}jo, and J{\'u}lio
+  Garganta.
+\newblock Sports teams as complex adaptive systems: manipulating player numbers
+  shapes behaviours during football small-sided games.
+\newblock {\em SpringerPlus}, 5(1):191, 2016.
+
+\bibitem{ashford2021understanding}
+Michael Ashford, Andrew Abraham, and Jamie Poolton.
+\newblock Understanding a player’s decision-making process in team sports: a
+  systematic review of empirical evidence.
+\newblock {\em Sports}, 9(5):65, 2021.
+
+\bibitem{martinez2020spatial}
+Johann~H Mart{\'\i}nez, David Garrido, Jos{\'e}~L Herrera-Diestra, Javier
+  Busquets, Ricardo Sevilla-Escoboza, and Javier~M Buld{\'u}.
+\newblock Spatial and temporal entropies in the spanish football league: A
+  network science perspective.
+\newblock {\em Entropy}, 22(2):172, 2020.
+
+\bibitem{cao2023football}
+Xiaoxiang Cao, Xiaodong Zhao, Huan Tang, Nianchun Fan, and Fateh Zereg.
+\newblock Football players’ strength training method using image processing
+  based on machine learning.
+\newblock {\em Plos one}, 18(6):e0287433, 2023.
+
+\bibitem{yamamoto2024theory}
+Ken Yamamoto, Seiya Uezu, Keiichiro Kagawa, Yoshihiro Yamazaki, and Takuma
+  Narizuka.
+\newblock Theory and data analysis of player and team ball possession time in
+  football.
+\newblock {\em Physical Review E}, 109(1):014305, 2024.
+
+\bibitem{chacoma2020modeling}
+A~Chacoma, Nahuel Almeira, Juan~Ignacio Perotti, and Orlando~Vito Billoni.
+\newblock Modeling ball possession dynamics in the game of football.
+\newblock {\em Physical Review E}, 102(4):042120, 2020.
+
+\bibitem{chacoma2021stochastic}
+A~Chacoma, N~Almeira, JI~Perotti, and OV~Billoni.
+\newblock Stochastic model for football's collective dynamics.
+\newblock {\em Physical Review E}, 104(2):024110, 2021.
+
+\bibitem{chacoma2025data}
+Andres Chacoma and Orlando~V Billoni.
+\newblock Data-driven approach to defining football styles in major leagues.
+\newblock {\em Chaos, Solitons \& Fractals}, 200:116926, 2025.
+
+\bibitem{amichay2025characterizing}
+Guy Amichay, Hugo Silva, Jo{\~a}o Brito, and Rui Marcelino.
+\newblock Characterizing the spatial structures of competing football teams.
+\newblock {\em Scientific Reports}, 15(1):35217, 2025.
+
+\bibitem{caicedo2020passing}
+Sergio Caicedo-Parada, Carlos Lago-Pe{\~n}as, and Enrique Ortega-Toro.
+\newblock Passing networks and tactical action in football: A systematic
+  review.
+\newblock {\em International Journal of Environmental Research and Public
+  Health}, 17(18):6649, 2020.
+
+\bibitem{ichinose2021robustness}
+Genki Ichinose, Tomohiro Tsuchiya, and Shunsuke Watanabe.
+\newblock Robustness of football passing networks against continuous node and
+  link removals.
+\newblock {\em Chaos, Solitons \& Fractals}, 147:110973, 2021.
+
+\bibitem{gonccalves2017exploring}
+Bruno Gon{\c{c}}alves, Diogo Coutinho, Sara Santos, Carlos Lago-Penas, Sergio
+  Jim{\'e}nez, and Jaime Sampaio.
+\newblock Exploring team passing networks and player movement dynamics in youth
+  association football.
+\newblock {\em PloS one}, 12(1):e0171156, 2017.
+
+\bibitem{chacoma2022complexity}
+A~Chacoma, OV~Billoni, and MN~Kuperman.
+\newblock Complexity emerges in measures of the marking dynamics in football
+  games.
+\newblock {\em Physical Review E}, 106(4):044308, 2022.
+
+\bibitem{chacoma2025identification}
+Andr{\'e}s Chacoma.
+\newblock Identification and optimization of high-performance passing networks
+  in football.
+\newblock {\em Physical Review E}, 111(4):044313, 2025.
+
+\bibitem{li2025motif}
+Ming-Xia Li, Li-Gong Xu, and Wei-Xing Zhou.
+\newblock Motif analysis and passing behavior in football passing networks.
+\newblock {\em Chaos, Solitons \& Fractals}, 190:115750, 2025.
+
+\bibitem{yung2025using}
+Kate~KY Yung, Paul~PY Wu, Karen aus~der F{\"u}nten, Anne Hecksteden, and Tim
+  Meyer.
+\newblock Using a bayesian network to classify time to return to sport based on
+  football injury epidemiological data.
+\newblock {\em PloS one}, 20(3):e0314184, 2025.
+
+\bibitem{jiang2011statistical}
+Xiaoye Jiang, Lek-Heng Lim, Yuan Yao, and Yinyu Ye.
+\newblock Statistical ranking and combinatorial hodge theory.
+\newblock {\em Mathematical Programming}, 127(1):203--244, 2011.
 
 \bibitem{pappalardo2019public}
 Luca Pappalardo, Paolo Cintia, Alessio Rossi, Emanuele Massucco, Paolo
@@ -13,11 +173,6 @@ Javier Fernandez-Navarro, Luis Fradua, Asier Zubillaga, and Allistair~P.
 \newblock Influence of contextual variables on styles of play in soccer.
 \newblock {\em International Journal of Performance Analysis in Sport},
   18(3):423--436, 2018.
-
-\bibitem{chacoma2025data}
-Andres Chacoma and Orlando~V Billoni.
-\newblock Data-driven approach to defining football styles in major leagues.
-\newblock {\em Chaos, Solitons \& Fractals}, 200:116926, 2025.
 
 \bibitem{kendall1938new}
 Maurice~G Kendall.
