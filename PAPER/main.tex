@@ -245,7 +245,7 @@ From these results, we observe the following: (i) the mean values are similar ($
 %
 Regarding the correlation parameter, the parametric bootstrap yielded $\bar{\rho} = -0.130$ ($SD = 0.07$) with a $95\%$ confidence interval of $[-0.3040, -0.0371]$. This result indicates the presence of a weak negative structural correlation between teams’ win ability $\eta_w$ and draw ability $\eta_d$. This suggests that teams with a higher propensity to win tend, on average, to exhibit a slightly lower propensity to draw.
 %
-In Fig.~\ref{fi:stats}(a), we show the CDF of the true rating together with the fitted model. The proposed model accurately captures the behavior of the empirical curve across the entire support. In Fig.~\ref{fi:stats}(b), we present a quantile--quantile plot comparing theoretical and empirical quantiles. For reference, we also include the relationship between the data quantiles and those associated with a Gaussian distribution with mean and standard deviation equal to the sample values, $\bar{R}_T = 52.45$ ($SD = 18.56$).
+In Fig.~\ref{fi:stats} (a), we show the CDF of the true rating together with the fitted model. The proposed model accurately captures the behavior of the empirical curve across the entire support. In Fig.~\ref{fi:stats} (b), we present a quantile--quantile plot comparing theoretical and empirical quantiles. For reference, we also include the relationship between the data quantiles and those associated with a Gaussian distribution with mean and standard deviation equal to the sample values, $\bar{R}_T = 52.45$ ($SD = 18.56$).
 %
 First, we observe that the proposed model reproduces well the behavior in the central-left region and provides an acceptable description of the right tail. The comparison with the Gaussian model reveals that the empirical distribution exhibits lighter left tails and heavier right tails relative to a Gaussian distribution, thereby uncovering the presence of asymmetry. The downward concavity observed in the central region of the plot further indicates that the median of the data is shifted to the left.
 
@@ -264,22 +264,22 @@ Nevertheless, this does not prevent a meaningful comparison, as the relevant inf
 %
 For this reason, in order to compare the behavior of the true rating and the metric rating, we standardize both variables and work with their corresponding {\it z-scores}.
 
-In Fig.~\ref{fi:rating}(a), we show the CDF of the true rating computed over all teams and all leagues, together with the CDF of the metric rating computed over all teams, all leagues, and all eight metrics considered. For both curves, outlier values—defined as those above the quantile $Q_{99.7}$—were removed.
+In Fig.~\ref{fi:rating} (a), we show the CDF of the true rating computed over all teams and all leagues, together with the CDF of the metric rating computed over all teams, all leagues, and all eight metrics considered. For both curves, outlier values—defined as those above the quantile $Q_{99.7}$—were removed.
 %
 We observe a remarkable agreement across most of the range, with some differences appearing in the tails: the metric rating exhibits more extreme positive values relative to the mean, whereas the true rating shows slightly more extreme negative values.
 %
-In Fig.~\ref{fi:rating}(b), we show the distribution of metric rating values for each league. For this purpose, within each league we aggregate the metric rating values associated with all metrics and standardize them using the z-score.
+In Fig.~\ref{fi:rating} (b), we show the distribution of metric rating values for each league. For this purpose, within each league we aggregate the metric rating values associated with all metrics and standardize them using the z-score.
 %
 As a reference, the CDF of a standard normal distribution is also shown as a black dashed line.
 It can be observed that the curves associated with different leagues differ slightly, indicating league-dependent behavior. Moreover, in all cases we observe an accumulation of probability mass in the central region. This is compensated by lighter left tails and heavier right tails relative to the standard normal distribution.
 %
-On the other hand, in Fig.~\ref{fi:rating}(c) we plot the true rating and the metric rating as a function of the true ranking, for the case of the {\it Pressure point} metric in the English league. The purpose of this representation is to highlight team-by-team differences.
+On the other hand, in Fig.~\ref{fi:rating} (c) we plot the true rating and the metric rating as a function of the true ranking, for the case of the {\it Pressure point} metric in the English league. The purpose of this representation is to highlight team-by-team differences.
 %
 First, we note that the true rating decreases as the ranking increases. This decrease is not strictly monotonic, as plateaus may occur, but it is non-increasing by construction: the first-ranked team has a true rating greater than or equal to that of the second-ranked team, the second greater than or equal to the third, and so on until the last position.
 %
 For the metric rating curve, we also observe an overall decreasing trend, although not strictly. In qualitative terms, the metric rating follows the general trend of the true rating, while exhibiting small local deviations.
 %
-In Fig.~\ref{fi:rating}(d), we show an analogous comparison for the {\it Direct play} metric in the Spanish league. In this case, the metric rating curve does not display a clear decreasing trend and shows a strong decorrelation with respect to the true rating values.
+In Fig.~\ref{fi:rating} (d), we show an analogous comparison for the {\it Direct play} metric in the Spanish league. In this case, the metric rating curve does not display a clear decreasing trend and shows a strong decorrelation with respect to the true rating values.
 %
 These results indicate that, for a given league, the true rating may differ substantially or only marginally from the metric rating, depending on the specific metric used to infer the rating.
 
@@ -363,9 +363,9 @@ Finally, in the Spanish league, point accumulation appears to be associated with
 
 The composite rating obtained for each league can be compared with the true rating in the same manner as was done in the previous sections for individual metric-based ratings. In Fig.~\ref{fi:mv}, panels (a), (b), (c), (d), and (e) show league-by-league, team-by-team comparisons in plots of rating versus true ranking.
 
-In the case of the English league (Fig.~\ref{fi:mv}(a)), we observe that the top two teams exhibit true ratings higher than their composite ratings. These teams therefore display statistical overperformance, appearing to obtain better results than expected based on their underlying metrics. This may be attributable to external factors or stochastic effects. In contrast, the team ranked third shows a true rating lower than its composite rating, indicating statistical underperformance—suggesting that the team performed adequately in process terms but failed in execution or was affected by unfavorable randomness. Similar patterns are observed across all leagues and at all positions in the table.
+In the case of the English league (Fig.~\ref{fi:mv} (a)), we observe that the top two teams exhibit true ratings higher than their composite ratings. These teams therefore display statistical overperformance, appearing to obtain better results than expected based on their underlying metrics. This may be attributable to external factors or stochastic effects. In contrast, the team ranked third shows a true rating lower than its composite rating, indicating statistical underperformance—suggesting that the team performed adequately in process terms but failed in execution or was affected by unfavorable randomness. Similar patterns are observed across all leagues and at all positions in the table.
 
-Overall, the composite rating curves follow trends similar to those of the true rating curves, with particularly strong agreement observed for the English and Italian leagues. To conclude the analysis, Fig.~\ref{fi:mv}(f) presents a bar chart showing the values of the Pearson correlation coefficient $\rho$ and the Kendall rank correlation coefficient $\tau$. In all cases, these values exceed those obtained using individual metrics alone (see Fig.~\ref{fi:correlacion} and Fig.~\ref{fi:rankings}), with especially notable improvements for the Italian league and significant gains for the Spanish and German leagues.
+Overall, the composite rating curves follow trends similar to those of the true rating curves, with particularly strong agreement observed for the English and Italian leagues. To conclude the analysis, Fig.~\ref{fi:mv} (f) presents a bar chart showing the values of the Pearson correlation coefficient $\rho$ and the Kendall rank correlation coefficient $\tau$. In all cases, these values exceed those obtained using individual metrics alone (see Fig.~\ref{fi:correlacion} and Fig.~\ref{fi:rankings}), with especially notable improvements for the Italian league and significant gains for the Spanish and German leagues.
 
 \section{Discussion and Conclusions}
 \label{se:concl}
@@ -443,6 +443,7 @@ This work was partially supported by CONICET under Grant No. PIP 112 20200 10110
 Each panel corresponds to a performance metric, and the bars show the value of $\rho$ obtained for each league. 
 Within each panel, bars are ordered in increasing order of $\rho$. Panels are also ordered in increasing order according to the average correlation value for each metric, $\overline{\rho}$. 
 Bars with hatching indicate cases for which the $p$-value exceeds $0.05$. In these cases, no statistically significant correlation was found between the true rating and the metric rating.}
+\label{fi:correlacion}
 \end{figure}
 
 
