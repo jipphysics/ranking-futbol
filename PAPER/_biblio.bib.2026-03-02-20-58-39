@@ -327,56 +327,6 @@
   publisher={Springer}
 }
 
-@book{grady2010discrete,
-  title = {{Discrete Calculus: Applied Analysis on Graphs for Computational Science}},
-  author    = "Grady, Leo J. and Polimeni, Jonathan R.",
-  publisher = "Springer",
-  publisher = {Springer London},
-  isbn = {978-1-84996-290-2},
-  url = {http://dx.doi.org/10.1007/978-1-84996-290-2},  
-  doi = {10.1007/978-1-84996-290-2},  
-  year = {2010}
-}
-
-@article{lim2020hodge,
-  author = {Lim, Lek-Heng},
-  title = {Hodge Laplacians on Graphs},
-  journal = {SIAM Review},
-  volume = {62},
-  number = {3},
-  pages = {685-715},
-  year = {2020},
-  doi = {10.1137/18M1223101},
-  url = {https://doi.org/10.1137/18M1223101},
-  eprint = {https://doi.org/10.1137/18M1223101},
-  abstract = { This is an elementary introduction to the Hodge Laplacian on a graph, a higher-order generalization of the graph Laplacian. We will discuss basic properties including cohomology and Hodge theory. The main feature of our approach is simplicity, requiring only knowledge of linear algebra and graph theory. We have also isolated the algebra from the topology to show that a large part of cohomology and Hodge theory is nothing more than the linear algebra of matrices satisfying \$AB = 0\$. For the remaining topological aspect, we cast our discussion entirely in terms of graphs as opposed to less familiar topological objects like simplicial complexes.}
-}
-
-@book{bianconi2021higher,
-  place={Cambridge},
-  series={Elements in the Structure and Dynamics of Complex Networks},
-  title={Higher-Order Networks},
-  publisher={Cambridge University Press},
-  author={Bianconi, Ginestra},
-  year={2021},
-  collection={Elements in the Structure and Dynamics of Complex Networks}
-} 
-
-@article{perotti2025analysis,
-  title = {Analysis of the inference of ratings and rankings in complex networks using discrete exterior calculus on higher-order networks},
-  author = {Perotti, Juan I.},
-  journal = {Phys. Rev. E},
-  volume = {111},
-  issue = {3},
-  pages = {034306},
-  numpages = {12},
-  year = {2025},
-  month = {Mar},
-  publisher = {American Physical Society},
-  doi = {10.1103/PhysRevE.111.034306},
-  url = {https://link.aps.org/doi/10.1103/PhysRevE.111.034306}
-}
-
 %jiang2011statistical
 
 

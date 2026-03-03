@@ -174,6 +174,29 @@ Javier Fernandez-Navarro, Luis Fradua, Asier Zubillaga, and Allistair~P.
 \newblock {\em International Journal of Performance Analysis in Sport},
   18(3):423--436, 2018.
 
+\bibitem{grady2010discrete}
+Leo~J. Grady and Jonathan~R. Polimeni.
+\newblock {\em {Discrete Calculus: Applied Analysis on Graphs for Computational
+  Science}}.
+\newblock Springer, 2010.
+
+\bibitem{lim2020hodge}
+Lek-Heng Lim.
+\newblock Hodge laplacians on graphs.
+\newblock {\em SIAM Review}, 62(3):685--715, 2020.
+
+\bibitem{bianconi2021higher}
+Ginestra Bianconi.
+\newblock {\em Higher-Order Networks}.
+\newblock Elements in the Structure and Dynamics of Complex Networks. Cambridge
+  University Press, 2021.
+
+\bibitem{perotti2025analysis}
+Juan~I. Perotti.
+\newblock Analysis of the inference of ratings and rankings in complex networks
+  using discrete exterior calculus on higher-order networks.
+\newblock {\em Phys. Rev. E}, 111:034306, Mar 2025.
+
 \bibitem{kendall1938new}
 Maurice~G Kendall.
 \newblock A new measure of rank correlation.
