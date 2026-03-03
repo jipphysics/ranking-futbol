@@ -136,6 +136,21 @@ Within this framework, we construct a total of 50 graphs, corresponding to 8 gra
 \section{Theoretical Framework}
 \label{se:theory}
 
+To find ratings from a given metric, we seek to minimize the sum
+%\begin{equation}
+%\label{eq:sum}
+$$
+\sum_{ij}
+a_{ij}\,
+|f_{ij}-(w_j-w_i)|^2
+$$
+%\end{equation}
+with respect to the vector $w$ of node weights $w_i$.
+Here, $a$ is the adjacency matrix of the network of matches between teams, which in the present work is fully connected, so $a_{ij}=1$ for $i\neq j$ and $a_{ii}=0$.
+The weights $w_i$ minimizing sum represent the inferred ratings associated to the given metric defining the components $f_{ij}$.
+Physically, we may think of the ratings $w_i$ as potential energies defined on the nodes and $f_{ij}$ as forces.
+In this way, the minimization of the sum results in the potentials $w_i$ reproducing the forces $f_{ij}$ as close as possible in a least squares sense.
+
 To infer metric-based team ratings, we use {\em HodgeRank}, which is a method based in the theory of Discrete Calculus over Higher Order Networks~\cite{jiang2011statistical,grady2010discrete,lim2020hodge,bianconi2021higher,perotti2025analysis}.
 In what follows we provide a short introduction to Higher Order Networks,  Simplicial Complexes, Discrete Calculus and HodgeRank.
 
@@ -186,7 +201,7 @@ It is self adjoint, so $L^*=L$, and it has a non-negative real spectrum, with at
 It can be decomposed as $L=L_0\oplus L_1\oplus ... \oplus L_n$ with $L_k = L_k^{\uparrow} \oplus L_k^{\downarrow}$ where $L_k^{\uparrow} = d_k^*d_k$ and $L_k^{\downarrow}=d_{k-1}d_{k-1}^*$ are called the $k$-th up- and low- Hodge Laplacians.
 Moreover, $L_k(C^*) = L(C_k^*) \subseteq C_k^*$.
 
-With previous ingredients, Hodge proves the following decomposition
+Based on previous constructions, Hodge proves the following decomposition
 $$
 C_k^* = \mathrm{rng}\, d_k^* \oplus \mathrm{krn}\, L_k \oplus \mathrm{rng}\, d_{k-1}
 $$
