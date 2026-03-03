@@ -140,6 +140,8 @@ To find ratings from a given metric, we seek to minimize the sum
 %\begin{equation}
 %\label{eq:sum}
 $$
+\chi(w)
+=
 \sum_{ij}
 a_{ij}\,
 |f_{ij}-(w_j-w_i)|^2
@@ -147,12 +149,15 @@ $$
 %\end{equation}
 with respect to the vector $w$ of node weights $w_i$.
 Here, $a$ is the adjacency matrix of the network of matches between teams, which in the present work is fully connected, so $a_{ij}=1$ for $i\neq j$ and $a_{ii}=0$.
-The weights $w_i$ minimizing sum represent the inferred ratings associated to the given metric defining the components $f_{ij}$.
+The weights $w_i$ minimizing $\chi$ represent the inferred ratings associated to the given metric defining the components $f_{ij}$.
 Physically, we may think of the ratings $w_i$ as potential energies defined on the nodes and $f_{ij}$ as forces.
-In this way, the minimization of the sum results in the potentials $w_i$ reproducing the forces $f_{ij}$ as close as possible in a least squares sense.
+In this way, the minimization of $\chi$ results in the potentials $w_i$ reproducing the forces $f_{ij}$ as close as possible in a least squares sense.
 
-To infer metric-based team ratings, we use {\em HodgeRank}, which is a method based in the theory of Discrete Calculus over Higher Order Networks~\cite{jiang2011statistical,grady2010discrete,lim2020hodge,bianconi2021higher,perotti2025analysis}.
-In what follows we provide a short introduction to Higher Order Networks,  Simplicial Complexes, Discrete Calculus and HodgeRank.
+At first sight, the minimization of $\chi$ seems easy.
+However, the minimum is highly degenrate because potentials are defined up to an arbitrary additive constante.
+To accurately and efficiently infer a minimum for $\chi$, Jiang et al. introduced HodgeRank, which leverages from the theory of Discrete Calculus on Higher Order Networks to translate the minimization problem to finding a solution for a couple of singular linear equations~\cite{jiang2011statistical,grady2010discrete,lim2020hodge,bianconi2021higher,perotti2025analysis}.
+%To infer metric-based team ratings, we use {\em HodgeRank}, which is a method based in the theory of Discrete Calculus over Higher Order Networks
+%In what follows we provide a short introduction to Higher Order Networks,  Simplicial Complexes, Discrete Calculus and HodgeRank.
 
 An hypergraph is a subset $K$ of the powerset of the set $\{0,1,...,n\}$ of $n++1$ nodes.
 An hypergraph is the most general representation of a Higher Order Network discrete topological structure.
