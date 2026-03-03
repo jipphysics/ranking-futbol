@@ -161,7 +161,7 @@ $$
 \partial e_{i_0...i_k} = \sum_{\ell=0}^k
 (-1)^{\ell} e_{i_0...i_{\ell-1}i_{\ell+1}...e_k}.
 $$
-It is not difficult to show that $\partial = \partial_0 + \partial_1 + ... + \partial_n$ with $\partial_k(C) = \partial_k(C_k) \subseteq C_{k-1}$ meaning that the boundary operator maps a simplicial complex to its boundary and, thanks to the alternating nature of the definition, that $\partial^2 = 0$ meaning that the boundary of a boundary has no boundary.
+It is not difficult to show that $\partial = \partial_0 + \partial_1 + ... + \partial_n$ with $\partial_k(C) = \partial(C_k) \subseteq C_{k-1}$ meaning that the boundary operator maps a simplicial complex to its boundary and, thanks to the alternating nature of the definition, that $\partial^2 = 0$ meaning that the boundary of a boundary has no boundary.
 
 The dual space $C^*$ of $C$ is called the space of cochains.
 The dual basis is defined in terms of the dual vectors $e^s$ in $C^*$, so $e^s(e_r) = \delta^s{}_r$ by definition.
@@ -169,13 +169,22 @@ The space of cochains also admits a direct sum decomposition $C^* = C_0^*\oplus 
 
 The coboundary operator $d:C^*\to C^*$ is defined as the the dual adjoint of the boundary operator, i.e. $df(c):=f(\partial c)$ for any cochain $f\in C^*$ and any chain $c\in C$.
 This is the discrete analogous of the generalized Stoke's theorem and $d$ is the discrete analogous of the differential operator.
-It can be easily shown that $d$ admits the decomposition $d=d_0+d_1+...+d_n$ with $d_k(C^*)=d_k(C_k^*)\subseteq C_{k+1}^*$ and, also, $d^2=0$ easily follows from its definition and the fact that $\partial^2=0$.
+It can be easily shown that $d$ admits the decomposition $d=d_0+d_1+...+d_n$ with $d_k(C^*)=d(C_k^*)\subseteq C_{k+1}^*$ and, also, $d^2=0$ easily follows from its definition and the fact that $\partial^2=0$.
 Notice how the boundary operator $\partial$ decreases $k$ while the coboundary operator $d$ increases $k$.
 
 Since $C$ is of finite dimension $|K|$, a non-singular inner product $c\cdot c'$ over $C$ establishes an (antilinear) isomorphism between $C$ and $C^*$ by the Rietz theorem, where $c^{\flat}\in C^*$ denotes the cochain univocally associated to the chain $c$ such that $c^{\flat}(c') = c\cdot c'$ for every $c'\in C$.
-Correspondingly, $f^{\sharp}$ denotes the chain univocally associated to the cochain $f\in C^*$ and $f\cdot f' = f^{\sharp}\cdot f'^{\sharp}$ is the inner product over $C^*$ induced by the inner product over $C$.
-Notice that $(c^{\flat})^{\sharp} = c$ and $(f^{\sharp})^{\flat}=f$.
+Its inverse is denoted by $f^{\sharp}$ for every $f\in C^*$, $(c^{\flat})^{\sharp} = c$ and $(f^{\sharp})^{\flat}=f$.
+Notice that $f\cdot f' := f^{\sharp}\cdot f'^{\sharp}$ is the inner product over $C^*$ naturally induced by the inner product over $C$.
+These inner product equips the combinatorial topological space $K$ with some geometric notions.
 
+The dual coboundary operator $d^*$ is a linear operator over $C^*$ defined as the inner product adjoint of $d$, i.e. $d^*f.g = f.dg$ for every cochains $f$ and $g$ in $C^*$.
+It can be decomposed as $d^* = d_0^* + d_1^* + ... + d_n^*$ where $d_k^*(C^*) = d^*(C_k^*) \subseteq C_{k+1}^*$, so $d^*$ raises $k$.
+Additionally, $(d^*)^2=0$ easily follows from $d^2=0$.
+
+The Hodge Laplacian is defined as $L:=(d^*+d)^2 = d^*d+dd^*$.
+It is self adjoint, so $L^*=L$, and it has a non-negative real spectrum, with at least one zero eigenvalue. 
+It can be decomposed as $L=L_0\oplus L_1\oplus ... \oplus L_n$ with $L_k = L_k^{\uparrow} \oplus L_k^{\downarrow}$ where $L_k^{\uparrow} = d_k^*d_k$ and $L_k^{\downarrow}=d_{k-1}d_{k-1}^*$ are called the $k$-th up- and low- Hodge Laplacians.
+Moreover, $L_k(C^*) = L(C_k^*) \subseteq C_k^*$.
 
 
 \section{Resultados}
