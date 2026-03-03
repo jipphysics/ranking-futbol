@@ -139,11 +139,14 @@ Within this framework, we construct a total of 50 graphs, corresponding to 8 gra
 To infer metric-based team ratings, we use {\em HodgeRank}, which is a method based in the theory of Discrete Calculus over Higher Order Networks~\cite{jiang2011statistical,grady2010discrete,lim2020hodge,bianconi2021higher,perotti2025analysis}.
 In what follows we provide a short introduction to Higher Order Networks,  Simplicial Complexes, Discrete Calculus and HodgeRank.
 
-An hypergraph is a subset $K$ of the powerset of $n$ nodes.
-A subset of $P_n$ is called an hyperlink.
-An abstract simplicial complex $K$ is a particular type of hypergraphs that satisfy the property of topological closure: if $s$ is an hyperlink of $K$ and $r$ is a nonempty subset of $s$, then $r$ is also an hyperlink of $K$.
+An hypergraph is a subset $K$ of the powerset of the set $\{0,1,...,n\}$ of $n++1$ nodes.
+An hypergraph is the most general representation of a Higher Order Network discrete topological structure.
+A subset of an hypergraph $K$ is called an hyperlink.
+
+An abstract simplicial complex $K$ is a particular type of hypergraph that satisfy the property of topological closure: if $s$ is an hyperlink of $K$ and $r$ is a nonempty subset of $s$, then $r$ is also an hyperlink of $K$.
 The hyperlinks of a simplicial complex are called simplices.
-In particular, a simplex containing $k$ nodes is called a $k$-simplex and $K_k$ is defined as the subset of $k$-simplices in $K$.
+In particular, a simplex containing $k$ nodes is called a $k$-simplex.
+The set of $k$-simplices of a simplicial complex $K$ is denoted by $K_k$.
 
 To each simplex $s$ we associate an abstract vector $e_s$, so we can define the vector space $C$ spanned by the canonical basis $\{e_s:s\in K\}$.
 The vectors in $C$ are called chains.
@@ -152,19 +155,22 @@ The space of chains can be decomposed into the direct sum $C = C_0\oplus C_1\opl
 The additional convenient definition $C_{-1} = C_{n+1} = \{0\}$ is introduced in terms of the zero vector of $C$.
 
 A notion of orientation can be defined on the space of chains $C$.
-Namely, after adopting an arbitrary enumeration of the nodes in $K$, we define the positive orientation $e_{j_0j_1...j_k} := e_s$ if $s=\{i_0,i_1,...,i_k\}$ and $i_0<i_1<...<i_k$, or else we define the negative orientation $e_{j_0j_1...j_k} := -e_s$ if $j_0j_1...j_k$ is an odd permutation, or else $e_{j_0j_1...j_k}=0$ otherwise.
+Namely, after adopting an arbitrary enumeration of the nodes in $K$, we define the positive orientation $e_{j_0j_1...j_k} := e_s$ if $s=\{i_0,i_1,...,i_k\}$ and $i_0<i_1<...<i_k$, the negative orientation $e_{j_0j_1...j_k} := -e_s$ if $j_0j_1...j_k$ is an odd permutation, and $e_{j_0j_1...j_k}=0$ otherwise.
 In this way, we can define the boundary linear operator $\partial$ over $C$ by how it acts on the canonical basis
 $$
 \partial e_{i_0...i_k} = \sum_{\ell=0}^k
 (-1)^{\ell} e_{i_0...i_{\ell-1}i_{\ell+1}...e_k}.
 $$
-It is not difficult to show that $\partial = \partial_0 + \partial_1 + ... + \partial_n$ with $\partial_k(C) = \partial_k(C_k) \subseteq C_{k-1}$ for $k=1,2,...,n$ and, crucially, that $\partial^2 = 0$, meaning that the boundary of a boundary has no boundary.
+It is not difficult to show that $\partial = \partial_0 + \partial_1 + ... + \partial_n$ with $\partial_k(C) = \partial_k(C_k) \subseteq C_{k-1}$ meaning that the boundary operator maps a simplicial complex to its boundary and, thanks to the alternating nature of the definition, that $\partial^2 = 0$ meaning that the boundary of a boundary has no boundary.
 
 The dual space $C^*$ of $C$ is called the space of cochains.
 The dual basis is defined in terms of the dual vectors $e^s$ in $C^*$, so $e^s(e_r) = \delta^s{}_r$ by definition.
 The space of cochains also admits a direct sum decomposition $C^* = C_0^*\oplus ... \oplus C_n^*$ where $C_k^*$ is the dual space associated to $C_k$ and the covectors in $C_k^*$ are called $k$-cochains.
 
-
+The coboundary operator $d:C^*\to C^*$ is defined as the the dual adjoint of the boundary operator, i.e. $df(c):=f(\partial c)$ for any cochain $f\in C^*$ and any chain $c\in C$.
+This is the discrete analogous of the generalized Stoke's theorem and $d$ is the discrete analogous of the differential operator.
+It can be easily shown that $d$ admits the decomposition $d=d_0+d_1+...+d_n$ with $d_k(C^*)=d_k(C_k^*)\subseteq C_{k+1}^*$ and, also, $d^2=0$ easily follows from its definition and the fact that $\partial^2=0$.
+Notice how the boundary operator $\partial$ decreases $k$ while the coboundary operator $d$ increases $k$.
 
 
 \section{Resultados}
