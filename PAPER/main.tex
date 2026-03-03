@@ -186,6 +186,12 @@ It is self adjoint, so $L^*=L$, and it has a non-negative real spectrum, with at
 It can be decomposed as $L=L_0\oplus L_1\oplus ... \oplus L_n$ with $L_k = L_k^{\uparrow} \oplus L_k^{\downarrow}$ where $L_k^{\uparrow} = d_k^*d_k$ and $L_k^{\downarrow}=d_{k-1}d_{k-1}^*$ are called the $k$-th up- and low- Hodge Laplacians.
 Moreover, $L_k(C^*) = L(C_k^*) \subseteq C_k^*$.
 
+With previous ingredients, Hodge proves the following decomposition
+$$
+C_k^* = \mathrm{rng}\, d_k^* \oplus \mathrm{krn}\, L_k \oplus \mathrm{rng}\, d_{k-1}
+$$
+where $\mathrm{rng}\, d_k^*$ is the range of $d_k^*$ and $\mathrm{krn}\, L_k$ is the kernel of $L_k$.
+As a consequence, any $k$-cochain $f\in C_k^*$ can be written as $f=s+h+g$ for a corresponding unique coexact or solenoidal component $s\in \mathrm{rng}\, d_k^*$, a corresponding harmonic component $h\in \mathrm{krn}\, L_k$ and a corresponding exact or gradient component $g\in \mathrm{rng}\, d_{k-1}$.
 
 \section{Resultados}
 \label{se:res}
