@@ -12,7 +12,10 @@
 
 \begin{document}
 
-\title{Ranking futbol with higher order networks}
+\title{Ranking football teams via performance-driven higher-order networks}
+
+
+%Sugerencia: Ranking football teams via higher-order networks based on performance metrics
 
 
 \author{Andres Chacoma}
@@ -50,11 +53,14 @@ Its global popularity, the growing availability of high-resolution data (event d
 
 Within the methodological toolkit of complex systems, complex network theory has emerged as a particularly powerful approach for football analysis. By modeling players or teams as nodes and their interactions (passes, duels, or competitive comparisons) as edges, it becomes possible to quantify and visualize the structural organization of the game. This approach has enabled, for instance, the measurement of player centrality in passing networks, the identification of team-specific tactical patterns, and the assessment of a playing system’s robustness to disruptions such as injuries, providing insights that are not accessible through traditional analytical methods \cite{caicedo2020passing,ichinose2021robustness,gonccalves2017exploring,chacoma2022complexity,chacoma2025identification,li2025motif,yung2025using}.
 
-In this work, we propose a specific application of network theory to address a central problem in sports analytics: the objective and multidimensional comparison of team performance. Our approach consists of defining a rating system that is not based solely on final match outcomes, but on a set of performance metrics derived from event data. To this end, we construct one network per metric, where nodes represent teams and weighted edges encode their relative performance in direct matchups. Applying the algebraic graph decomposition method \textit{HodgeRank} \cite{jiang2011statistical,perotti2025analysis} {\color{red}[Agregué una referencia a mi paper]} to these networks, allows us to infer a scalar rating for each team in each dimension of the game, thereby offering a nuanced, process-based comparison. The specific metrics that feed this model are defined and justified in the following section.
+In this work, we propose a specific application of network theory to address a central problem in sports analytics: the objective and multidimensional comparison of team performance. Our approach consists of defining a rating system that is not based solely on final match outcomes, but on a set of performance metrics derived from event data. To this end, we construct one network per metric, where nodes represent teams and weighted edges encode their relative performance in direct matchups. Applying the algebraic graph decomposition method \textit{HodgeRank} \cite{jiang2011statistical,perotti2025analysis} to these networks, allows us to infer a scalar rating for each team in each dimension of the game, thereby offering a nuanced, process-based comparison. 
+%The specific metrics that feed this model are defined and justified in the following section.
 
 The construction of these multidimensional, process-based ratings has direct practical implications. A single ranking, such as the league table, summarizes outcomes but can obscure the mechanisms underlying them. By decomposing performance into interpretable components (e.g., pressure, chance creation, possession times), our framework provides a structural diagnosis. For coaching staffs, this makes it possible to identify teams that accumulate points despite poor performance in key metrics—an indication of potential unsustainability—or, conversely, teams whose strong process-level performance does not translate into results, suggesting inefficiency in decisive moments. Such information is crucial for informed decision-making in areas such as player recruitment, tactical design, and opponent-specific preparation, allowing resources to be directed toward the aspects of play that truly determine long-term competitive advantage.
+%
+The specific metrics that feed this model are defined and justified in the following section.
 
-This article is organized as follows {\color{red}[Va coma acá?]} to present the methodological framework and findings in a coherent manner. Section \ref{se:dym},  Data and Metrics, describes in detail the data collection process and sources, defines the eight performance metrics derived from match events, and explains the construction of the complex networks that represent competitive interactions between teams for each metric. Section \ref{se:theory}, Theoretical Framework, presents the algebraic foundations of the HodgeRank method, detailing how this graph decomposition technique is applied to infer ratings from the pairwise comparisons encoded in our networks. The main findings are presented in Section \ref{se:res}, Results, structured into four analytical subsections: (\ref{sse:rat}) an initial statistical analysis of the true rating and the validation of the hierarchical skill model; (\ref{sse:corr}) a global correlation analysis (Pearson coefficient) between the metric-based ratings and the true rating; (\ref{sse:ken}) a comparison of the resulting ordinal rankings using Kendall’s rank correlation coefficient; and (\ref{sse:comp}) the proposal and optimization of a composite rating, obtained as a weighted linear combination of the most relevant metric ratings. Finally, the article concludes with Section \ref{se:concl}, Discussion and Conclusions, which integrates and interprets the overall results, discusses their implications, outlines the limitations of the study, and proposes concrete directions for future research.
+This article is organized as follows, to present the methodological framework and findings in a coherent manner. Section \ref{se:dym},  Data and Metrics, describes in detail the data collection process and sources, defines the eight performance metrics derived from match events, and explains the construction of the complex networks that represent competitive interactions between teams for each metric. Section \ref{se:theory}, Theoretical Framework, presents the algebraic foundations of the HodgeRank method, detailing how this graph decomposition technique is applied to infer ratings from the pairwise comparisons encoded in our networks. The main findings are presented in Section \ref{se:res}, Results, structured into four analytical subsections: (\ref{sse:rat}) an initial statistical analysis of the true rating and the validation of the hierarchical skill model; (\ref{sse:corr}) a global correlation analysis (Pearson coefficient) between the metric-based ratings and the true rating; (\ref{sse:ken}) a comparison of the resulting ordinal rankings using Kendall’s rank correlation coefficient; and (\ref{sse:comp}) the proposal and optimization of a composite rating, obtained as a weighted linear combination of the most relevant metric ratings. Finally, the article concludes with Section \ref{se:concl}, Discussion and Conclusions, which integrates and interprets the overall results, discusses their implications, outlines the limitations of the study, and proposes concrete directions for future research.
 
 \section{Data and metrics}
 \label{se:dym}
@@ -67,7 +73,7 @@ In that article, the authors manually annotate all matches from the 2017--2018 s
 %
 In the reference system used to locate events in time and space, $t$ denotes the elapsed time since the start of the match, the coordinate $x$ represents the distance relative to the goal defended by the team generating the event, and the coordinate $y$ represents the distance relative to the right touchline. Spatial coordinates are expressed as percentages of the pitch length, such that, for example, $x=0$, $x=50$, and $x=100$ correspond to the team’s own goal line, the midfield line, and the opponent’s goal line, respectively.
 
-Within this framework, we define a ball possession interval (BPI) as the set given by a continuous sequence of events {\color{red} [Yo pondría ``given by a sequence of consecutive events'']]} generated by a single team. Note that each BPI contains information from only one team.  
+Within this framework, we define a ball possession interval (BPI) as the set given by a sequence of consecutive events generated by a single team. Note that each BPI contains information from only one team.  
 We collect all BPIs from all teams in each league, and from these data we extract metrics that allow us to detect some of the tactical resources employed by teams within that temporal window of the match.  
 The metrics considered in our analysis are based on those proposed by J. Fernández-Navarro in \cite{fernandez2018influence}. The study of these metrics was also employed in a previous work to identify characteristic football playing styles \cite{chacoma2025data}.  
 Below, we describe each of these metrics in detail:
@@ -81,7 +87,7 @@ Below, we describe each of these metrics in detail:
 
     \item {\it Build up.} If within a BPI it is verified that $\bar{x}>60$, i.e., the possession develops predominantly in the opponent’s half, the total possession time is reported. Otherwise, a value of $0$ is reported. This metric captures possession time in situations where the team strongly occupies the opponent’s territory.  
 
-    \item {\it Midfield play.} If within a BPI it is observed that $\bar{x}\leq60$ and $\bar{x}\geq40$ {\color{red}[Yo pondría al revés, i.e. ``$\bar{x}\geq40$ and $\bar{x}\leq60$'']}, i.e., the possession develops predominantly in the central area of the pitch, the total possession time is reported; otherwise, a value of $0$ is reported. The purpose of this variable is to measure the time the team spends in the midfield zone.
+    \item {\it Midfield play.} If within a BPI it is observed that $\bar{x}\geq40$ and $\bar{x}\leq60$, i.e., the possession develops predominantly in the central area of the pitch, the total possession time is reported; otherwise, a value of $0$ is reported. The purpose of this variable is to measure the time the team spends in the midfield zone.
 
     \item {\it Flow rate.} For each BPI satisfying $\bar{x}\geq50$, we compute the temporal differences between all consecutive events and calculate their mean value, $\bar{dt}$. The metric is then defined as $1/\bar{dt}$. In this way, this metric provides a measure of how quickly the team circulates the ball in the opponent’s half.
 
@@ -101,38 +107,32 @@ After computing the metric values for each BPI, we analyzed their empirical dist
 Subsequently, we aggregated the information by match and by team, summing the values obtained for each metric. In this way, for example, the feature {\it Shots} quantifies the total number of shots on goal taken by a team in a given match.  
 Similarly, the feature {\it Build up} quantifies the net amount of time during which a team sustained an attacking possession against its opponent in that match.
 %
-Note that in the 2017--2018 season, teams in the Spanish, English, French, and Italian leagues played 38 matches. Therefore, when considering data from the top 4 teams in each league, each league contributes a total of $38\times4=152$ samples to the dataset.  
-In the German league, due to the smaller number of teams, 34 matches were played, and thus this league contributes 136 samples.
-%
-Consequently, the data matrix consists of 744 rows and 10 columns.  
-Finally, in a separate dataset we collected meta-data associated with each sample, which are later used in the analysis: the team corresponding to each sample, the league it belongs to, and the final position in the league table.
+%Note that in the 2017--2018 season, teams in the Spanish, English, French, and Italian leagues played 38 matches. Therefore, when considering data from the top 4 teams in each league, each league contributes a total of $38\times4=152$ samples to the dataset. In the German league, due to the smaller number of teams, 34 matches were played, and thus this league contributes 136 samples.
+%Consequently, the data matrix consists of 744 rows and 10 columns.  
+Finally, in a separate dataset we collected meta-data associated with each BPI, which are later used in the analysis: the team corresponding to each one, the league it belongs to, and the final position in the league table.
 
-\subsection{Representation as complex networks}
+\subsection{Representation as weighted fully connected networks}
 
-{\color{red} [Me resulta raro el t\'ermino ``complex networks'' teniendo en cuenta que son redes totalmente conectadas.]}
-
-In what follows, we present our proposal to represent performance metrics in terms of complex networks.  
-We define $M(i,j,g)$ as the performance metric corresponding to team $i$ when facing team $j$ in match $g$. For example, this quantity may represent the number of shots on goal taken by FC Barcelona {\color{red} [Agregaría ``represented by $i$'']} when playing against Real Madrid {\color{red} [Agregaría ``represented by $j$'']} in the first encounter {\color{red} [Yo agregaría ``$g$'']} of the Spanish league {\it La Liga}.  
+In what follows, we present our proposal to represent performance metrics in terms of networks.  
+We define $M(i,j,g)$ as the performance metric corresponding to team $i$ when facing team $j$ in match $g$. For example, this quantity may represent the number of shots on goal taken by FC Barcelona, represented by $i$, when playing against Real Madrid, represented by $j$, in the first encounter $g$ of the Spanish league {\it La Liga}.  
 %
 In our dataset, all teams participated in a round-robin league format, facing each opponent twice: a first-leg match ($g_1$) and a second-leg match ($g_2$). Using the information from both encounters, we define an aggregated metric that summarizes the performance observed between the two teams over the course of the season:
-
+%
 $$
-M(i,j) = \sum_{g_1, g_2} M(i,j,g).
+M(i,j) = \sum_{g= g_1, g_2} M(i,j,g).
 $$
-{\color{red} [La sumatoria sobre $g_1$ y $g_2$ es una notación rara, ya que la expresi\'on dentro de la sumatoria depende de $g$, pero no de $g_1$ y $g_2$.]}
 %
 In the previous example, $M(i,j)$ represents the total number of shots on goal taken by FC Barcelona against Real Madrid across both matches of the tournament.
 %
 By computing $M(i,j)$ for each pair of teams in a league $L$, it is possible to represent these performance relationships by means of a directed and weighted graph $G(L,M)$, whose weights are defined as
-
+%
 $$
 f_{ij} = M(j,i) - M(i,j).
 $$
 %
-{\color{red} [La siguiente oraci\'on es un poco redundante?]}
 Note that, in this representation, $f_{ij} < 0$ indicates that team $i$ outperformed team $j$ with respect to the metric under consideration.
 %
-Within this framework, we construct a total of 50 graphs, corresponding to 8 graphs per league, each one associated with a different performance metric.
+Within this framework, we construct a total of 40 graphs, corresponding to 8 graphs per league, each one associated with a different performance metric.
 
 
 
@@ -140,7 +140,6 @@ Within this framework, we construct a total of 50 graphs, corresponding to 8 gra
 \section{Theoretical Framework}
 \label{se:theory}
 
-{\color{red}
 To infer ratings $w_i$ from given comparison values $f_{ij}$, we seek to minimize the sum
 $$
 \chi(w)
@@ -165,7 +164,7 @@ $$
 where $g$, $s$, and $h$ represent gradient, curl, and harmonic components respectively.
 In this setup, $w$ is a 0-cochain and is related to the gradient by $g=d_0 w$, where the coboundary operator $d_0$ is the discrete gradient operator.
 This decomposition can be efficiently found by solving a pair of singular linear systems~\cite{perotti2025analysis}.
-}
+
 
 \section{Resultados}
 \label{se:res}
@@ -173,7 +172,9 @@ This decomposition can be efficiently found by solving a pair of singular linear
 \subsection{Statistics of the true rating}
 \label{sse:rat}
 
-The purpose of this section is to define a statistical model for the probability distribution of the true rating, $R_T$, defined as the total number of points obtained by a team over the course of a league season.
+Given that this work introduces a performance-based rating, it is essential to first analyze the statistics of the traditional system—namely, the ranking derived from accumulated points.
+%
+Therefore, the purpose of this section is to define a statistical model for the probability distribution of the true rating, $R_T$, defined as the total number of points obtained by a team over the course of a league season.
 %
 $R_T$ is a stochastic variable that depends on the number of matches won, drawn, and lost by teams in the league.
 %
@@ -247,10 +248,13 @@ With these ingredients, we can finally write the theoretical probability distrib
 P(R_T = r_T) = \sum_X P( W=w, D=d ),
 \end{equation}
 %
-$$
-X = \{ w,d>0,\; 3w+d=r_T,\; w+d \le n \}.
-$$
+where the sum runs over the set of configurations $X$ defined by the constraints:
+%X = \{ w,d>0,\; 3w+d=r_T,\; w+d \le n \}.
 %
+$$
+X = \{ (w, d) \in \mathbb{N}_0^2 : 3w + d = r_T, w + d \le n \}.
+$$
+
 The degrees of freedom provided by the parameters $\mu_w$, $\mu_d$, $\sigma_w$, $\sigma_d$, and $\rho$ allow the theoretical curve in Eq.~\ref{theo} to be fitted to the empirical distribution.
 %
 The fit was performed using the dataset associated with the English, French, Italian, and Spanish leagues. For this analysis, we chose not to include data from the German league, as its competition involves a smaller number of teams (18), which leads to a slightly different distribution of true rating values compared to the other leagues, where a total of 20 teams participate.
