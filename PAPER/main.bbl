@@ -160,6 +160,12 @@ Xiaoye Jiang, Lek-Heng Lim, Yuan Yao, and Yinyu Ye.
 \newblock Statistical ranking and combinatorial hodge theory.
 \newblock {\em Mathematical Programming}, 127(1):203--244, 2011.
 
+\bibitem{perotti2025analysis}
+Juan~I. Perotti.
+\newblock Analysis of the inference of ratings and rankings in complex networks
+  using discrete exterior calculus on higher-order networks.
+\newblock {\em Phys. Rev. E}, 111:034306, Mar 2025.
+
 \bibitem{pappalardo2019public}
 Luca Pappalardo, Paolo Cintia, Alessio Rossi, Emanuele Massucco, Paolo
   Ferragina, Dino Pedreschi, and Fosca Giannotti.
@@ -176,8 +182,8 @@ Javier Fernandez-Navarro, Luis Fradua, Asier Zubillaga, and Allistair~P.
 
 \bibitem{grady2010discrete}
 Leo~J. Grady and Jonathan~R. Polimeni.
-\newblock {\em {Discrete Calculus: Applied Analysis on Graphs for Computational
-  Science}}.
+\newblock {\em Discrete Calculus: Applied Analysis on Graphs for Computational
+  Science}.
 \newblock Springer, 2010.
 
 \bibitem{lim2020hodge}
@@ -190,12 +196,6 @@ Ginestra Bianconi.
 \newblock {\em Higher-Order Networks}.
 \newblock Elements in the Structure and Dynamics of Complex Networks. Cambridge
   University Press, 2021.
-
-\bibitem{perotti2025analysis}
-Juan~I. Perotti.
-\newblock Analysis of the inference of ratings and rankings in complex networks
-  using discrete exterior calculus on higher-order networks.
-\newblock {\em Phys. Rev. E}, 111:034306, Mar 2025.
 
 \bibitem{kendall1938new}
 Maurice~G Kendall.
