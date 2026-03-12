@@ -15,6 +15,9 @@
 \title{Ranking football teams via performance-driven higher-order networks}
 
 
+%Sugerencia: Ranking football teams via higher-order networks based on performance metrics
+
+
 \author{Andres Chacoma}
 \email{achacoma@df.uba.ar}
 \affiliation{Universidad de Buenos Aires, Facultad de Ciencias Exactas y Naturales, Departamento de Física. Buenos Aires, Argentina}
@@ -51,7 +54,7 @@ Its global popularity, the growing availability of high-resolution data (event d
 Within the methodological toolkit of complex systems, complex network theory has emerged as a particularly powerful approach for football analysis. By modeling players or teams as nodes and their interactions (passes, duels, or competitive comparisons) as edges, it becomes possible to quantify and visualize the structural organization of the game. This approach has enabled, for instance, the measurement of player centrality in passing networks, the identification of team-specific tactical patterns, and the assessment of a playing system’s robustness to disruptions such as injuries, providing insights that are not accessible through traditional analytical methods \cite{caicedo2020passing,ichinose2021robustness,gonccalves2017exploring,chacoma2022complexity,chacoma2025identification,li2025motif,yung2025using}.
 
 In this work, we propose a specific application of network theory to address a central problem in sports analytics: the objective and multidimensional comparison of team performance. Our approach consists of defining a rating system that is not based solely on final match outcomes, but on a set of performance metrics derived from event data. To this end, we construct one network per metric, where nodes represent teams and weighted edges encode their relative performance in direct matchups. Applying the algebraic graph decomposition method \textit{HodgeRank} \cite{jiang2011statistical,perotti2025analysis} to these networks, allows us to infer a scalar rating for each team in each dimension of the game, thereby offering a nuanced, process-based comparison. 
-
+%The specific metrics that feed this model are defined and justified in the following section.
 
 The construction of these multidimensional, process-based ratings has direct practical implications. A single ranking, such as the league table, summarizes outcomes but can obscure the mechanisms underlying them. By decomposing performance into interpretable components (e.g., pressure, chance creation, possession times), our framework provides a structural diagnosis. For coaching staffs, this makes it possible to identify teams that accumulate points despite poor performance in key metrics—an indication of potential unsustainability—or, conversely, teams whose strong process-level performance does not translate into results, suggesting inefficiency in decisive moments. Such information is crucial for informed decision-making in areas such as player recruitment, tactical design, and opponent-specific preparation, allowing resources to be directed toward the aspects of play that truly determine long-term competitive advantage.
 %
@@ -103,7 +106,9 @@ After computing the metric values for each BPI, we analyzed their empirical dist
 %
 Subsequently, we aggregated the information by match and by team, summing the values obtained for each metric. In this way, for example, the feature {\it Shots} quantifies the total number of shots on goal taken by a team in a given match.  
 Similarly, the feature {\it Build up} quantifies the net amount of time during which a team sustained an attacking possession against its opponent in that match.
-%  
+%
+%Note that in the 2017--2018 season, teams in the Spanish, English, French, and Italian leagues played 38 matches. Therefore, when considering data from the top 4 teams in each league, each league contributes a total of $38\times4=152$ samples to the dataset. In the German league, due to the smaller number of teams, 34 matches were played, and thus this league contributes 136 samples.
+%Consequently, the data matrix consists of 744 rows and 10 columns.  
 Finally, in a separate dataset we collected meta-data associated with each BPI, which are later used in the analysis: the team corresponding to each one, the league it belongs to, and the final position in the league table.
 
 \subsection{Representation as weighted fully connected networks}
@@ -244,6 +249,7 @@ P(R_T = r_T) = \sum_X P( W=w, D=d ),
 \end{equation}
 %
 where the sum runs over the set of configurations $X$ defined by the constraints:
+%X = \{ w,d>0,\; 3w+d=r_T,\; w+d \le n \}.
 %
 $$
 X = \{ (w, d) \in \mathbb{N}_0^2 : 3w + d = r_T, w + d \le n \}.
@@ -434,220 +440,8 @@ This work used computational resources from UNC Supercómputo (CCAD), which is p
 
 
 % BIBLIO
-%\bibliographystyle{unsrt}
-%\bibliography{biblio}
-
-\begin{thebibliography}{10}
-
-\bibitem{barthelemy2025fragility}
-Marc Barthelemy.
-\newblock Fragility of chess positions: Measure, universality, and tipping
-  points.
-\newblock {\em Physical Review E}, 111(1):014314, 2025.
-
-\bibitem{Clauset2015safe}
-A~Clauset, M~Kogan, and S~Redner.
-\newblock Safe leads and lead changes in competitive team sports.
-\newblock {\em Physical Review E}, 91(6):062815, 2015.
-
-\bibitem{buldu2019defining}
-Javier~M Buld{\'u}, Javier Busquets, Ignacio Echegoyen, and F~Seirul.~lo.
-\newblock Defining a historic football team: Using network science to analyze
-  guardiola’s fc barcelona.
-\newblock {\em Scientific reports}, 9(1):13602, 2019.
-
-\bibitem{Ribeiro2012anomalous}
-Haroldo~V Ribeiro, Satyam Mukherjee, and Xiao Han~T Zeng.
-\newblock Anomalous diffusion and long-range correlations in the score
-  evolution of the game of cricket.
-\newblock {\em Physical Review E}, 86(2):022102, 2012.
-
-\bibitem{Chacoma2022simple}
-Andr{\'e}s Chacoma and Orlando~V Billoni.
-\newblock Simple mechanism rules the dynamics of volleyball.
-\newblock {\em Journal of Physics: Complexity}, 3(3):035006, 2022.
-
-\bibitem{Chacoma2023probabilistic}
-Andr{\'e}s Chacoma and Orlando~V Billoni.
-\newblock Probabilistic model for padel games dynamics.
-\newblock {\em Chaos, Solitons \& Fractals}, 174:113784, 2023.
-
-\bibitem{chacoma2025emergent}
-Andr{\'e}s Chacoma and Orlando~V Billoni.
-\newblock Emergent complexity in the decision-making process of chess players.
-\newblock {\em Scientific Reports}, 15(1):23234, 2025.
-
-\bibitem{zappala2022role}
-Chiara Zappal{\`a}, Alessandro Pluchino, Andrea Rapisarda, Alessio~Emanuele
-  Biondo, and Pawel Sobkowicz.
-\newblock On the role of chance in fencing tournaments: An agent-based
-  approach.
-\newblock {\em Plos one}, 17(5):e0267541, 2022.
-
-\bibitem{ibanez2018relative}
-Sergio~J Ib{\'a}{\~n}ez, Aitor Mazo, Juarez Nascimento, and Javier
-  Garc{\'\i}a-Rubio.
-\newblock The relative age effect in under-18 basketball: Effects on
-  performance according to playing position.
-\newblock {\em PloS one}, 13(7):e0200408, 2018.
-
-\bibitem{galeano2022using}
-Javier Galeano, Miguel-{\'A}ngel G{\'o}mez, Fernando Rivas, and Javier~M
-  Buld{\'u}.
-\newblock Using markov chains to identify player’s performance in badminton.
-\newblock {\em Chaos, Solitons \& Fractals}, 165:112828, 2022.
-
-\bibitem{silva2016sports}
-Pedro Silva, Lu{\'\i}s Vilar, Keith Davids, Duarte Ara{\'u}jo, and J{\'u}lio
-  Garganta.
-\newblock Sports teams as complex adaptive systems: manipulating player numbers
-  shapes behaviours during football small-sided games.
-\newblock {\em SpringerPlus}, 5(1):191, 2016.
-
-\bibitem{ashford2021understanding}
-Michael Ashford, Andrew Abraham, and Jamie Poolton.
-\newblock Understanding a player’s decision-making process in team sports: a
-  systematic review of empirical evidence.
-\newblock {\em Sports}, 9(5):65, 2021.
-
-\bibitem{martinez2020spatial}
-Johann~H Mart{\'\i}nez, David Garrido, Jos{\'e}~L Herrera-Diestra, Javier
-  Busquets, Ricardo Sevilla-Escoboza, and Javier~M Buld{\'u}.
-\newblock Spatial and temporal entropies in the spanish football league: A
-  network science perspective.
-\newblock {\em Entropy}, 22(2):172, 2020.
-
-\bibitem{cao2023football}
-Xiaoxiang Cao, Xiaodong Zhao, Huan Tang, Nianchun Fan, and Fateh Zereg.
-\newblock Football players’ strength training method using image processing
-  based on machine learning.
-\newblock {\em Plos one}, 18(6):e0287433, 2023.
-
-\bibitem{yamamoto2024theory}
-Ken Yamamoto, Seiya Uezu, Keiichiro Kagawa, Yoshihiro Yamazaki, and Takuma
-  Narizuka.
-\newblock Theory and data analysis of player and team ball possession time in
-  football.
-\newblock {\em Physical Review E}, 109(1):014305, 2024.
-
-\bibitem{chacoma2020modeling}
-A~Chacoma, Nahuel Almeira, Juan~Ignacio Perotti, and Orlando~Vito Billoni.
-\newblock Modeling ball possession dynamics in the game of football.
-\newblock {\em Physical Review E}, 102(4):042120, 2020.
-
-\bibitem{chacoma2021stochastic}
-A~Chacoma, N~Almeira, JI~Perotti, and OV~Billoni.
-\newblock Stochastic model for football's collective dynamics.
-\newblock {\em Physical Review E}, 104(2):024110, 2021.
-
-\bibitem{chacoma2025data}
-Andres Chacoma and Orlando~V Billoni.
-\newblock Data-driven approach to defining football styles in major leagues.
-\newblock {\em Chaos, Solitons \& Fractals}, 200:116926, 2025.
-
-\bibitem{amichay2025characterizing}
-Guy Amichay, Hugo Silva, Jo{\~a}o Brito, and Rui Marcelino.
-\newblock Characterizing the spatial structures of competing football teams.
-\newblock {\em Scientific Reports}, 15(1):35217, 2025.
-
-\bibitem{caicedo2020passing}
-Sergio Caicedo-Parada, Carlos Lago-Pe{\~n}as, and Enrique Ortega-Toro.
-\newblock Passing networks and tactical action in football: A systematic
-  review.
-\newblock {\em International Journal of Environmental Research and Public
-  Health}, 17(18):6649, 2020.
-
-\bibitem{ichinose2021robustness}
-Genki Ichinose, Tomohiro Tsuchiya, and Shunsuke Watanabe.
-\newblock Robustness of football passing networks against continuous node and
-  link removals.
-\newblock {\em Chaos, Solitons \& Fractals}, 147:110973, 2021.
-
-\bibitem{gonccalves2017exploring}
-Bruno Gon{\c{c}}alves, Diogo Coutinho, Sara Santos, Carlos Lago-Penas, Sergio
-  Jim{\'e}nez, and Jaime Sampaio.
-\newblock Exploring team passing networks and player movement dynamics in youth
-  association football.
-\newblock {\em PloS one}, 12(1):e0171156, 2017.
-
-\bibitem{chacoma2022complexity}
-A~Chacoma, OV~Billoni, and MN~Kuperman.
-\newblock Complexity emerges in measures of the marking dynamics in football
-  games.
-\newblock {\em Physical Review E}, 106(4):044308, 2022.
-
-\bibitem{chacoma2025identification}
-Andr{\'e}s Chacoma.
-\newblock Identification and optimization of high-performance passing networks
-  in football.
-\newblock {\em Physical Review E}, 111(4):044313, 2025.
-
-\bibitem{li2025motif}
-Ming-Xia Li, Li-Gong Xu, and Wei-Xing Zhou.
-\newblock Motif analysis and passing behavior in football passing networks.
-\newblock {\em Chaos, Solitons \& Fractals}, 190:115750, 2025.
-
-\bibitem{yung2025using}
-Kate~KY Yung, Paul~PY Wu, Karen aus~der F{\"u}nten, Anne Hecksteden, and Tim
-  Meyer.
-\newblock Using a bayesian network to classify time to return to sport based on
-  football injury epidemiological data.
-\newblock {\em PloS one}, 20(3):e0314184, 2025.
-
-\bibitem{jiang2011statistical}
-Xiaoye Jiang, Lek-Heng Lim, Yuan Yao, and Yinyu Ye.
-\newblock Statistical ranking and combinatorial hodge theory.
-\newblock {\em Mathematical Programming}, 127(1):203--244, 2011.
-
-\bibitem{perotti2025analysis}
-Juan~I. Perotti.
-\newblock Analysis of the inference of ratings and rankings in complex networks
-  using discrete exterior calculus on higher-order networks.
-\newblock {\em Phys. Rev. E}, 111:034306, Mar 2025.
-
-\bibitem{pappalardo2019public}
-Luca Pappalardo, Paolo Cintia, Alessio Rossi, Emanuele Massucco, Paolo
-  Ferragina, Dino Pedreschi, and Fosca Giannotti.
-\newblock A public data set of spatio-temporal match events in soccer
-  competitions.
-\newblock {\em Scientific data}, 6(1):236, 2019.
-
-\bibitem{fernandez2018influence}
-Javier Fernandez-Navarro, Luis Fradua, Asier Zubillaga, and Allistair~P.
-  McRobert.
-\newblock Influence of contextual variables on styles of play in soccer.
-\newblock {\em International Journal of Performance Analysis in Sport},
-  18(3):423--436, 2018.
-
-\bibitem{grady2010discrete}
-Leo~J. Grady and Jonathan~R. Polimeni.
-\newblock {\em Discrete Calculus: Applied Analysis on Graphs for Computational
-  Science}.
-\newblock Springer, 2010.
-
-\bibitem{lim2020hodge}
-Lek-Heng Lim.
-\newblock Hodge laplacians on graphs.
-\newblock {\em SIAM Review}, 62(3):685--715, 2020.
-
-\bibitem{bianconi2021higher}
-Ginestra Bianconi.
-\newblock {\em Higher-Order Networks}.
-\newblock Elements in the Structure and Dynamics of Complex Networks. Cambridge
-  University Press, 2021.
-
-\bibitem{kendall1938new}
-Maurice~G Kendall.
-\newblock A new measure of rank correlation.
-\newblock {\em Biometrika}, 30(1-2):81--93, 1938.
-
-\bibitem{elo1978rating}
-Arpad~E. Elo.
-\newblock {\em The Rating of Chess Players, Past and Present}.
-\newblock Arco Publishing, New York, 1978.
-
-\end{thebibliography}
-
+\bibliographystyle{unsrt}
+\bibliography{biblio}
 
 
 \pagebreak
