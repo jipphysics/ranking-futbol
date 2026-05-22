@@ -1,4 +1,23 @@
----
+
+## Referato 1
+
+6 de Mayo de 2026
+
+Preparando las respuestas en
+
+https://docs.google.com/document/d/1eL3EnBvYKVy75SuTU7Ivw2kXBqd3xaaHuyE6xItCtuA/edit?usp=sharing
+
+
+Version revisada en 
+
+/PAPER/main_revised_1.tex
+
+
+# Enviado 1
+
+Marzo-abril 2026
+
+
 ## Actualización 19/01/2026
 
 La version actual en main.tex es un draft decente para
