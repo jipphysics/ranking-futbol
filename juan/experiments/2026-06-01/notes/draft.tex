@@ -347,6 +347,79 @@ $$
 
 \section{Description of the experiments}
 
+In our numerical experiments we start with an empirically obtained cochain $f$ defined on the links, i.e.
+$$
+f 
+= 
+\sum_{ij \in K}
+f_{ij} e^{ij}.
+$$
+Then, we compute its Hodge decomposition to obtain the gradient component
+$$
+g 
+= 
+\sum_{ij \in K}
+g_{ij} e^{ij},
+$$
+the solenoidal component
+$$
+s 
+= 
+\sum_{ij \in K}
+s_{ij} e^{ij}
+$$
+and the harmonic component
+$$
+h 
+= 
+\sum_{ij \in K}
+h_{ij} e^{ij}.
+$$
+Notice, these are also quantities defined over the links (i.e., they look like vector potentials).
+The method also provides a ``scalar pontential'' or potential over the nodes $i$:
+$$
+w
+=
+\sum_i
+w_i e^i
+$$
+whose ``gradient'' produces the gradient component 
+$$
+g
+=
+dw
+$$
+of $f$.
+Crucially, modula an arbitrary constant that is chosen such that $w_i\geq 0$ together with the condition that the smallest rating is $0$, the components $w_i$ provide the ratings of the nodes.
+Additionally, the method provides a ``tensor potential'' or potential over the triangles $ijk$:
+$$
+u
+=
+\sum_{ijk}
+u_{ijk} e^{ijk}
+$$
+whose ``rotor'' produces the solenoidal component
+$$
+s
+=
+d^*
+u
+$$
+of $f$.
+
+\subsection{Discussion}
+
+The ratings $w_i$ in $w$ inferred from $f$ are basically determined by $g$ via the equation $g=dw$ previously mentioned.
+Hence, the part $f-g = s\oplus h$ of $f$ that is not explained by $g$ somehow determines how ``inconsistent'' are the inferred ratings.
+In particular, $h=0$ for a fully connected network.
+As a consequence, we can say that the ratio
+$$
+\frac{|s|}{|f|} \in [0,1]
+$$
+somehow quantifies how ``inconsistent'' are the inferred ratings.
+If the ratio is zero, the ratings are fully consistent.
+If the ratio is one, the ratings make no sense.
+
 %\section{Introducción}
 
 %Complex systems...~\cite{grady2010discrete}.
