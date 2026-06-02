@@ -322,11 +322,25 @@ since it can be shown that $d^2 = (d^*)^2 = 0$.
 \subsection{Hodge decomposition}
 
 
-Any cochain $f$ admits a so called Hodge decomposition
+Any cochain $f\in C^*$ admits a so called Hodge decomposition
 $$
 f
 =
 g\oplus s\oplus h
+$$
+where $g,s,h\in C^*$ are unique given $f$.
+In particular, the components $g$, $s$ and $h$ are called the gradient, solenoidal and harmonic components of $f$ and are such that:
+$$
+Lh=0
+$$
+i.e. $h$ belongs to the kernel of the Hodge Laplacian $L$,
+there exists a $w\in C^*$ such that 
+$$
+g=dw
+$$ 
+and, there exists a $u\in C^*$ such that 
+$$
+s=d^*u.
 $$
 
 
