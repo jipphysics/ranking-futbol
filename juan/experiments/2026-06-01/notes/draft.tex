@@ -206,7 +206,7 @@ The set $\{e_{i_0...i_k}:i_0...i_k\in K\}$ denotes the canonical basis of $C$.
 Any chain $c\in C$ can be written as
 $$
 c = 
-\sum_{k=0}^N 
+\sum_{k=0}^{N-1}
 \sum_{i_0...i_k \in K}
 c^{i_0...i_k}
 e_{i_0...i_k}
@@ -231,7 +231,7 @@ $$
 Any cochain $f\in C^*$ can be written as
 $$
 f = 
-\sum_{k=0}^N 
+\sum_{k=0}^{N-1}
 \sum_{i_0...i_k \in K}
 f_{i_0...i_k}
 e^{i_0...i_k}
@@ -250,6 +250,7 @@ e_{i_0...i_k}
 (-1)^k
 e_{i_0...i_{j-1}i_{j+1}...i_k}
 $$
+In other words, it maps a $k$-chain $e_{i_0...i_k}$ to the alternating linear combinations of the $(k-1)$-chains associated to the  ``boundary'' of the simplex $i_0...i_k$.
 It mimics the behavior of the boundary operator of a ``smooth'' topological space.
 
 \subsection{Coboundary operator}
