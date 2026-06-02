@@ -407,7 +407,7 @@ u
 $$
 of $f$.
 
-\subsection{Discussion}
+\section{Discussion}
 
 The ratings $w_i$ in $w$ inferred from $f$ are basically determined by $g$ via the equation $g=dw$ previously mentioned.
 Hence, the part $f-g = s\oplus h$ of $f$ that is not explained by $g$ somehow determines how ``inconsistent'' are the inferred ratings.
@@ -419,6 +419,63 @@ $$
 somehow quantifies how ``inconsistent'' are the inferred ratings.
 If the ratio is zero, the ratings are fully consistent.
 If the ratio is one, the ratings make no sense.
+Just to be clear, here,
+$$
+|s|^2 = \sum_{ij} |s_{ij}|^2
+$$
+and
+$$
+|f|^2 = \sum_{ij} |f_{ij}|^2,
+$$
+i.e. these are the standard euclidean norms.
+
+\section{Description of the data obtained from the experiments}
+
+In the folder:
+
+\quad \verb+ranking-futbol/juan/experiments/2026-06-01/txt/+
+
+we provide text files such as:
+\begin{itemize}
+\item 
+\verb+LIGA-METRIC-hodge-decomposition-nodes.txt+
+\item 
+\verb+LIGA-METRIC-hodge-decomposition-links.txt+
+\item 
+\verb+LIGA-METRIC-hodge-decomposition-triangles.txt+
+\end{itemize}
+where \verb+LIGA+ is any of the leagues and \verb+METRIC+ is any of the metrics.
+
+The first file:
+
+\quad \verb+LIGA-METRIC-hodge-decomposition-nodes.txt+
+
+contains the columns:
+
+\quad \verb+i w_i r_i tr_i+
+
+denoting the label or number associated to each node $i$, the corresponding rating $w_i$, the corresponding ranking $r_i$ and the corresponding true rating \verb+tr_i+.
+
+The second file:
+
+\quad \verb+LIGA-METRIC-hodge-decomposition-links.txt+
+
+contains the columns:
+
+\quad \verb+l i j f_ij g_ij s_ij h_ij+
+
+denoting the label or number $l$ associated to each link, the corresponding nodes $i$ and $j$, and the corresponding components of $f$, $g$, $s$ and $h$ on such link.
+
+The third file:
+
+\quad \verb+LIGA-METRIC-hodge-decomposition-triangles.txt+
+
+contains the columns:
+
+\quad \verb+t i j k u_ijk+
+
+denoting the label or number $t$ associated to each triangle, the corresponding nodes $i$, $j$ and $k$, and the corresponding components of the $u$.
+
 
 %\section{Introducción}
 
