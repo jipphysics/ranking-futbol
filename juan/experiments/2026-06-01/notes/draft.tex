@@ -444,39 +444,54 @@ we provide text files such as:
 \verb+LIGA-METRIC-hodge-decomposition-links.txt+
 \item 
 \verb+LIGA-METRIC-hodge-decomposition-triangles.txt+
+\item 
+\verb+LIGA-METRIC-hodge-decomposition-globals.txt+
 \end{itemize}
-where \verb+LIGA+ is any of the leagues and \verb+METRIC+ is any of the metrics.
+where \verb+LIGA+ and \verb+METRIC+ represent any of the leagues and metrics.
 
-The first file:
+\begin{itemize}
+
+\item The first file:
 
 \quad \verb+LIGA-METRIC-hodge-decomposition-nodes.txt+
 
-contains the columns:
+\noindent contains the columns:
 
-\quad \verb+i w_i r_i tr_i+
+\quad \verb+i w[i]=w_i r[i]=r_i tr[i]=tr_i+
 
-denoting the label or number associated to each node $i$, the corresponding rating $w_i$, the corresponding ranking $r_i$ and the corresponding true rating \verb+tr_i+.
+\noindent denoting the label or number associated to each node $i$ (which it is also the true ranking), the corresponding inferred rating $w_i$, the corresponding inferred ranking $r_i$ and the corresponding true rating \verb+tr_i+ from the final position in the table (not from the metrics).
 
-The second file:
+\item The second file:
 
 \quad \verb+LIGA-METRIC-hodge-decomposition-links.txt+
 
-contains the columns:
+\noindent contains the columns:
 
-\quad \verb+l i j f_ij g_ij s_ij h_ij+
+\quad \verb+l i j f[l]=f_ij g[l]=g_ij s[l]=s_ij h[l]=h_ij+
 
-denoting the label or number $l$ associated to each link, the corresponding nodes $i$ and $j$, and the corresponding components of $f$, $g$, $s$ and $h$ on such link.
+\noindent denoting the label or number $l$ associated to each link, the corresponding nodes $i$ and $j$, and the corresponding components of $f$, $g$, $s$ and $h$ on such link.
 
-The third file:
+\item The third file:
 
 \quad \verb+LIGA-METRIC-hodge-decomposition-triangles.txt+
 
-contains the columns:
+\noindent contains the columns:
 
-\quad \verb+t i j k u_ijk+
+\quad \verb+t i j k u[t]=u_ijk+
 
-denoting the label or number $t$ associated to each triangle, the corresponding nodes $i$, $j$ and $k$, and the corresponding components of the $u$.
+\noindent denoting the label or number $t$ associated to each triangle, the corresponding nodes $i$, $j$ and $k$, and the corresponding components of the $u$.
 
+\item The fourth file:
+
+\quad \verb+LIGA-METRIC-hodge-decomposition-globals.txt+
+
+\noindent contains the columns:
+
+\quad \verb+|f| |g| |s| |h| |u|+
+
+\noindent denoting the norm of the corresponding vectors in $C^*$.
+These are global characteristics.
+\end{itemize}
 
 %\section{Introducción}
 
