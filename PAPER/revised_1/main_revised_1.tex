@@ -841,7 +841,9 @@ Bars with hatching indicate cases for which the $p$-value exceeds $0.05$. In the
 \begin{figure}[t!]
 \centering
 \includegraphics[width=1.\textwidth]{IG.pdf}
-\caption{}
+\caption{
+Indicador de inconsistencia, $I$. Cada panel se corresponde con una metrica de performance y loas barras muestran los valores de $I$ obtenidos para cada liga. Dentro de cada panel las barras estan ordenadas de manera ascendente respecto de $I$. Los paneles estan tambien ordenados de manera ascendente respecto del valor promedio por metrica, $\overline{I}$.
+}
 \label{fi:I1}
 \end{figure}
 
@@ -850,7 +852,10 @@ Bars with hatching indicate cases for which the $p$-value exceeds $0.05$. In the
 \begin{figure}[t!]
 \centering
 \includegraphics[width=1.\textwidth]{fig5.pdf}
-\caption{}
+\caption{
+(a) Relacion entre el coeficiente de incosistencia, $I$, y el valor de kendall, $\tau$, para todas las metricas y ligas estudiadas. La regression lineal, evidencia el efecto de la incositencia en la correlacion del ranking obtenido con el método respecto del ranking real.
+(b) Relación entre el promedio de la incosistencia evaluada por liga, $\overline{I}$, y la dispersión cuantificada a partir de la desviacion estandar, $SD(I)$. La lineas punteadas muestran a modo de referencia el centro de la distribución de puntos.
+}
 \label{fi:I2}
 \end{figure}
 
@@ -859,7 +864,11 @@ Bars with hatching indicate cases for which the $p$-value exceeds $0.05$. In the
 \begin{figure}[t!]
 \centering
 \includegraphics[width=1.\textwidth]{lasso1.pdf}
-\caption{}
+\caption{Visualización de variables utilizadas para la elección del parámetro $\alpha$ de la regresion Lasso.
+(a) Efecto del valor de penalización $\alpha$ en la función de perdida de la regresión, cuantificado a partir del valor $MSE$, en el caso de la liga inglesa.
+(b) Efecto del valor de penalización $\alpha$ en el rendimiento, cuantificado a travez de $R^2$, y efecto en el numero de variables con coeficientes distinto de cero de la regresión, $N_v$.
+Paneles (c) y (d) idem (a) y (b), respectivamente, pero para el caso de la liga española.
+}
 \label{fi:lasso1}
 \end{figure}
 
@@ -923,7 +932,7 @@ Shots & 1.558 &  \\
 
 \begin{table}[htbp]
 \centering
-\caption{}
+\caption{Valores de correlación de Kendall obtenidos al constrasta el ranking real con (i) el ranking obtenido a partir del metodo HodgeRank, $\tau_{HR}$, y (ii) el ranking obtenido a partir del metodo Bradley-Terry, $\tau_{BT}$. El resultado se muestra para todas las metricas en todas la ligas. Los valores indicados con $^*$, indican que la correlación obtenida no es estadisticamente significativa ($p\text{-value}>0.05$).}
 \label{tab:comp}
 \small % Ajuste de tamaño 
 %
